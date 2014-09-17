@@ -179,7 +179,7 @@ Drawing.SphereGraph = function(options) {
     // end sphere geom JHE
 
     // Create node geometry (will be used in drawNode())
-    geometry = new THREE.SphereGeometry( 25, 25, 0 );
+    geometry = new THREE.SphereGeometry( 50, 25, 0 );
 
     // Create node selection, if set
     if(that.selection) {
@@ -311,7 +311,7 @@ Drawing.SphereGraph = function(options) {
    *  Create an edge object (line) and add it to the scene.
    */
   function drawEdge(source, target) {
-    material = new THREE.LineBasicMaterial( { color: 0xCCCCCC, opacity: 0.5, linewidth: 0.5 } );
+    material = new THREE.LineBasicMaterial( { color: 0xCCCCCC, opacity: 0.5, linewidth: 1 } );
     var tmp_geo = new THREE.Geometry();
 
     tmp_geo.vertices.push(source.data.draw_object.position);
