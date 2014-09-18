@@ -225,12 +225,12 @@ Drawing.SphereGraph = function(options) {
   function drawNode(node) {
     var draw_object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( {  color: Math.random() * 0xffffff } ) );
 
-    var area = 2000;
-    draw_object.position.x = Math.floor(Math.random() * (area + area + 1) - area);
-    draw_object.position.y = Math.floor(Math.random() * (area + area + 1) - area);
-
-    node.position.x = Math.floor(Math.random() * (area + area + 1) - area);
-    node.position.y = Math.floor(Math.random() * (area + area + 1) - area);
+    var area = 5000;
+    var phi = (90 - node.position.x) * Math.PI / 180;
+    var theta = (180 - node.position.y) * Math.PI / 180;
+    node.position.x = area * Math.sin(phi) * Math.cos(theta);
+    node.position.y = area * Math.cos(phi);
+    node.position.z = area * Math.sin(phi) * Math.sin(theta);
 
     draw_object.id = node.id;
     node.data.draw_object = draw_object;
@@ -240,7 +240,8 @@ Drawing.SphereGraph = function(options) {
     node.layout.max_Y = 180;
     node.layout.min_Y = -180;
 
-    // node.position = draw_object.position;
+    node.data.draw_object.position = node.position;
+
     scene.add( node.data.draw_object );
   }
 
@@ -250,18 +251,25 @@ Drawing.SphereGraph = function(options) {
    */
   function drawEdge(source, target) {
     material = new THREE.LineBasicMaterial( { color: 0xCCCCCC, opacity: 0.5, linewidth: 1 } );
-    var tmp_geo = new THREE.Geometry();
-
-    tmp_geo.vertices.push(source.data.draw_object.position);
-    tmp_geo.vertices.push(target.data.draw_object.position);
-
-    line = new THREE.Line( tmp_geo, material, THREE.LinePieces );
-    line.scale.x = line.scale.y = line.scale.z = 1;
-    line.originalScale = 1;
-
-    geometries.push(tmp_geo);
-
-    scene.add( line );
+    var sourceXy = source.position;
+    var targetXy = target.position;
+    
+    var AvgX = (sourceXy['x'] + targetXy['x']) / 2;
+    var AvgY = (sourceXy['y'] + targetXy['y']) / 2;
+    var AvgZ = (sourceXy['z'] + targetXy['z']) / 2;
+    var diffX = Math.abs(sourceXy['x'] - targetXy['x']);
+    var diffY = Math.abs(sourceXy['y'] - targetXy['y']);
+    var middle = [ AvgX, AvgY, AvgZ + (diffX+diffY) ];
+    
+    var curve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(sourceXy['x'], sourceXy['y'], sourceXy['z']), new THREE.Vector3(middle[0], middle[1], middle[2]), new THREE.Vector3(targetXy['x'], targetXy['y'], targetXy['z']));
+    var path = new THREE.CurvePath();
+    path.add(curve);
+    var curveMaterial = new THREE.LineBasicMaterial({
+      color: "red", linewidth: 2
+    });
+    curvedLine = new THREE.Line(path.createPointsGeometry(400), curveMaterial);
+    curvedLine.lookAt(new THREE.Vector3(0,0,0));
+    scene.add(curvedLine);
   }
 
 
@@ -269,9 +277,6 @@ Drawing.SphereGraph = function(options) {
     requestAnimationFrame( animate );
     //update camera-view here
     render();
-    if(that.show_info) {
-      printInfo();
-    }
   }
 
 
