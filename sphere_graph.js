@@ -109,13 +109,10 @@ Drawing.SphereGraph = function(options) {
   this.show_info = options.showInfo || false;
   this.selection = options.selection || false;
   this.limit = options.limit || 10;
-  this.nodes_count = options.numNodes || 20;
-  this.edges_count = options.numEdges || 10;
 
   var camera, controls, scene, renderer, interaction, geometry, object_selection;
   var stats;
-  var info_text = {};
-  var graph = new Graph({limit: options.limit});
+  var graph = new Graph();
 
   var geometries = [];
 
@@ -138,22 +135,6 @@ Drawing.SphereGraph = function(options) {
 
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
     camera.position.z = 10000;
-
-    controls = new THREE.TrackballControls(camera);
-
-    controls.rotateSpeed = 0.5;
-    controls.zoomSpeed = 5.2;
-    controls.panSpeed = 1;
-
-    controls.noZoom = false
-    controls.noPan = false;
-
-    controls.staticMoving = false;
-    controls.dynamicDampingFactor = 0.3;
-
-    controls.keys = [ 65, 83, 68 ];
-
-    controls.addEventListener('change', render);
 
     scene = new THREE.Scene();
 
@@ -185,14 +166,6 @@ Drawing.SphereGraph = function(options) {
     if(that.selection) {
       object_selection = new THREE.ObjectSelection({
         domElement: renderer.domElement,
-        selected: function(obj) {
-          // display info
-          if(obj != null) {
-            info_text.select = "Object " + obj.id;
-          } else {
-            delete info_text.select;
-          }
-        }
       });
     }
 
@@ -205,50 +178,16 @@ Drawing.SphereGraph = function(options) {
       stats.domElement.style.top = '0px';
       document.body.appendChild( stats.domElement );
     }
-
-    // Create info box
-    if(that.show_info) {
-      var info = document.createElement("div");
-      var id_attr = document.createAttribute("id");
-      id_attr.nodeValue = "graph-info";
-      info.setAttributeNode(id_attr);
-      document.body.appendChild( info );
-    }
   }
 
-
-  /**
-   *  Creates a graph with random nodes and edges.
-   *  Number of nodes and edges can be set with
-   *  numNodes and numEdges.
-   */
   function createGraph() {
-    var node = new Node(0);
-    graph.addNode(node);
-    drawNode(node);
+    /*
+    This is where we create nodes, add them to the graph,
+    create edges, and call drawNode and drawEdge accordingly
+    */
 
-    var nodes = [];
-    nodes.push(node);
-
-    var steps = 1;
-    while(nodes.length != 0 && steps < that.nodes_count) {
-      var node = nodes.shift();
-
-      var numEdges = randomFromTo(1, that.edges_count);
-      for(var i=1; i <= numEdges; i++) {
-        var target_node = new Node(i*steps);
-        if(graph.addNode(target_node)) {
-          drawNode(target_node);
-          nodes.push(target_node);
-          if(graph.addEdge(node, target_node)) {
-            drawEdge(node, target_node);
-          }
-        }
-      }
-      steps++;
-    }
-
-    // Transform a lat, lng-position to x,y.
+    /*
+    This is the force-directed layout for the graph
     graph.layout = new Layout.ForceDirected(graph, {width: 2000, height: 2000, iterations: 1000, positionUpdated: function(node) {
       max_X = Math.max(max_X, node.position.x);
       min_X = Math.min(min_X, node.position.x);
@@ -276,8 +215,7 @@ Drawing.SphereGraph = function(options) {
 
     }});
     graph.layout.init();
-    info_text.nodes = "Nodes " + graph.nodes.length;
-    info_text.edges = "Edges " + graph.edges.length;
+    */
   }
 
 
@@ -329,7 +267,7 @@ Drawing.SphereGraph = function(options) {
 
   function animate() {
     requestAnimationFrame( animate );
-    controls.update();
+    //update camera-view here
     render();
     if(that.show_info) {
       printInfo();
@@ -339,12 +277,6 @@ Drawing.SphereGraph = function(options) {
 
   function render() {
     // Generate layout if not finished
-    if(!graph.layout.finished) {
-      info_text.calc = "<span style='color: red'>Calculating layout...</span>";
-      graph.layout.generate();
-    } else {
-      info_text.calc = "";
-    }
 
     // Update position of lines (edges)
     for(var i=0; i<geometries.length; i++) {
@@ -370,29 +302,8 @@ Drawing.SphereGraph = function(options) {
     renderer.render( scene, camera );
   }
 
-
-  /**
-   *  Prints info from the attribute info_text.
-   */
-  function printInfo(text) {
-    var str = '';
-    for(var index in info_text) {
-      if(str != '' && info_text[index] != '') {
-        str += " - ";
-      }
-      str += info_text[index];
-    }
-    document.getElementById("graph-info").innerHTML = str;
-  }
-
-
   // Generate random number
   function randomFromTo(from, to) {
     return Math.floor(Math.random() * (to - from + 1) + from);
-  }
-
-  // Stop layout calculation
-  this.stop_calculating = function() {
-    graph.layout.stop_calculating();
   }
 }
