@@ -12,8 +12,9 @@
   </html>
 -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8">
     <title>Graph Visualization</title>
     <script type="text/javascript" src="Graph.js"></script>
     <script type="text/javascript" src="webgl-frameworks/three.min.js"></script>
@@ -23,6 +24,15 @@
     <script type="text/javascript" src="utils/ObjectSelection.js"></script>
     <script type="text/javascript" src="force-directed-layout.js"></script>
     <script type="text/javascript" src="sphere_graph.js"></script>
+
+    <!-- Kim's facebook data management scripts -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/facebook/facebookGraphAPI.js"></script>
+    <script src="js/facebook/facebookQueries.js"></script>
+    <script src="js/facebook/ui.js"></script>
+    <!-- end of Kim's facebook data management scripts -->
+
     <link rel="stylesheet" type="text/css" href="style.css">
     <script type="text/javascript">
       var createDrawing = function(){
@@ -36,5 +46,30 @@
       Zoom: Press Key S + Left Mouse Button and Move<br />
       Drag: Press Key D + Left Mouse Button and Move
     </div>
+
+    <!-- Kim's facebook ui HTML -->
+    <!-- scope attribute within fb:login are 'permissions' for what can be queried -->
+    <fb:login-button
+      scope="
+        public_profile,
+        user_friends,
+        user_location,
+        user_hometown,
+        user_checkins,
+        user_photos,
+        friends_location,
+        friends_hometown,
+        friends_photos,
+        friends_checkins
+        read_friendlists,
+        user_status,
+        friends_status"
+
+      onlogin="checkLoginState();"
+    >button
+    </fb:login-button>
+    <div id="status"></div>
+    <button id="getLocations" class="query">current locations</button>
+    <!-- end of kim's facebook HTML ui -->
   </body>
 </html>
