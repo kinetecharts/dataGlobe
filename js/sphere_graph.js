@@ -186,12 +186,12 @@ Drawing.SphereGraph = function(options) {
     document.body.appendChild( renderer.domElement );
 
     // Stats.js
-    if(that.show_stats) {
-      stats = new Stats();
-      stats.domElement.style.position = 'absolute';
-      stats.domElement.style.top = '0px';
-      document.body.appendChild( stats.domElement );
-    }
+    // if(that.show_stats) {
+    //   stats = new Stats();
+    //   stats.domElement.style.position = 'absolute';
+    //   stats.domElement.style.top = '0px';
+    //   document.body.appendChild( stats.domElement );
+    // }
   }
 
   function createGraph() {
@@ -314,9 +314,9 @@ Drawing.SphereGraph = function(options) {
     }
 
     // update stats
-    if(that.show_stats) {
-      stats.update();
-    }
+    // if(that.show_stats) {
+    //   stats.update();
+    // }
 
     // render scene
     renderer.render( scene, camera );
