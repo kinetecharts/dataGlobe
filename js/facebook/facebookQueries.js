@@ -51,7 +51,13 @@ function getRequest(query){
       if(response && Array.isArray(response.data)){
         lastResponse = formatDataForGraph(response.data);
       }
-      window.drawing.createGraph(lastResponse);
+      if(lastResponse){
+      setInterval(function(){
+        if(lastResponse.length){
+          window.drawing.createGraph(lastResponse.splice(0,1))
+        }
+      }, 700)
+      }
     }
   );
 

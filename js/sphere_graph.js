@@ -142,6 +142,8 @@ Drawing.SphereGraph = function(options) {
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
     camera.position.z = 17000;
 
+    // controls = new THREE.OrbitControls(camera);
+
     scene = new THREE.Scene();
 
     //add sphere geometry from google globe JHE
@@ -197,7 +199,6 @@ Drawing.SphereGraph = function(options) {
   this.indexes = -1;
   this.createGraph = function(array) {
 
-    while(array.length){
       var current = array.pop();
       if(current.location.coords.longitude !== null && current.location.coords.latitude !== null){
         var node = new Node(this.indexes+1);
@@ -205,22 +206,21 @@ Drawing.SphereGraph = function(options) {
         node.position.y = current.location.coords.latitude;
         graph.addNode(node);
         drawNode(node);
-        console.log(node);
-        if(this.indexes > 0){
-          var loadedNodes = this.indexes;
-          while(loadedNodes){
-            var target = this.nodes[loadedNodes];
-            if(graph.addEdge(node, target)){
-              drawEdge(node, target);
-            }
-            loadedNodes--;
-          }
-        }
+        createjs.Tween.get(camera.position).to({x: node.position.x + sphere_radius, y: node.position.y + sphere_radius}, 250)
+        // camera.position.x = node.position.x + sphere_radius;        
+        // camera.position.y = node.position.y + sphere_radius;
+        camera.lookAt( scene.position );
+        // if(this.indexes > 0){
+        //   for(var k = this.indexes; k > 0; k--){
+        //     var target = this.nodes[k];
+        //     if(graph.addEdge(node, target)){
+        //       drawEdge(node, target);
+        //     }
+        //   }
+        // }
         this.nodes.push(node);
         this.indexes++
-      }
-    }
-  
+      }  
 
     /*
     This is the force-directed layout for the graph, currently not set up for use
