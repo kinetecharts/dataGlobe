@@ -51,7 +51,7 @@ function getRequest(query){
       if(response && Array.isArray(response.data)){
         lastResponse = formatDataForGraph(response.data);
       }
-      console.log(lastResponse);
+      window.drawing.createGraph(lastResponse);
     }
   );
 
