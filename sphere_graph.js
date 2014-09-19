@@ -134,7 +134,7 @@ Drawing.SphereGraph = function(options) {
     renderer.setSize( window.innerWidth, window.innerHeight );
 
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
-    camera.position.z = 10000;
+    camera.position.z = 17000;
 
     scene = new THREE.Scene();
 
@@ -166,6 +166,14 @@ Drawing.SphereGraph = function(options) {
     if(that.selection) {
       object_selection = new THREE.ObjectSelection({
         domElement: renderer.domElement,
+        selected: function(obj) {
+          // display info
+          if(obj != null) {
+            info_text.select = "Object " + obj.id;
+          } else {
+            delete info_text.select;
+          }
+        }
       });
     }
 
