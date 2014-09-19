@@ -3,7 +3,7 @@
 .LSOverride
 
 # private
-./js/config.js
+config.js
 
 # Icon must ends with two \r.
 Icon
