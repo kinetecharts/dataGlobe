@@ -7,7 +7,6 @@ function statusChangeCallback(response) {
   // for FB.getLoginStatus().
   if (response.status === 'connected') {
     // Logged into your app and Facebook.
-    // setClientToken(response);
     testAPI();
   } else if (response.status === 'not_authorized') {
     // The person is logged into Facebook, but not your app.
@@ -65,13 +64,26 @@ window.fbAsyncInit = function() {
 
 // Here we run a very simple test of the Graph API after login is
 // successful.  See statusChangeCallback() for when this call is made.
+// successful response adds property FB.dataGlobeUserLocation with latitude, longitude for initial user graph node
 function testAPI() {
   console.log('Welcome!  Fetching your information.... ');
-  FB.api('/me', function(response) {
-    console.log('Successful login for: ' + response.name);
-    document.getElementById('status').innerHTML =
-      'Thanks for logging in, ' + response.name + '!';
-    console.log('isloggedIn response:',response);
+  FB.api('/me',
+    function(response) {
+      console.log('Successful login for: ' + response.name);
+      document.getElementById('status').innerHTML =
+        'Thanks for logging in, ' + response.name + '!';
+      console.log('isloggedIn response:',response);
+
+      FB.api('/fql',
+        {
+          q: "SELECT current_location.latitude, current_location.longitude FROM user WHERE uid = me()"
+        },
+        function(response){
+          FB.dataGlobeUserLocation = response.data[0].current_location;
+          FB.dataGlobeUserLocation = FB.dataGlobeUserLocation || null;
+          console.log("logged in user's location", FB.dataGlobeUserLocation);
+        }
+      );
   });
 }
 
