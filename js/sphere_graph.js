@@ -142,7 +142,8 @@ Drawing.SphereGraph = function(options) {
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
     camera.position.z = 17000;
 
-    // controls = new THREE.OrbitControls(camera);
+    controls = new THREE.OrbitControls(camera);
+    controls.addEventListener( 'change', render );
 
     scene = new THREE.Scene();
 
@@ -197,27 +198,50 @@ Drawing.SphereGraph = function(options) {
   }
   this.nodes = [];
   this.indexes = -1;
+  this.userNode;
   this.createGraph = function(array) {
 
+    //if user is node a node on the graph, create user node with lat/lon coordinates
+      if(this.userNode === undefined){
+        var user = new Node(++this.indexes);
+        //set new position of user node to equal user lon and lat
+        user.position.x = FB.dataGlobeUserLocation.latitude;
+        user.position.y = FB.dataGlobeUserLocation.longitude;
+        //add user node to graph
+        graph.addNode(user);
+        //draw user node on globe
+        drawNode(user);
+        //set global "usernode" to equal the rendered user node
+        this.userNode = user;
+      }
+
+      //remove the single datum from the array
       var current = array.pop();
+
+      //only add if lat and lon are not null
       if(current.location.coords.longitude !== null && current.location.coords.latitude !== null){
-        var node = new Node(this.indexes+1);
-        node.position.x = current.location.coords.longitude;
-        node.position.y = current.location.coords.latitude;
+        //make a new node object
+        var node = new Node(++this.indexes);
+        //set position of node object to equal lat/lon of datum
+        node.position.x = current.location.coords.latitude;
+        node.position.y = current.location.coords.longitude;
+        //add and render node
         graph.addNode(node);
         drawNode(node);
-        createjs.Tween.get(camera.position).to({x: node.position.x + sphere_radius, y: node.position.y + sphere_radius}, 250)
-        // camera.position.x = node.position.x + sphere_radius;        
-        // camera.position.y = node.position.y + sphere_radius;
-        camera.lookAt( scene.position );
-        // if(this.indexes > 0){
-        //   for(var k = this.indexes; k > 0; k--){
-        //     var target = this.nodes[k];
-        //     if(graph.addEdge(node, target)){
-        //       drawEdge(node, target);
-        //     }
-        //   }
-        // }
+        //if node can be connected to user in graph, connect and draw edge
+        if(graph.addEdge(this.userNode, node)){
+          drawEdge(this.userNode, node);
+        }
+        /*
+        This is the code for tweening the camera, currently not functional
+        */
+        // var phi = (90 - node.position.x) * Math.PI / 180;
+        // var theta = (180 - node.position.y) * Math.PI / 180;
+        // var nextX = node.position.x + sphere_radius * Math.sin(phi) * Math.cos(theta);
+        // // var nextY = node.position.y + sphere_radius * Math.cos(phi);
+        // createjs.Tween.get(camera.position).to({x: nextX}, 250)
+        // camera.lookAt( scene.position );
+
         this.nodes.push(node);
         this.indexes++
       }  
@@ -260,16 +284,18 @@ Drawing.SphereGraph = function(options) {
    *  Create a node object and add it to the scene.
    */
   function drawNode(node) {
+    //make a new sphere object
     var draw_object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( {  color: Math.random() * 0xffffff } ) );
 
-    var area = 5000;
+    //convert lat and lon to x/y coordinates on a sphere
     var phi = (90 - node.position.x) * Math.PI / 180;
     var theta = (180 - node.position.y) * Math.PI / 180;
-    node.position.x = area * Math.sin(phi) * Math.cos(theta);
-    node.position.y = area * Math.cos(phi);
-    node.position.z = area * Math.sin(phi) * Math.sin(theta);
+    node.position.x = sphere_radius * Math.sin(phi) * Math.cos(theta);
+    node.position.y = sphere_radius * Math.cos(phi);
+    node.position.z = sphere_radius * Math.sin(phi) * Math.sin(theta);
 
     draw_object.id = node.id;
+    //set node.data.draw_object to equal the three.js sphere object
     node.data.draw_object = draw_object;
     node.layout = {}
     node.layout.max_X = 90;
@@ -277,8 +303,9 @@ Drawing.SphereGraph = function(options) {
     node.layout.max_Y = 180;
     node.layout.min_Y = -180;
 
+    //set the position of the sphere to equal the previously calculated x/y coordinates
     node.data.draw_object.position = node.position;
-
+    //render it!
     scene.add( node.data.draw_object );
   }
 
@@ -287,32 +314,49 @@ Drawing.SphereGraph = function(options) {
    *  Create an edge object (line) and add it to the scene.
    */
   function drawEdge(source, target) {
+    //make a 3js line object
     material = new THREE.LineBasicMaterial( { color: 0xCCCCCC, opacity: 0.5, linewidth: 1 } );
+
+    //cache the coordinates of the source and target nodes
     var sourceXy = source.position;
     var targetXy = target.position;
+
+    /*
+    The following code is broken, it does not produce a nice curved line from the source to the larget
+    */
     
+    //get averages (mid-point) between coordinates of source and target
     var AvgX = (sourceXy['x'] + targetXy['x']) / 2;
     var AvgY = (sourceXy['y'] + targetXy['y']) / 2;
     var AvgZ = (sourceXy['z'] + targetXy['z']) / 2;
+    //get difference between source and target
     var diffX = Math.abs(sourceXy['x'] - targetXy['x']);
     var diffY = Math.abs(sourceXy['y'] - targetXy['y']);
-    var middle = [ AvgX, AvgY, AvgZ + (diffX+diffY) ];
-    
+    //set middle point to average(x/y) and average(z + sum of difference(x/y))
+    var middle = [ AvgX, AvgY, AvgZ - (diffX+diffY) ];
+
+    //make quadratic bezier out of the three points
     var curve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(sourceXy['x'], sourceXy['y'], sourceXy['z']), new THREE.Vector3(middle[0], middle[1], middle[2]), new THREE.Vector3(targetXy['x'], targetXy['y'], targetXy['z']));
+
+    //make a curve path and add the bezier curve to it
     var path = new THREE.CurvePath();
     path.add(curve);
+    
+    //create material for our line    
     var curveMaterial = new THREE.LineBasicMaterial({
       color: "red", linewidth: 2
     });
-    curvedLine = new THREE.Line(path.createPointsGeometry(400), curveMaterial);
-    curvedLine.lookAt(new THREE.Vector3(0,0,0));
+
+    //create curved line and add to scene
+    curvedLine = new THREE.Line(path.createPointsGeometry(40), curveMaterial);
+    curvedLine.lookAt(scene.position);
     scene.add(curvedLine);
   }
 
 
   function animate() {
     requestAnimationFrame( animate );
-    //update camera-view here
+    controls.update();
     render();
   }
 

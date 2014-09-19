@@ -56,7 +56,7 @@ function getRequest(query){
         if(lastResponse.length){
           window.drawing.createGraph(lastResponse.splice(0,1))
         }
-      }, 700)
+      }, 10)
       }
     }
   );
