@@ -1,4 +1,4 @@
-var FBData = (function(window){
+var FBData = (function(){
 
 // array to store formatted data from an API response
 var lastResponse;
@@ -18,11 +18,13 @@ var queryMap = {
 ////////////////////////////////////////////////// queries ////////////////////////////////////////
 
 // get user and user_friends current locations and a pic
-queryMap["currentLocations"]  = "SELECT name, current_location.latitude, current_location.longitude, pic_square " +
-                                "FROM user " +
-                                "WHERE uid in (" +
-                                  "SELECT uid2 FROM friend " +
-                                  "WHERE uid1 = me())";
+var locationQuery = [ "SELECT name, current_location.latitude, current_location.longitude, pic_square ",
+"FROM user ",
+"WHERE uid in (",
+"SELECT uid2 FROM friend ",
+"WHERE uid1 = me())" ]
+
+queryMap["currentLocations"]  = locationQuery.join('');
 
 // get checkins that a user or user_friends is associated with
 queryMap["checkins"]          = "name,checkins{created_time,place,message}";
@@ -93,4 +95,4 @@ return {
   lastResponse: lastResponse,
   get: getRequest
 };
-})(window);
+})();
