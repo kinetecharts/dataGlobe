@@ -124,10 +124,16 @@ Drawing.SphereGraph = function(options) {
 
   var that=this;
 
+  /*
+  Run the functions to make the graph and start the animation
+  */
   init();
   createGraph();
   animate();
 
+  /*
+  This function renders the globe
+  */
   function init() {
     // Three.js initialization
     renderer = new THREE.WebGLRenderer({alpha: true});
@@ -144,7 +150,7 @@ Drawing.SphereGraph = function(options) {
     shader = Shaders['earth'];
     uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 
-    uniforms['texture'].value = THREE.ImageUtils.loadTexture('./world.jpg');
+    uniforms['texture'].value = THREE.ImageUtils.loadTexture('./img/world.jpg');
 
     material = new THREE.ShaderMaterial({
 
@@ -195,7 +201,8 @@ Drawing.SphereGraph = function(options) {
     */
 
     /*
-    This is the force-directed layout for the graph
+    This is the force-directed layout for the graph, currently not set up for use
+
     graph.layout = new Layout.ForceDirected(graph, {width: 2000, height: 2000, iterations: 1000, positionUpdated: function(node) {
       max_X = Math.max(max_X, node.position.x);
       min_X = Math.min(min_X, node.position.x);
