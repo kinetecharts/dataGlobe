@@ -106,7 +106,7 @@ Drawing.SphereGraph = function(options) {
   // end shaders and colors from google globe JHE
   this.layout = options.layout || "2d";
   this.show_stats = options.showStats || false;
-  this.show_info = options.showInfo || false;
+  this.show_info = options.showInfo || true;
   this.selection = options.selection || false;
   this.limit = options.limit || 10;
 
@@ -128,7 +128,7 @@ Drawing.SphereGraph = function(options) {
   Run the functions to make the graph and start the animation
   */
   init();
-  createGraph();
+  //createGraph();
   animate();
 
   /*
@@ -193,12 +193,34 @@ Drawing.SphereGraph = function(options) {
     //   document.body.appendChild( stats.domElement );
     // }
   }
+  this.nodes = [];
+  this.indexes = -1;
+  this.createGraph = function(array) {
 
-  function createGraph() {
-    /*
-    This is where we create nodes, add them to the graph,
-    create edges, and call drawNode and drawEdge accordingly
-    */
+    while(array.length){
+      var current = array.pop();
+      if(current.location.coords.longitude !== null && current.location.coords.latitude !== null){
+        var node = new Node(this.indexes+1);
+        node.position.x = current.location.coords.longitude;
+        node.position.y = current.location.coords.latitude;
+        graph.addNode(node);
+        drawNode(node);
+        console.log(node);
+        if(this.indexes > 0){
+          var loadedNodes = this.indexes;
+          while(loadedNodes){
+            var target = this.nodes[loadedNodes];
+            if(graph.addEdge(node, target)){
+              drawEdge(node, target);
+            }
+            loadedNodes--;
+          }
+        }
+        this.nodes.push(node);
+        this.indexes++
+      }
+    }
+  
 
     /*
     This is the force-directed layout for the graph, currently not set up for use
