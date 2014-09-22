@@ -9,20 +9,11 @@ var resourceEndpointMap = {
   posts: null
 };
 
-var queryMap = {
-  currentLocations: null,
-  checkins: null,
-  posts: null
-};
 
 ////////////////////////////////////////////////// queries ////////////////////////////////////////
 
 // get user and user_friends current locations and a pic
-var locationQuery = [ "SELECT name, current_location.latitude, current_location.longitude, pic_square ",
-"FROM user ",
-"WHERE uid in (",
-"SELECT uid2 FROM friend ",
-"WHERE uid1 = me())" ]
+var queryMap = queryStringData;
 
 queryMap["currentLocations"]  = locationQuery.join('');
 
