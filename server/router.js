@@ -36,9 +36,11 @@ router.post('/save-user', function(req, res){
     fbId: userData.uid,
     latitude: userData.current_location.latitude,
     longitude: userData.current_location.longitude,
+    picture_url: userData.pic_square
     },{upsert: true}, function(err, data){
       if(err) console.log(err);
       console.log(data);
+      req.session.userId = data.id;
       res.end();
     })
 });
@@ -49,7 +51,7 @@ router.post('/save-friends', function(req, res){
   friendData = friendData.data;
   var saveFriends = function(friendData){
     var current = friendData.pop();
-    Friend.findOneAndUpdate({ fbId: current.uid },{
+    User.findOneAndUpdate({ fbId: current.uid },{
       name: current.name,
       fbId: current.uid,
       latitude: (current.current_location !== null) ? current.current_location.latitude : null,
@@ -57,12 +59,15 @@ router.post('/save-friends', function(req, res){
       picture_url: current.pic_square
     },{upsert: true}, function(err, data){
       if(err) console.log(err);
-      console.log(data)
-      if(friendData.length){
-        return saveFriends(friendData);
-      } else {
-        res.end();
-      }
+      User.findByIdAndUpdate(req.session.userId,{$push: {friends: data.id}},
+        {upsert: false}, function(err, data){
+          if(err) console.log(data);
+          if(friendData.length){
+            return saveFriends(friendData);
+          } else {
+            res.end();
+          }
+        })
     })
   }
   saveFriends(friendData);
