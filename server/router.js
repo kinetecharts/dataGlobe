@@ -37,6 +37,12 @@ router.post('/save-friends', function(req, res){
   var data = req.body.friends;
   console.log(data);
   res.end();
+});
+
+router.post('/save-checkins', function(req, res){
+  var data = req.body.friends;
+  console.log(data);
+  res.end();
 })
 
 module.exports = router;
