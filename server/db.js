@@ -14,7 +14,7 @@ var User = new Schema({
 var Checkin = new Schema({
   // id to checkin object and not the place
   fbId: Number,
-  checkin_date: String
+  checkin_date: String,
   // the place
   place: {
     fbId: Number,

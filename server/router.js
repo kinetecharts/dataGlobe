@@ -39,7 +39,6 @@ router.post('/save-user', function(req, res){
     picture_url: userData.pic_square
     },{upsert: true}, function(err, data){
       if(err) console.log(err);
-      console.log(data);
       req.session.userId = data.id;
       res.end();
     })
@@ -77,6 +76,32 @@ router.post('/save-checkins', function(req, res){
   var data = req.body.friends;
   console.log(data);
   res.end();
+})
+
+router.get('/get-friends', function(req, res){
+  var results = [];
+  var getAllFriends = function(idArray){
+    var current = idArray.pop();
+    User.findById(current, function(err, data){
+      if(err) console.log(err);
+      results.push(data);
+      if(idArray.length){
+        return getAllFriends(idArray);
+      } else {
+        results = JSON.stringify({data: results})
+        res.end(results);
+      }
+    })
+  }
+  User.findById(req.session.userId, function(err, data){
+    if(err) console.log(err);
+    if(!data){
+      res.redirect('/');
+    } else {
+      var idArray = data.friends;
+      getAllFriends(idArray);
+    }
+  })
 })
 
 module.exports = router;
