@@ -4,7 +4,7 @@ var FBData = (function(){
 var lastResponse;
 
 var resourceEndpointMap = {
-  currentLocations: "/fql",
+  firends: "/fql",
   checkins: "/me/friends",
   posts: null
 };
@@ -14,37 +14,28 @@ var resourceEndpointMap = {
 
 // get user and user_friends current locations and a pic
 var queryMap = queryStringData;
-
-queryMap["currentLocations"]  = locationQuery.join('');
-
-// get checkins that a user or user_friends is associated with
-queryMap["checkins"]          = "name,checkins{created_time,place,message}";
-
 ////////////////////////////////////////////// end of queries /////////////////////////////////////
 
 function getRequest(query){
+  var queryData = queryMap[query];
   // generate a parameter object for either FQL or Graph API syntax
-  var queryType = resourceEndpointMap[query];
+  var queryType = queryData.endpoint;
   var queryParameters = {};
   if(queryType === "/fql"){
-    queryParameters["q"] = queryMap[query];
+    queryParameters["q"] = queryData.queryString.join('');
   } else {
-    queryParameters["fields"] = queryMap[query];
+    queryParameters["fields"] = queryData.queryString.join('');;
   }
   // querying attempt using FQL + facebook API
   FB.api(
-    resourceEndpointMap[query],
+    queryType,
     queryParameters,
 
     // callback when async http request responds
-    function(response){
-      lastResponse = null;
-      if(response && Array.isArray(response.data)){
-        lastResponse = formatDataForGraph(response.data);
-      }
-      if(lastResponse){
-        var data = JSON.stringify(lastResponse)
-        $.post('/api/save-friends', {friends: data}).then(function(response){
+    function(Qresponse){
+      if(Qresponse){
+        var data = JSON.stringify(Qresponse)
+        $.post(queryData.url, {friends: data}).then(function(response){
           console.log(response);
         })
       }

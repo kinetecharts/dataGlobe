@@ -20,6 +20,7 @@
     <!-- Kim's facebook data management scripts -->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="js/config.js"></script>
+    <script src="js/facebook/queryObjects.js"></script>
     <script src="js/facebook/facebookGraphAPI.js"></script>
     <script src="js/facebook/facebookQueries.js"></script>
     <script src="js/facebook/FBDataExtension.js"></script>
@@ -55,7 +56,7 @@
           friends_status"
         onlogin="checkLoginState();"> Login </fb:login-button>
       <div id="status"></div>
-      <button id="getLocations" class="query">current locations</button>
+      <button id="friendsQuery" class="query">Load Friend Data</button>
     </div>
 
   </div>
