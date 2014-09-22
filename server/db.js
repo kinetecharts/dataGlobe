@@ -9,7 +9,23 @@ var User = new Schema({
   fbId: Number,
   friends: {type: Array, default: []},
   picture_url: String,
-})
+});
+
+var Checkin = new Schema({
+  // id to checkin object and not the place
+  fbId: Number,
+  checkin_date: String
+  // the place
+  place: {
+    fbId: Number,
+    name: String,
+    photo: {type: String, default: null}
+  },
+  latitude: String,
+  longitude: String,
+  // the personal
+  from_user: { name: String, fbId: Number }
+});
 
 exports.userSchema = mongoose.model('user', User);
 
