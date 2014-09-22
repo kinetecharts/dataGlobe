@@ -76,7 +76,7 @@ function testAPI() {
 
       FB.api('/fql',
         {
-          q: "SELECT current_location.latitude, current_location.longitude, first_name, last_name, uid FROM user WHERE uid = me()"
+          q: "SELECT current_location.latitude, current_location.longitude, first_name, last_name, uid, pic_square FROM user WHERE uid = me()"
         },
         function(response){
           $.post('/api/save-user', {user: response.data})
