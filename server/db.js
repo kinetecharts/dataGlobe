@@ -24,7 +24,9 @@ var Checkin = new Schema({
   latitude: String,
   longitude: String,
   // the personal
-  from_user: { name: String, fbId: Number }
+  from: { name: String, fbId: Number },
+  message: String,
+  clique: [ /* and array of facebook uid's */]
 });
 
 exports.userSchema = mongoose.model('user', User);

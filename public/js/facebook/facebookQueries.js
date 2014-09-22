@@ -30,39 +30,35 @@ function getRequest(query){
   );
 
 }
-// currently unused function
-function formatDataForGraph(arrayOfAPIReesults){
-  var results = [];
-  arrayOfAPIReesults.forEach(function(item, index){
+// https:graph.facebook.com/{user-id}?fields=checkins{tags,from,message,...}
+function formatCheckinDataForDB(facebookResponse){
+  var formattedData = [];
+  arrayOfCheckins = facebookResponse.checkins.data;
+  arrayOfCheckins.forEach(function(item, index){
+    if(item){
+      var formattedItem = {
+        fbId: item.id,
+        checkin_date: item.data[index].created_time,
 
-    var formattedItem = {
-      hometown: {
-        name: null,
-        coords: {
-          lat: null,
-          lng: null
-        }
-      },
-      location: {
-        name: null,
-        coords: {
-          latitude: null,
-          longitude: null
-        }
-      },
-      picture: null
-    };
+        place: {
+          fbId: item.place.id,
+          name: item.place.name,
+          photo: null
+        } || null,
+        latitude: item.place.latitude,
+        longitude: item.place.longitude,
 
-    formattedItem.location.name = (item.location) ? item.location.name : null;
-    formattedItem.location.coords.latitude = (item.current_location) ? item.current_location.latitude : null;
-    formattedItem.location.coords.longitude = (item.current_location) ? item.current_location.longitude : null;
-
-    formattedItem.hometown.name = (item.hometown) ? item.hometown.name : null;
-    formattedItem.picture = (item.picture) ? item.picture.data.url : null;
-
+        from: {
+          name: item.from.name,
+          fbId: item.from.id
+        } || null,
+        message: item.message || null,
+        clique: item.tags.data || []
+      };
     results.push(formattedItem);
+    }
   });
-  return results;
+  return formattedData;
 }
 
 return {
