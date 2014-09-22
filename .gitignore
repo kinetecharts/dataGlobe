@@ -5,7 +5,7 @@ node_modules/
 node_modules/*
 
 # private
-config.js
+public/js/config.js
 
 # Icon must ends with two \r.
 Icon
