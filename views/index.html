@@ -1,0 +1,63 @@
+<!--
+  This is an example html file with some options added. The minimum html file for
+  the graph visualization is:
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>Graph Visualization</title>
+      <script type="text/javascript" src="build/graph.min.js"></script>
+    </head>
+    <body onload="new Drawing.SimpleGraph({layout: '3d', showStats: true, showInfo: true})">
+    </bod>
+  </html>
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Graph Visualization</title>
+    
+    <!-- Kim's facebook data management scripts -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/facebook/facebookGraphAPI.js"></script>
+    <script src="js/facebook/facebookQueries.js"></script>
+    <script src="js/facebook/FBDataExtension.js"></script>
+    <script src="js/facebook/ui.js"></script>
+    <!-- end of Kim's facebook data management scripts -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    
+  </head>
+  <div class='row'>
+    <h1 class='text-center'>Global Data</h1>
+  </div>
+  <div class='row center-block'>
+    <div class='col-md-4'>
+    </div>
+    <div class='col-md-4'>
+      <img src="/img/smallGlobe.png">
+      <br>
+      <fb:login-button
+        scope="
+          public_profile,
+          user_friends,
+          user_location,
+          user_hometown,
+          user_checkins,
+          user_photos,
+          friends_location,
+          friends_hometown,
+          friends_photos,
+          friends_checkins
+          read_friendlists,
+          user_status,
+          friends_status"
+        onlogin="checkLoginState();"> Login </fb:login-button>
+      <div id="status"></div>
+      <button id="getLocations" class="query">current locations</button>
+    </div>
+
+  </div>
+  </body>
+</html>

@@ -1,0 +1,29 @@
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript" src="js/Graph.js"></script>
+    <script type="text/javascript" src="webgl-frameworks/Three.js"></script>
+    <script type="text/javascript" src="webgl-frameworks/OrbitControls.js"></script>
+    <script type="text/javascript" src="webgl-frameworks/easeljs-0.7.1.min.js"></script>
+    <script type="text/javascript" src="webgl-frameworks/tweenjs-0.5.1.min.js"></script>
+    <script type="text/javascript" src="utils/Label.js"></script>
+    <script type="text/javascript" src="utils/ObjectSelection.js"></script>
+    <script type="text/javascript" src="js/force-directed-layout.js"></script>
+    <script type="text/javascript" src="js/sphere_graph.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+	<script type="text/javascript">
+      var createDrawing = function(){
+        window.drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: true});
+      }
+    </script>
+    <body onload="createDrawing()">
+    <div class="guide">
+      Rotate: Left Mouse Button and Move<br />
+      Zoom: Press Key S + Left Mouse Button and Move<br />
+      Drag: Press Key D + Left Mouse Button and Move
+    </div>
+
+</body>
+</html>
