@@ -35,7 +35,7 @@ function getRequest(query){
     function(Qresponse){
       if(Qresponse){
         var data = JSON.stringify(Qresponse)
-        $.post(queryData.url, {friends: data}).then(function(response){
+        $.post(queryData.url, {response: data}).then(function(response){
           console.log(response);
         })
       }
