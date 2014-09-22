@@ -7,5 +7,10 @@ var queryStringData = {
 	timelineQuery: {
 		queryString: [],
 		url: '/api/save-timeline'
-	}
+	},
+  checkinsQuery: {
+    queryString: ['checkins{place,id,from,coordinates,created_time,message}'],
+    url: '/api/save-checkins',
+    endpoint: '/me'
+  }
 }

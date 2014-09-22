@@ -1,20 +1,6 @@
 var FBData = (function(){
 
-// array to store formatted data from an API response
-var lastResponse;
-
-var resourceEndpointMap = {
-  firends: "/fql",
-  checkins: "/me/friends",
-  posts: null
-};
-
-
-////////////////////////////////////////////////// queries ////////////////////////////////////////
-
-// get user and user_friends current locations and a pic
 var queryMap = queryStringData;
-////////////////////////////////////////////// end of queries /////////////////////////////////////
 
 function getRequest(query){
   var queryData = queryMap[query];
@@ -26,6 +12,7 @@ function getRequest(query){
   } else {
     queryParameters["fields"] = queryData.queryString.join('');;
   }
+  console.log('my query:', queryType, queryParameters);
   // querying attempt using FQL + facebook API
   FB.api(
     queryType,
@@ -79,7 +66,6 @@ function formatDataForGraph(arrayOfAPIReesults){
 }
 
 return {
-  lastResponse: lastResponse,
   get: getRequest
 };
 })();
