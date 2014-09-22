@@ -27,24 +27,16 @@ router.get('/api/friends', function(req, res){
   res.end(data)
 });
 
-router.get('/api/requestFriendsFB', function(req, res){
-  console.log(req.session.passport.user.accessToken);
-  request({
-    uri: "https://graph.facebook.com/v1.0/fql?q=select+uid+from+friend+where+uid=me()&access_token="+req.session.passport.user.accessToken,
-    method: "GET",
-    timeout: 10000,
-    followRedirect: true,
-    maxRedirects: 10
-  }, function(error, response, body) {
-    console.log('server request response',body);
-    res.end(body)
-  });
+router.post('/save-user', function(req, res){
+  var user = req.body.user;
+  console.log(user);
+  res.end();
 });
 
-// router.get('/api/friends', function(req, res){
-//   Friend.find().exec(function(err, data){
-//     res.end(data)
-//   })
-// })
+router.post('/save-friends', function(req, res){
+  var data = req.body.friends;
+  console.log(data);
+  res.end();
+})
 
 module.exports = router;

@@ -52,11 +52,10 @@ function getRequest(query){
         lastResponse = formatDataForGraph(response.data);
       }
       if(lastResponse){
-      setInterval(function(){
-        if(lastResponse.length){
-          window.drawing.createGraph(lastResponse.splice(0,1))
-        }
-      }, 10)
+        var data = JSON.stringify(lastResponse)
+        $.post('/api/save-friends', {friends: data}).then(function(response){
+          console.log(response);
+        })
       }
     }
   );

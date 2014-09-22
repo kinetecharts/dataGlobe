@@ -76,12 +76,10 @@ function testAPI() {
 
       FB.api('/fql',
         {
-          q: "SELECT current_location.latitude, current_location.longitude FROM user WHERE uid = me()"
+          q: "SELECT current_location.latitude, current_location.longitude, first_name, last_name FROM user WHERE uid = me()"
         },
         function(response){
-          FB.dataGlobeUserLocation = response.data[0].current_location;
-          FB.dataGlobeUserLocation = FB.dataGlobeUserLocation || null;
-          console.log("logged in user's location", FB.dataGlobeUserLocation);
+          $.post('/api/save-user', {user: response.data})
         }
       );
   });
