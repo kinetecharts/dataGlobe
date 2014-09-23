@@ -20,10 +20,17 @@ function getRequest(query){
 
     // callback when async http request responds
     function(Qresponse){
+      var payload;
+      var data;
       if(Qresponse){
-        var data = JSON.stringify(Qresponse)
-        $.post(queryData.url, {response: data}).then(function(response){
-          console.log(response);
+        // special prep just for checkin data from facebook to app server
+        if(queryData.type === 'checkins'){
+          data = formatCheckinDataForDB(Qresponse);
+        }
+        data = data || Qresponse;
+        payload = JSON.stringify(data)
+        $.post(queryData.url, {response: payload}).then(function(response){
+          console.log('ajax success:', queryData.url, response);
         })
       }
     }
@@ -33,7 +40,8 @@ function getRequest(query){
 // https:graph.facebook.com/{user-id}?fields=checkins{tags,from,message,...}
 function formatCheckinDataForDB(facebookResponse){
   var formattedData = [];
-  arrayOfCheckins = facebookResponse.checkins.data;
+  console.log('fb response',facebookResponse);
+  arrayOfCheckins = (facebookResponse.checkins) ? facebookResponse.checkins.data : [];
   arrayOfCheckins.forEach(function(item, index){
     if(item){
       var formattedItem = {

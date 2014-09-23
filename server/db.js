@@ -36,5 +36,6 @@ var Checkin = new Schema({
 });
 
 exports.userSchema = mongoose.model('user', User);
+exports.checkinSchema = mongoose.model('checkin', Checkin);
 
 mongoose.connect(process.env.DB || 'mongodb://localhost/dataglobe');
