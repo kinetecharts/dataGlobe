@@ -12,9 +12,8 @@ var User = new Schema({
 });
 
 var Mutual = new Schema({
-  user_a: Number,
-  user_b: Number,
-  mutual_friends: {type: Array, default: []}
+  mutual_of: {type: Array, default: [], dropDups: true},
+  mutual_friends: {type: Array, default: [], dropDups: true}
 })
 
 var Checkin = new Schema({
@@ -37,5 +36,6 @@ var Checkin = new Schema({
 
 exports.userSchema = mongoose.model('user', User);
 exports.checkinSchema = mongoose.model('checkin', Checkin);
+exports.mutualSchema = mongoose.model('mutual', Mutual);
 
 mongoose.connect(process.env.DB || 'mongodb://localhost/dataglobe');

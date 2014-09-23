@@ -1,3 +1,11 @@
+var filter = function(array){
+  var results = [];
+  for(var i = 0; i < array.length; i++){
+    results.push(array[i].id)
+  }
+  return results;
+}
+
 var FBData = (function(){
 
 var queryMap = queryStringData;
@@ -37,6 +45,30 @@ function getRequest(query){
   );
 
 }
+
+function getMutual(){
+  $.get('/api/get-friends').then(function(response){
+    console.log(response);
+    response = JSON.parse(response);
+    var friends = response.data;
+    var eachFriend = function(friendsArray){
+      var current = friendsArray.pop();
+      var id = current.fbId;
+      FB.api('/me/mutualfriends/'+id, function(response){
+        var mutuals = filter(response.data);
+        var payload = {userB: id, mutuals: mutuals}
+        $.post('/api/save-mutual', payload).then(function(response){
+          if(friendsArray.length){
+            return eachFriend(friendsArray);
+          } else {
+            return;
+          }
+        })
+      });
+    };
+    eachFriend(friends);
+  });
+}
 // https:graph.facebook.com/{user-id}?fields=checkins{tags,from,message,...}
 function formatCheckinDataForDB(facebookResponse){
   var formattedData = [];
@@ -70,6 +102,7 @@ function formatCheckinDataForDB(facebookResponse){
 }
 
 return {
-  get: getRequest
+  get: getRequest,
+  getMutual: getMutual
 };
 })();

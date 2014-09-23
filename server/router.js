@@ -4,6 +4,7 @@ var router = express.Router();
 var schemas = require('./db.js');
 var User = schemas.userSchema;
 var Checkin = schemas.checkinSchema;
+var Mutual = schemas.mutualSchema;
 var drawing = require('../public/js/sphere_graph')
 
 router.get("/", function (req,res){
@@ -18,15 +19,6 @@ router.get('/friends', function (req, res){
   res.render('globe');
 })
 
-router.get('/api/friends', function (req, res){
-  var data = [
-  {name: 'john', latitude: 44, longitude: 77},
-  {name: 'sam', latitude: 22, longitude: 120}
-  ];
-  data = JSON.stringify(data);
-  res.end(data)
-});
-
 router.post('/save-user', function (req, res){
   var userData = req.body.user;
   userData = userData[0];
@@ -40,6 +32,7 @@ router.post('/save-user', function (req, res){
     },{upsert: true}, function (err, data){
       if(err) console.log(err);
       req.session.userId = data.id;
+      req.session.fbId = data.fbId;
       res.end();
     })
 });
@@ -76,37 +69,36 @@ router.post('/save-checkins', function (req, res){
   var data = req.body.response;
   var checkin;
   console.log('checkin data to be saved to mongo',data);
-  if(data && data.length > 0){
-    for(var i = 0; i < data.length; i++){
-      checkin = data[i];
-      // TODO: value types don't match the mongoose schema
-      Checkin.findOneAndUpdate(
-        // find the checkin by this id
-        { fbId: checkin.fbId },
-        // update it's values
-        {
-          fbId: checkin.fbId,
-          checkin_date: checkin.checkin_date,
-          // the place
-          place: checkin.place,
-          latitude: checkin.latitude,
-          longitude: checkin.longitude,
-          // the personal
-          from: checkin.from,
-          message: checkin.message,
-          clique: checkin.clique
-        },
-        // if checkin doesn't exist then create it
-        { upsert: true},
-        //
-        function (err, data){
-          if(err) console.log(err);
-          console.log('checkin data saved to mongo:',data);
-        }
-      );
-    }
+  var saveCheckins = function(checkins){
+
+        checkin = data[i];
+        // TODO: value types don't match the mongoose schema
+        Checkin.findOneAndUpdate(
+          // find the checkin by this id
+          { fbId: checkin.fbId },
+          // update it's values
+          {
+            fbId: checkin.fbId,
+            checkin_date: checkin.checkin_date,
+            // the place
+            place: checkin.place,
+            latitude: checkin.latitude,
+            longitude: checkin.longitude,
+            // the personal
+            from: checkin.from,
+            message: checkin.message,
+            clique: checkin.clique
+          },
+          // if checkin doesn't exist then create it
+          { upsert: true},
+          //
+          function (err, data){
+            if(err) console.log(err);
+            console.log('checkin data saved to mongo:',data);
+          }
+        );
+    res.end();
   }
-  res.end();
 });
 
 router.get('/get-friends', function(req, res){
@@ -132,6 +124,21 @@ router.get('/get-friends', function(req, res){
       var idArray = data.friends;
       getAllFriends(idArray);
     }
+  })
+})
+
+router.post('/save-mutual', function(req, res){
+  console.log('my fbid: ', req.session.fbId);
+  var data = req.body;
+  console.log('theirs: ', data.userB);
+  var userArray = [req.session.fbId, data.userB];
+  console.log(userArray);
+  Mutual.findOneAndUpdate({users: req.session.fbId, users: data.userB},{
+    $addToSet: {mutual_of: {$each: userArray}, mutual_friends: {$each: data.mutuals}},
+  },{upsert: true}, function(err, data){
+    if(err) console.log(err);
+    console.log(data);
+    res.end();
   })
 })
 
