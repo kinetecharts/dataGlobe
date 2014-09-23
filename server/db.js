@@ -14,7 +14,7 @@ var User = new Schema({
 var Checkin = new Schema({
   // id to checkin object and not the place
   fbId: Number,
-  checkin_date: String
+  checkin_date: String,
   // the place
   place: {
     fbId: Number,
@@ -30,5 +30,6 @@ var Checkin = new Schema({
 });
 
 exports.userSchema = mongoose.model('user', User);
+exports.checkinSchema = mongoose.model('checkin', Checkin);
 
 mongoose.connect(process.env.DB || 'mongodb://localhost/dataglobe');

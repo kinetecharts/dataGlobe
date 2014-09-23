@@ -10,6 +10,7 @@ var queryStringData = {
 	},
   checkinsQuery: {
     queryString: ['checkins{place,id,from,created_time,message,tags}'],
+    type: 'checkins',
     url: '/api/save-checkins',
     endpoint: '/me'
   }
