@@ -11,6 +11,12 @@ var User = new Schema({
   picture_url: String,
 });
 
+var Mutual = new Schema({
+  user_a: Number,
+  user_b: Number,
+  mutual_friends: {type: Array, default: []}
+})
+
 var Checkin = new Schema({
   // id to checkin object and not the place
   fbId: Number,
