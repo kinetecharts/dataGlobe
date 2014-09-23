@@ -61,8 +61,6 @@ function postFetchNextPostCheckinData(initialGetResponse){
   }
 }
 
-<<<<<<< HEAD
-=======
 function getMutual(){
   $.get('/api/get-friends').then(function(response){
     console.log(response);
@@ -86,7 +84,7 @@ function getMutual(){
     eachFriend(friends);
   });
 }
->>>>>>> 8137ca25e593c49deaf3c4490ce40e5311d77fdb
+
 // https:graph.facebook.com/{user-id}?fields=checkins{tags,from,message,...}
 function formatCheckinDataForDB(facebookResponse){
   var formattedData = [];
