@@ -25,7 +25,7 @@ function getRequest(query){
       if(Qresponse){
         // special prep just for checkin data from facebook to app server
         if(queryData.type === 'checkins'){
-          data = formatCheckinDataForDB(Qresponse);
+          postFetchNextPostCheckinData(Qresponse);
         }
         data = data || Qresponse;
         payload = JSON.stringify(data)
@@ -35,8 +35,24 @@ function getRequest(query){
       }
     }
   );
-
 }
+
+function postFetchNextPostCheckinData(initialGetResponse){
+  if(initialGetResponse.next){
+    var nextPage = initialGetResponse.next;
+    var data = formatCheckinDataForDB(initialGetResponse);
+    console.table(data);
+    setTimeout(function(data){
+      $.get(nextPage,
+        function(nextResponse){
+          console.table('paginated response:', nextResponse);
+          postFetchNextPostCheckinData(nextResponse);
+        }
+      );
+    });
+  }
+}
+
 // https:graph.facebook.com/{user-id}?fields=checkins{tags,from,message,...}
 function formatCheckinDataForDB(facebookResponse){
   var formattedData = [];
