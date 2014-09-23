@@ -199,29 +199,21 @@ Drawing.SphereGraph = function(options) {
     // }
   }
   this.nodes = [];
-  this.indexes = -1;
   this.userNode;
+  this.addEdge = function(from, to){
+    console.log(from);
+    console.log(to);
+    var fromNode = graph.getNode(from);
+    var toNode = graph.getNode(to);
+    if(graph.addEdge(fromNode, toNode)){
+      drawEdge(fromNode, toNode);
+    }
+  }
   this.createGraph = function(current) {
-
-    //if user is node a node on the graph, create user node with lat/lon coordinates
-      // if(this.userNode === undefined){
-      //   var user = new Node(++this.indexes);
-      //   //set new position of user node to equal user lon and lat
-      //   user.position.x = FB.dataGlobeUserLocation.latitude;
-      //   user.position.y = FB.dataGlobeUserLocation.longitude;
-      //   //add user node to graph
-      //   graph.addNode(user);
-      //   //draw user node on globe
-      //   drawNode(user);
-      //   //set global "usernode" to equal the rendered user node
-      //   this.userNode = user;
-      // }
-
-
       //only add if lat and lon are not null
       if(current.longitude !== null && current.latitude !== null){
         //make a new node object
-        var node = new Node(++this.indexes);
+        var node = new Node(current.fbId);
         //set position of node object to equal lat/lon of datum
         node.position.x = current.latitude;
         node.position.y = current.longitude;
@@ -229,13 +221,6 @@ Drawing.SphereGraph = function(options) {
         graph.addNode(node);
         drawNode(node);
 
-        //if node can be connected to user in graph, connect and draw edge
-        //currently connects node in a series, not too special
-        if(this.nodes.length){
-          if(graph.addEdge(this.nodes[this.nodes.length-1], node)){
-            drawEdge(this.nodes[this.nodes.length-1], node);
-          }
-        }
         /*
         This is the code for tweening the camera, currently not functional
         */
@@ -281,6 +266,23 @@ Drawing.SphereGraph = function(options) {
     }});
     graph.layout.init();
     */
+  }
+
+  this.addUserNode = function(user){
+    //if user is node a node on the graph, create user node with lat/lon coordinates
+      // if(this.userNode === undefined){
+      //   var user = new Node(++this.indexes);
+      //   //set new position of user node to equal user lon and lat
+      //   user.position.x = FB.dataGlobeUserLocation.latitude;
+      //   user.position.y = FB.dataGlobeUserLocation.longitude;
+      //   //add user node to graph
+      //   graph.addNode(user);
+      //   //draw user node on globe
+      //   drawNode(user);
+      //   //set global "usernode" to equal the rendered user node
+      //   this.userNode = user;
+      // }
+    
   }
 
 

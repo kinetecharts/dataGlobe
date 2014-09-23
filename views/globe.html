@@ -11,6 +11,7 @@
     <script type="text/javascript" src="utils/ObjectSelection.js"></script>
     <script type="text/javascript" src="js/force-directed-layout.js"></script>
     <script type="text/javascript" src="js/sphere_graph.js"></script>
+    <script type="text/javascript" src="js/client_rendering.js"></script>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -20,16 +21,8 @@
       }
     </script>
     <body onload="createDrawing()">
-    <script type="text/javascript">
-    	$.get('/api/get-friends').then(function(response){
-    		var friends = JSON.parse(response);
-    		friends = friends.data;
-    		setInterval(function(){
-    			if(friends.length){
-    				window.drawing.createGraph(friends.pop());
-    			}
-    		}, 500)
-    	})
-    </script>
+    <div class="row controls">
+        <button class="btn btn-default mutual">View Mutual</button>
+    </div>
 </body>
 </html>

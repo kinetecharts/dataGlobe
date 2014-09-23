@@ -51,7 +51,7 @@ router.post('/save-friends', function (req, res){
       picture_url: current.pic_square
     },{upsert: true}, function (err, data){
       if(err) console.log(err);
-      User.findByIdAndUpdate(req.session.userId,{$push: {friends: data.id}},
+      User.findByIdAndUpdate(req.session.userId,{$push: {friends: data.fbId}},
         {upsert: false}, function (err, data){
           if(err) console.log(data);
           if(friendData.length){
@@ -105,7 +105,7 @@ router.get('/get-friends', function(req, res){
   var results = [];
   var getAllFriends = function(idArray){
     var current = idArray.pop();
-    User.findById(current, function(err, data){
+    User.findOne({fbId: current}).exec(function(err, data){
       if(err) console.log(err);
       results.push(data);
       if(idArray.length){
@@ -132,13 +132,39 @@ router.post('/save-mutual', function(req, res){
   var data = req.body;
   console.log('theirs: ', data.userB);
   var userArray = [req.session.fbId, data.userB];
-  console.log(userArray);
-  Mutual.findOneAndUpdate({users: req.session.fbId, users: data.userB},{
+  Mutual.findOneAndUpdate({mutual_of: {$all: userArray}},{
     $addToSet: {mutual_of: {$each: userArray}, mutual_friends: {$each: data.mutuals}},
   },{upsert: true}, function(err, data){
     if(err) console.log(err);
-    console.log(data);
     res.end();
+  })
+})
+
+router.get('/get-user', function(req, res){
+  User.findById(req.session.userId, function(err, data){
+    if(data){
+      var friends = data.friends
+      console.log(friends);
+      friends = JSON.stringify(friends);
+      res.end(friends);  
+    } else {
+      res.end()
+    }
+  })
+})
+
+router.post('/get-mutual', function(req, res){
+  var fbId = req.body.id;
+  Mutual.findOne({ mutual_of: {$all:[req.session.fbId, fbId]} }).exec(function(err, data){
+    if(err) console.log(err);
+    if(data){
+      var data = data.mutual_friends;
+      console.log(data);
+      data = JSON.stringify(data);
+      res.end(data);
+    } else {
+      res.end('[]');
+    }
   })
 })
 
