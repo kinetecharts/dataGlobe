@@ -302,7 +302,7 @@ Drawing.SphereGraph = function(options) {
     var line = new THREE.Geometry();
     var material = new THREE.LineBasicMaterial({  color: 'red', linewidth: 1 })
     line.vertices.push(new THREE.Vector3(node.position.x, node.position.y, node.position.z));
-    line.vertices.push(new THREE.Vector3(node.position.x, node.position.y, node.position.z));
+    line.vertices.push(new THREE.Vector3(node.position.x*1.1, node.position.y*1.1, node.position.z*1.1));
     //set node.data.draw_object to equal the three.js sphere object
 
     var draw_object = new THREE.Line( line, material );
@@ -316,9 +316,8 @@ Drawing.SphereGraph = function(options) {
     node.layout.min_Y = -180;
 
     //set the position of the sphere to equal the previously calculated x/y coordinates
-    node.data.draw_object.position = mesh.position;
-    //render it!
-    console.log('render line')
+    node.data.draw_object.position = node.position;
+    //render it
     node.data.draw_object.lookAt(scene.position);
     scene.add( node.data.draw_object );
   }
