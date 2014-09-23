@@ -1,6 +1,7 @@
 <html>
 <head>
 	<title></title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script type="text/javascript" src="js/Graph.js"></script>
     <script type="text/javascript" src="webgl-frameworks/Three.js"></script>
     <script type="text/javascript" src="webgl-frameworks/OrbitControls.js"></script>
@@ -19,11 +20,16 @@
       }
     </script>
     <body onload="createDrawing()">
-    <div class="guide">
-      Rotate: Left Mouse Button and Move<br />
-      Zoom: Press Key S + Left Mouse Button and Move<br />
-      Drag: Press Key D + Left Mouse Button and Move
-    </div>
-
+    <script type="text/javascript">
+    	$.get('/api/get-friends').then(function(response){
+    		var friends = JSON.parse(response);
+    		friends = friends.data;
+    		setInterval(function(){
+    			if(friends.length){
+    				window.drawing.createGraph(friends.pop());
+    			}
+    		}, 500)
+    	})
+    </script>
 </body>
 </html>
