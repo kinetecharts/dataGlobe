@@ -143,10 +143,8 @@ router.post('/save-mutual', function(req, res){
 router.get('/get-user', function(req, res){
   User.findById(req.session.userId, function(err, data){
     if(data){
-      var friends = data.friends
-      console.log(friends);
-      friends = JSON.stringify(friends);
-      res.end(friends);  
+      data = JSON.stringify(data);
+      res.end(data);  
     } else {
       res.end()
     }
