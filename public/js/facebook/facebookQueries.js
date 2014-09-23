@@ -33,7 +33,7 @@ function getRequest(query){
       if(Qresponse){
         // special prep just for checkin data from facebook to app server
         if(queryData.type === 'checkins'){
-          postFetchNextPostCheckinData(Qresponse);
+          fetchPaginatedCheckinData(Qresponse);
         }
         data = data || Qresponse;
         payload = JSON.stringify(data)
@@ -45,7 +45,7 @@ function getRequest(query){
   );
 }
 
-function postFetchNextPostCheckinData(initialGetResponse){
+function fetchPaginatedCheckinData(initialGetResponse){
   if(initialGetResponse.next){
     var nextPage = initialGetResponse.next;
     var data = formatCheckinDataForDB(initialGetResponse);
@@ -54,7 +54,7 @@ function postFetchNextPostCheckinData(initialGetResponse){
       $.get(nextPage,
         function(nextResponse){
           console.table('paginated response:', nextResponse);
-          postFetchNextPostCheckinData(nextResponse);
+          fetchPaginatedCheckinData(nextResponse);
         }
       );
     });
