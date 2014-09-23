@@ -301,12 +301,12 @@ Drawing.SphereGraph = function(options) {
 
     var line = new THREE.Geometry();
     var material = new THREE.LineBasicMaterial({  color: 'red', linewidth: 1 })
-    line.vertices.push(new THREE.Vector3(node.position.x, node.position.y, node.position.z));
-    line.vertices.push(new THREE.Vector3(node.position.x*1.1, node.position.y*1.1, node.position.z*1.1));
+    line.vertices.push(new THREE.Vector3(node.position.x*0, node.position.y*0, node.position.z*0));
+    line.vertices.push(new THREE.Vector3(node.position.x*1.2, node.position.y*1.2, node.position.z*1.2));
     //set node.data.draw_object to equal the three.js sphere object
 
     var draw_object = new THREE.Line( line, material );
-    draw_object.id = node.id;
+    // draw_object.id = node.id;
 
     node.data.draw_object = draw_object;
     node.layout = {}
@@ -316,7 +316,7 @@ Drawing.SphereGraph = function(options) {
     node.layout.min_Y = -180;
 
     //set the position of the sphere to equal the previously calculated x/y coordinates
-    node.data.draw_object.position = node.position;
+    // node.data.draw_object.position = node.position;
     //render it
     node.data.draw_object.lookAt(scene.position);
     scene.add( node.data.draw_object );
@@ -384,7 +384,7 @@ Drawing.SphereGraph = function(options) {
 
     // set lookat of nodes to camera
     for(var i=0; i<graph.nodes.length; i++) {
-      graph.nodes[i].data.draw_object.lookAt(camera.position);
+      // graph.nodes[i].data.draw_object.lookAt(camera.position);
     }
 
     // render selection
