@@ -11,6 +11,11 @@ var User = new Schema({
   picture_url: String,
 });
 
+var Mutual = new Schema({
+  mutual_of: {type: Array, default: [], dropDups: true},
+  mutual_friends: {type: Array, default: [], dropDups: true}
+})
+
 var Checkin = new Schema({
   // id to checkin object and not the place
   fbId: Number,
@@ -31,5 +36,6 @@ var Checkin = new Schema({
 
 exports.userSchema = mongoose.model('user', User);
 exports.checkinSchema = mongoose.model('checkin', Checkin);
+exports.mutualSchema = mongoose.model('mutual', Mutual);
 
 mongoose.connect(process.env.DB || 'mongodb://localhost/dataglobe');

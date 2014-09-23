@@ -168,6 +168,8 @@ Drawing.SphereGraph = function(options) {
     scene.add(mesh);
     // end sphere geom JHE
 
+    scene.add(new THREE.AxisHelper(9000))
+
     // Create node geometry (will be used in drawNode())
     geometry = new THREE.SphereGeometry( 50, 25, 0 );
 
@@ -226,7 +228,9 @@ Drawing.SphereGraph = function(options) {
         //add and render node
         graph.addNode(node);
         drawNode(node);
+
         //if node can be connected to user in graph, connect and draw edge
+        //currently connects node in a series, not too special
         if(this.nodes.length){
           if(graph.addEdge(this.nodes[this.nodes.length-1], node)){
             drawEdge(this.nodes[this.nodes.length-1], node);
@@ -285,7 +289,6 @@ Drawing.SphereGraph = function(options) {
    */
   function drawNode(node) {
     //make a new sphere object
-    var draw_object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( {  color: Math.random() * 0xffffff } ) );
 
     //convert lat and lon to x/y coordinates on a sphere
     var phi = (90 - node.position.x) * Math.PI / 180;
@@ -294,8 +297,15 @@ Drawing.SphereGraph = function(options) {
     node.position.y = sphere_radius * Math.cos(phi);
     node.position.z = sphere_radius * Math.sin(phi) * Math.sin(theta);
 
-    draw_object.id = node.id;
+    var line = new THREE.Geometry();
+    var material = new THREE.LineBasicMaterial({  color: 'red', linewidth: 1 })
+    line.vertices.push(new THREE.Vector3(node.position.x, node.position.y, node.position.z));
+    line.vertices.push(new THREE.Vector3(node.position.x, node.position.y, node.position.z));
     //set node.data.draw_object to equal the three.js sphere object
+
+    var draw_object = new THREE.Line( line, material );
+    draw_object.id = node.id;
+
     node.data.draw_object = draw_object;
     node.layout = {}
     node.layout.max_X = 90;
@@ -304,8 +314,10 @@ Drawing.SphereGraph = function(options) {
     node.layout.min_Y = -180;
 
     //set the position of the sphere to equal the previously calculated x/y coordinates
-    node.data.draw_object.position = node.position;
+    node.data.draw_object.position = mesh.position;
     //render it!
+    console.log('render line')
+    node.data.draw_object.lookAt(scene.position);
     scene.add( node.data.draw_object );
   }
 
@@ -326,14 +338,14 @@ Drawing.SphereGraph = function(options) {
     */
     
     //get averages (mid-point) between coordinates of source and target
-    var AvgX = (sourceXy['x'] + targetXy['x']) / 2;
-    var AvgY = (sourceXy['y'] + targetXy['y']) / 2;
-    var AvgZ = (sourceXy['z'] + targetXy['z']) / 2;
+    var AvgX = (sourceXy['x'] + targetXy['x']);
+    var AvgY = (sourceXy['y'] + targetXy['y']);
+    var AvgZ = (sourceXy['z'] + targetXy['z']);
     //get difference between source and target
     var diffX = Math.abs(sourceXy['x'] - targetXy['x']);
     var diffY = Math.abs(sourceXy['y'] - targetXy['y']);
     //set middle point to average(x/y) and average(z + sum of difference(x/y))
-    var middle = [ AvgX, AvgY, AvgZ - (diffX+diffY) ];
+    var middle = [ AvgX, AvgY, AvgZ + (diffX - diffY) ];
 
     //make quadratic bezier out of the three points
     var curve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(sourceXy['x'], sourceXy['y'], sourceXy['z']), new THREE.Vector3(middle[0], middle[1], middle[2]), new THREE.Vector3(targetXy['x'], targetXy['y'], targetXy['z']));
