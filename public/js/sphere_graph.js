@@ -147,25 +147,42 @@ Drawing.SphereGraph = function(options) {
 
     scene = new THREE.Scene();
 
+    // a sun like light source and ambient light so all parts of globe are visible
+    // adding a specular map turns the globe black without having lighting
+    var sun = new THREE.DirectionalLight( 0xbbbbbb );
+    sun.position.set(10000, 100, 100 );
+    var ambientLight = new THREE.AmbientLight( 0xeeeeee );
     //add sphere geometry from google globe JHE
-    var geometry = new THREE.SphereGeometry(sphere_radius, 40, 30);
+    var globeGeometry = new THREE.SphereGeometry(sphere_radius, 40, 30);
+/////////////////////////////////////////////////////////////////////////////////
+    // Adds bumps, shininess
+    var globeMaterial  = new THREE.MeshPhongMaterial();
+    globeMaterial.map    = THREE.ImageUtils.loadTexture('./img/world.jpg');
+    globeMaterial.normalMap    = THREE.ImageUtils.loadTexture('./img/earth_normal.jpg');
+    globeMaterial.bumpScale = 0.05;
+    globeMaterial.specularMap = THREE.ImageUtils.loadTexture('./img/earth_specular.jpg');
+    globeMaterial.specular = new THREE.Color(0x444444);
 
-    shader = Shaders['earth'];
-    uniforms = THREE.UniformsUtils.clone(shader.uniforms);
+/////////////////////////////////////////////////////////////////////////////////
+    // shader = Shaders['earth'];
+    // uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 
-    uniforms['texture'].value = THREE.ImageUtils.loadTexture('./img/world.jpg');
+    // uniforms['texture'].value = THREE.ImageUtils.loadTexture('./img/world.jpg');
 
-    material = new THREE.ShaderMaterial({
+    // material = new THREE.ShaderMaterial({
 
-          uniforms: uniforms,
-          vertexShader: shader.vertexShader,
-          fragmentShader: shader.fragmentShader
+    //       uniforms: uniforms,
+    //       vertexShader: shader.vertexShader,
+    //       fragmentShader: shader.fragmentShader
 
-        });
+    //     });
 
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.rotation.y = Math.PI;
-    scene.add(mesh);
+    globe = new THREE.Mesh(globeGeometry, globeMaterial);
+    globe.rotation.y = Math.PI;
+    scene.add(globe);
+    scene.add(sun);
+    scene.add(ambientLight);
+
     // end sphere geom JHE
 
     // scene.add(new THREE.AxisHelper(9000))
@@ -243,7 +260,7 @@ Drawing.SphereGraph = function(options) {
 
 
         this.nodes.push(node);
-      }  
+      }
 
     /*
     This is the force-directed layout for the graph, currently not set up for use
@@ -295,7 +312,7 @@ var latlonDistance = function(a, b){
   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
   var d = R * c;
-  return Math.round(d);  
+  return Math.round(d);
 }
 
 Number.prototype.toRadians = function(){
@@ -322,7 +339,7 @@ Number.prototype.toRadians = function(){
           drawEdge(this.userNode, currentNode, 'blue');
         }
       }
-    }  
+    }
   }
 
 
@@ -379,7 +396,7 @@ Number.prototype.toRadians = function(){
     // }
     // else if(distance > 12000 && distance < 17000){
     //   multiplier = 2.1;
-    // } 
+    // }
     // else if(distance > 17000 && distance < 22000){
     //   multiplier = 2.7;
     // }
@@ -396,7 +413,7 @@ Number.prototype.toRadians = function(){
     /*
     The following code is broken, it does not produce a nice curved line from the source to the larget
     */
-    
+
     //get averages (mid-point) between coordinates of source and target
     var AvgX = (sourceXy['x'] + targetXy['x'])/2;
     var AvgY = (sourceXy['y'] + targetXy['y'])/2;
@@ -413,8 +430,8 @@ Number.prototype.toRadians = function(){
     //make a curve path and add the bezier curve to it
     var path = new THREE.CurvePath();
     path.add(curve);
-    
-    //create material for our line    
+
+    //create material for our line
     var curveMaterial = new THREE.LineBasicMaterial({
       color: color, linewidth: 2
     });
@@ -429,7 +446,6 @@ Number.prototype.toRadians = function(){
     }
     scene.add(curvedLine);
   }
-
 
   function animate() {
     requestAnimationFrame( animate );
