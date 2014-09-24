@@ -51,7 +51,7 @@ router.post('/save-friends', function (req, res){
       picture_url: current.pic_square
     },{upsert: true}, function (err, data){
       if(err) console.log(err);
-      User.findByIdAndUpdate(req.session.userId,{$push: {friends: data.fbId}},
+      User.findByIdAndUpdate(req.session.userId,{$addToSet: {friends: data.fbId}},
         {upsert: false}, function (err, data){
           if(err) console.log(data);
           if(friendData.length){

@@ -137,9 +137,9 @@ Drawing.SphereGraph = function(options) {
   function init() {
     // Three.js initialization
     renderer = new THREE.WebGLRenderer({alpha: true});
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( window.outerWidth, window.outerHeight );
 
-    camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
+    camera = new THREE.PerspectiveCamera(35, window.outerWidth / window.outerHeight, 1, 100000);
     camera.position.z = 17000;
 
     controls = new THREE.OrbitControls(camera);
@@ -200,6 +200,7 @@ Drawing.SphereGraph = function(options) {
   }
   this.nodes = [];
   this.userNode;
+  this.previousNode;
   this.addEdge = function(from, to){
     console.log(from);
     console.log(to);
@@ -209,6 +210,24 @@ Drawing.SphereGraph = function(options) {
       drawEdge(fromNode, toNode, 'red');
     }
   }
+
+  this.goToNode = function(id){
+    var node = graph.getNode(id);
+    var x = node.position.x * 2.2;
+    var y = node.position.y * 2.2;
+    var z = node.position.z * 2.2;
+    createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 500)
+    camera.lookAt( scene.position );
+    $('.info-header').text(node.data.name);
+    if(this.previousNode){
+      if(graph.addEdge(node, this.previousNode)){
+        drawEdge(node, this.previousNode, 'red', true);
+      }
+    }
+    this.previousNode = node;
+  }
+
+
   this.createGraph = function(current) {
       //only add if lat and lon are not null
       if(current.longitude !== null && current.latitude !== null){
@@ -217,19 +236,11 @@ Drawing.SphereGraph = function(options) {
         //set position of node object to equal lat/lon of datum
         node.position.x = current.latitude;
         node.position.y = current.longitude;
+        node.data.name = current.name;
         //add and render node
         graph.addNode(node);
         drawNode(node);
 
-        /*
-        This is the code for tweening the camera, currently not functional
-        */
-        // var phi = (90 - node.position.x) * Math.PI / 180;
-        // var theta = (180 - node.position.y) * Math.PI / 180;
-        // var nextX = node.position.x + sphere_radius * Math.sin(phi) * Math.cos(theta);
-        // // var nextY = node.position.y + sphere_radius * Math.cos(phi);
-        // createjs.Tween.get(camera.position).to({x: nextX}, 250)
-        // camera.lookAt( scene.position );
 
         this.nodes.push(node);
       }  
@@ -356,7 +367,8 @@ Number.prototype.toRadians = function(){
   /**
    *  Create an edge object (line) and add it to the scene.
    */
-  function drawEdge(source, target, color) {
+  function drawEdge(source, target, color, fade) {
+    fade = fade || false;
     var distance = latlonDistance(source.position, target.position);
     var multiplier = 2.0;
     // if(distance < 9000){
@@ -410,6 +422,11 @@ Number.prototype.toRadians = function(){
     //create curved line and add to scene
     curvedLine = new THREE.Line(path.createPointsGeometry(100), curveMaterial);
     curvedLine.lookAt(scene.position);
+    if(fade){
+      curvedLine.material.transparent = true;
+      createjs.Tween.get(curvedLine.material).to({opacity: 100}, 3000);
+      console.log(curvedLine);
+    }
     scene.add(curvedLine);
   }
 

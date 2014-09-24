@@ -12,19 +12,26 @@
     <script type="text/javascript" src="js/force-directed-layout.js"></script>
     <script type="text/javascript" src="js/sphere_graph.js"></script>
     <script type="text/javascript" src="js/client_rendering.js"></script>
-    <script src="https://dl.dropboxusercontent.com/u/3587259/Code/Threejs/CSS3DRenderer.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-	<script type="text/javascript">
-      var createDrawing = function(){
-        window.drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: true});
-      }
-    </script>
-    <body onload="createDrawing()">
-    <div class="row controls">
-        <button class="btn btn-default mutual">View Mutual</button>
-        <button class="btn btn-default connect">Connect to Me</button>
+    <div class="container">
+        <div class="row">
+            <button class="btn btn-default mutual">View Mutual</button>
+            <button class="btn btn-default connect">Connect to Me</button>
+            <button class="btn btn-default fly">Fly to friends</button>
+            <div class="pull-right">
+                <h3 class="info-header"></h3>
+                <p class="info-data"></p>    
+            </div>
+        </div>
+        <script type="text/javascript">
+          var createDrawing = function(){
+            window.drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: true});
+          }
+        </script>
+        <body onload="createDrawing()">
     </div>
 </body>
 </html>

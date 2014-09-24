@@ -47,5 +47,16 @@ $(document).ready(function(){
       window.drawing.addUser(user, true);
     })
   })
+
+  $('.fly').on('click', function(){
+    $.get('/api/get-user').then(function(response){
+      var friends = JSON.parse(response).friends;
+      var current;
+      setInterval(function(){
+        current = friends.pop();
+        window.drawing.goToNode(current);
+      }, 1000)
+    })
+  })
         
 })
