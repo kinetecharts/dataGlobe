@@ -206,7 +206,7 @@ Drawing.SphereGraph = function(options) {
     var fromNode = graph.getNode(from);
     var toNode = graph.getNode(to);
     if(graph.addEdge(fromNode, toNode)){
-      drawEdge(fromNode, toNode);
+      drawEdge(fromNode, toNode, 'red');
     }
   }
   this.createGraph = function(current) {
@@ -232,7 +232,6 @@ Drawing.SphereGraph = function(options) {
         // camera.lookAt( scene.position );
 
         this.nodes.push(node);
-        this.indexes++
       }  
 
     /*
@@ -268,6 +267,30 @@ Drawing.SphereGraph = function(options) {
     */
   }
 
+var latlonDistance = function(a, b){
+  var lat1 = a.x;
+  var lon1 = a.y;
+  var lat2 = b.x;
+  var lon2 = b.y;
+  var R = 4900; // km
+  var φ1 = lat1.toRadians();
+  var φ2 = lat2.toRadians();
+  var Δφ = (lat2-lat1).toRadians();
+  var Δλ = (lon2-lon1).toRadians();
+
+  var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+          Math.cos(φ1) * Math.cos(φ2) *
+          Math.sin(Δλ/2) * Math.sin(Δλ/2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+  var d = R * c;
+  return Math.round(d);  
+}
+
+Number.prototype.toRadians = function(){
+  return this * Math.PI / 180;
+}
+
   this.addUser = function(user, connect){
     connect = connect || false;
     var userNode = new Node(user.fbId);
@@ -285,7 +308,7 @@ Drawing.SphereGraph = function(options) {
       for(var i=0; i<graph.nodes.length; i++){
         currentNode = graph.nodes[i];
         if(graph.addEdge(this.userNode, currentNode)){
-          drawEdge(this.userNode, currentNode);
+          drawEdge(this.userNode, currentNode, 'blue');
         }
       }
     }  
@@ -295,6 +318,7 @@ Drawing.SphereGraph = function(options) {
   /**
    *  Create a node object and add it to the scene.
    */
+
   function drawNode(node) {
     //make a new sphere object
 
@@ -332,7 +356,24 @@ Drawing.SphereGraph = function(options) {
   /**
    *  Create an edge object (line) and add it to the scene.
    */
-  function drawEdge(source, target) {
+  function drawEdge(source, target, color) {
+    var distance = latlonDistance(source.position, target.position);
+    var multiplier = 2.0;
+    // if(distance < 9000){
+    //   multiplier = 1.2;
+    // }
+    // else if(distance > 9000 && distance < 12000){
+    //   multiplier = 1.5;
+    // }
+    // else if(distance > 12000 && distance < 17000){
+    //   multiplier = 2.1;
+    // } 
+    // else if(distance > 17000 && distance < 22000){
+    //   multiplier = 2.7;
+    // }
+    // else if(distance > 22000){
+    //   console.log(distance);
+    // }
     //make a 3js line object
     material = new THREE.LineBasicMaterial( { color: 0xCCCCCC, opacity: 0.5, linewidth: 1 } );
 
@@ -352,7 +393,7 @@ Drawing.SphereGraph = function(options) {
     var diffX = Math.abs(sourceXy['x'] - targetXy['x']);
     var diffY = Math.abs(sourceXy['y'] - targetXy['y']);
     //set middle point to average(x/y) and average(z + sum of difference(x/y))
-    var middle = [ AvgX*1.2, AvgY*1.2, AvgZ * 1.2 ];
+    var middle = [ AvgX * multiplier, AvgY * multiplier, AvgZ * multiplier ];
 
     //make quadratic bezier out of the three points
     var curve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(sourceXy['x'], sourceXy['y'], sourceXy['z']), new THREE.Vector3(middle[0], middle[1], middle[2]), new THREE.Vector3(targetXy['x'], targetXy['y'], targetXy['z']));
@@ -363,11 +404,11 @@ Drawing.SphereGraph = function(options) {
     
     //create material for our line    
     var curveMaterial = new THREE.LineBasicMaterial({
-      color: "red", linewidth: 2
+      color: color, linewidth: 2
     });
 
     //create curved line and add to scene
-    curvedLine = new THREE.Line(path.createPointsGeometry(40), curveMaterial);
+    curvedLine = new THREE.Line(path.createPointsGeometry(100), curveMaterial);
     curvedLine.lookAt(scene.position);
     scene.add(curvedLine);
   }
