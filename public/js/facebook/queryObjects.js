@@ -20,7 +20,7 @@ var queryStringData = {
     endpoint: '/me'
   },
   newsFeed: {
-    queryString: ['feed{id,type,from,created_time,message,story,link,name,tags,picture}'],
+    queryString: ['posts{id,type,from,created_time,message,story,link,name,tags,picture}'],
     endpoint: false
   }
 }

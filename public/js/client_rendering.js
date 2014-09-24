@@ -59,8 +59,9 @@ $(document).ready(function(){
         $info.empty();
         FBData.get('newsFeed',current, function(data){
           data = JSON.parse(data);
-          if(data.feed){
-            data = data.feed.data;
+          if(data.posts){
+            data = data.posts.data;
+            console.log('posts: ',data)
             for(var i = 0; i < data.length; i++){
               var post = data[i];
               console.log('post: ', post.type);

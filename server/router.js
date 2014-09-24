@@ -5,7 +5,7 @@ var schemas = require('./db.js');
 var User = schemas.userSchema;
 var Checkin = schemas.checkinSchema;
 var Mutual = schemas.mutualSchema;
-var drawing = require('../public/js/sphere_graph')
+//var drawing = require('../public/js/sphere_graph')
 
 router.get("/", function (req,res){
   res.render("home");

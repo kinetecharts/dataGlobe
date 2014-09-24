@@ -137,9 +137,9 @@ Drawing.SphereGraph = function(options) {
   function init() {
     // Three.js initialization
     renderer = new THREE.WebGLRenderer({alpha: true});
-    renderer.setSize( window.outerWidth, window.outerHeight );
+    renderer.setSize( window.innerWidth, window.innerHeight );
 
-    camera = new THREE.PerspectiveCamera(35, window.outerWidth / window.outerHeight, 1, 100000);
+    camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
     camera.position.z = 17000;
 
     controls = new THREE.OrbitControls(camera);
