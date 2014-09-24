@@ -6,13 +6,12 @@ $(document).ready(function(){
 			if(friends.length){
 				window.drawing.createGraph(friends.pop());
 			}
-		}, 100)
+		}, 0)
 	})
 
   $('.mutual').on('click', function(){
     $.get('/api/get-user').then(function(response){
-      friendList = JSON.parse(response);
-      console.log(friendList);
+      friendList = JSON.parse(response).friends;
       var getMutual = function(idArray){
         var currentFriend = idArray.pop();
         var payload = {id: currentFriend};
@@ -39,6 +38,13 @@ $(document).ready(function(){
         }
       }
       getMutual(friendList);
+    })
+  })
+
+  $('.connect').on('click', function(){
+    $.get('/api/get-user').then(function(response){
+      var user = JSON.parse(response);
+      window.drawing.addUser(user, true);
     })
   })
         
