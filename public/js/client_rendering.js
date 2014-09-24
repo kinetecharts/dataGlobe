@@ -7,7 +7,7 @@ $(document).ready(function(){
 				window.drawing.createGraph(friends.pop());
 			}
 		}, 0)
-	})
+	});
 
   $('.mutual').on('click', function(){
     $.get('/api/get-user').then(function(response){
@@ -39,14 +39,14 @@ $(document).ready(function(){
       }
       getMutual(friendList);
     })
-  })
+  });
 
   $('.connect').on('click', function(){
     $.get('/api/get-user').then(function(response){
       var user = JSON.parse(response);
       window.drawing.addUser(user, true);
     })
-  })
+  });
 
   $('.fly').on('click', function(){
     $.get('/api/get-user').then(function(response){
@@ -65,31 +65,41 @@ $(document).ready(function(){
             for(var i = 0; i < data.length; i++){
               var post = data[i];
               console.log('post: ', post.type);
-              if(post.message){
-                $info.append('<p>'+post.message+'</p>')
-                $info.append('<p>'+post.created_time+'</p>')
-              }
-              if(post.picture){
-                $info.append('<img src="'+post.picture+'"></img>');
-                $info.append('<p>'+post.created_time+'</p>')
-              }
-              if(post.story){
-                $info.append('<p>'+post.story+'</p>');
-                if(post.link){
-                  $info.append('<a href="'+post.link+'">Take a Look</a>')
-                }
-              }
+              // display posts
+              displayInfo(post);
             }
           }
         })
       }, 2000)
     })
-  })
+  });
   $('.newsFeed').on('click', function(){
     FBData.get('newsFeed', 'me', function(data){
       data = JSON.parse(data);
       console.log(data);
     })
-  })
-        
-})
+  });
+///// for info display //////////////////////////////////////////////////
+  var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-heading info-header"></div><div class="panel-body info-data"></div></div>');
+  var displayInfo = function(post){
+    var $infoHTMLClone = $infoHTMl.clone();
+    var $info = $infoHTMLClone.find('.info-data');
+    if(post.message){
+      $info.append('<p>'+post.message+'</p>')
+      $info.append('<p>'+post.created_time+'</p>')
+    }
+    if(post.picture){
+      $info.append('<img src="'+post.picture+'"></img>');
+      $info.append('<p>'+post.created_time+'</p>')
+    }
+    if(post.story){
+      $info.append('<p>'+post.story+'</p>');
+      if(post.link){
+        $info.append('<a href="'+post.link+'">Take a Look</a>')
+      }
+    }
+    $('panel-wrapper').append($infoHTMLCLone);
+    $infoHTMLClone.fadeOut("8000");
+  }
+//////////////////////////////////////////////////////////////////////////
+});

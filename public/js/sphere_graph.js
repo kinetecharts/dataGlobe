@@ -150,7 +150,7 @@ Drawing.SphereGraph = function(options) {
 /////////////////////////////////////////////////////////////////////////////////
     // a sun like light source and ambient light so all parts of globe are visible
     // adding a specular map turns the globe black without having lighting
-    var sun = new THREE.DirectionalLight( 0xbbbbbb );
+    var sun = new THREE.DirectionalLight( 0x999999 );
     sun.position.set(100000000, 100, 1000 );
     var ambientLight = new THREE.AmbientLight( 0xffffff );
     //add sphere geometry from google globe JHE
