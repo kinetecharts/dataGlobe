@@ -12,18 +12,24 @@
     <script type="text/javascript" src="js/force-directed-layout.js"></script>
     <script type="text/javascript" src="js/sphere_graph.js"></script>
     <script type="text/javascript" src="js/client_rendering.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/facebook/queryObjects.js"></script>
+    <script src="js/facebook/facebookGraphAPI.js"></script>
+    <script src="js/facebook/facebookQueries.js"></script>
+    <script src="js/facebook/FBDataExtension.js"></script>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <div class="container">
+    <div class="container" style="position: absolute;">
         <div class="row">
             <button class="btn btn-default mutual">View Mutual</button>
             <button class="btn btn-default connect">Connect to Me</button>
             <button class="btn btn-default fly">Fly to friends</button>
-            <div class="pull-right">
-                <h3 class="info-header"></h3>
-                <p class="info-data"></p>
+            <button class="btn btn-default newsFeed">News Feed</button>
+            <div class="panel panel-default pull-right info-box", style="background-color: white;">
+                <div class="panel-heading info-header"></div>
+                <div class="panel-body info-data"></div>
             </div>
         </div>
         <script type="text/javascript">

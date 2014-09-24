@@ -10,10 +10,15 @@ var FBData = (function(){
 
 var queryMap = queryStringData;
 
-function getRequest(query){
+function getRequest(query, endpoint, cb){
   var queryData = queryMap[query];
   // generate a parameter object for either FQL or Graph API syntax
-  var queryType = queryData.endpoint;
+  var queryType;
+  if(!queryData.endpoint){
+    queryType = '/' + endpoint;
+  } else {
+    queryType = queryData.endpoint;  
+  }
   var queryParameters = {};
   if(queryType === "/fql"){
     queryParameters["q"] = queryData.queryString.join('');
@@ -37,9 +42,13 @@ function getRequest(query){
         }
         data = data || Qresponse;
         payload = JSON.stringify(data)
-        $.post(queryData.url, {response: payload}).then(function(response){
-          console.log('ajax success:', queryData.url, response);
-        })
+        if(queryData.url){
+          $.post(queryData.url, {response: payload}).then(function(response){
+            console.log('ajax success:', queryData.url, response);
+          })
+        } else {
+          return cb(payload);
+        }
       }
     }
   );

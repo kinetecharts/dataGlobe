@@ -147,14 +147,14 @@ Drawing.SphereGraph = function(options) {
 
     scene = new THREE.Scene();
 
+/////////////////////////////////////////////////////////////////////////////////
     // a sun like light source and ambient light so all parts of globe are visible
     // adding a specular map turns the globe black without having lighting
     var sun = new THREE.DirectionalLight( 0xbbbbbb );
-    sun.position.set(10000, 100, 100 );
-    var ambientLight = new THREE.AmbientLight( 0xeeeeee );
+    sun.position.set(100000000, 100, 1000 );
+    var ambientLight = new THREE.AmbientLight( 0xffffff );
     //add sphere geometry from google globe JHE
     var globeGeometry = new THREE.SphereGeometry(sphere_radius, 40, 30);
-/////////////////////////////////////////////////////////////////////////////////
     // Adds bumps, shininess
     var globeMaterial  = new THREE.MeshPhongMaterial();
     globeMaterial.map    = THREE.ImageUtils.loadTexture('./img/world.jpg');

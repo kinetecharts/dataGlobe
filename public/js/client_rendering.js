@@ -52,10 +52,42 @@ $(document).ready(function(){
     $.get('/api/get-user').then(function(response){
       var friends = JSON.parse(response).friends;
       var current;
+      var $info = $('.info-data');
       setInterval(function(){
         current = friends.pop();
         window.drawing.goToNode(current);
-      }, 1000)
+        $info.empty();
+        FBData.get('newsFeed',current, function(data){
+          data = JSON.parse(data);
+          if(data.feed){
+            data = data.feed.data;
+            for(var i = 0; i < data.length; i++){
+              var post = data[i];
+              console.log('post: ', post.type);
+              if(post.message){
+                $info.append('<p>'+post.message+'</p>')
+                $info.append('<p>'+post.created_time+'</p>')
+              }
+              if(post.picture){
+                $info.append('<img src="'+post.picture+'"></img>');
+                $info.append('<p>'+post.created_time+'</p>')
+              }
+              if(post.story){
+                $info.append('<p>'+post.story+'</p>');
+                if(post.link){
+                  $info.append('<a href="'+post.link+'">Take a Look</a>')
+                }
+              }
+            }
+          }
+        })
+      }, 2000)
+    })
+  })
+  $('.newsFeed').on('click', function(){
+    FBData.get('newsFeed', 'me', function(data){
+      data = JSON.parse(data);
+      console.log(data);
     })
   })
         
