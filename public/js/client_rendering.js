@@ -79,7 +79,6 @@ $(document).ready(function(){
   });
 ///// for info display //////////////////////////////////////////////////
   var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-heading info-header"></div><div class="panel-body info-data"></div></div>');
-  console.log('my element',$infoHTML);
   var displayInfo = function(post){
     var $infoHTMLClone = $infoHTML.clone();
     var $info = $infoHTMLClone.find('.info-data');
