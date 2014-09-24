@@ -52,11 +52,9 @@ $(document).ready(function(){
     $.get('/api/get-user').then(function(response){
       var friends = JSON.parse(response).friends;
       var current;
-      var $info = $('.info-data');
       setInterval(function(){
         current = friends.pop();
         window.drawing.goToNode(current);
-        $info.empty();
         FBData.get('newsFeed',current, function(data){
           data = JSON.parse(data);
           if(data.posts){
@@ -81,8 +79,9 @@ $(document).ready(function(){
   });
 ///// for info display //////////////////////////////////////////////////
   var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-heading info-header"></div><div class="panel-body info-data"></div></div>');
+  console.log('my element',$infoHTML);
   var displayInfo = function(post){
-    var $infoHTMLClone = $infoHTMl.clone();
+    var $infoHTMLClone = $infoHTML.clone();
     var $info = $infoHTMLClone.find('.info-data');
     if(post.message){
       $info.append('<p>'+post.message+'</p>')
@@ -98,7 +97,7 @@ $(document).ready(function(){
         $info.append('<a href="'+post.link+'">Take a Look</a>')
       }
     }
-    $('panel-wrapper').append($infoHTMLCLone);
+    $('panel-wrapper').append($infoHTMLClone);
     $infoHTMLClone.fadeOut("8000");
   }
 //////////////////////////////////////////////////////////////////////////
