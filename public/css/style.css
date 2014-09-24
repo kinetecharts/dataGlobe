@@ -2,3 +2,14 @@
   font-size: 100px;
   font-family: 'Alegreya SC', serif;
 }
+
+.container {
+	width: 98%;
+	position: absolute;
+}
+
+.info-box {
+	position: absolute;
+	right: 0;
+	width: 20%;
+}
