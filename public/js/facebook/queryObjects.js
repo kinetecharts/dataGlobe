@@ -15,8 +15,12 @@ var queryStringData = {
     endpoint: '/me'
   },
   mutualFriends: {
-    queryString: ['SELECT uid1 FROM friend WHERE uid2=[targetID] AND uid1 IN (SELECT uid2 FROM friend WHERE uid1=[sourceID])'],
+    queryString: ['SELECT uid1 FROM friend WHERE uid2=[targetID] AND uid1 IN (SELECT uid2 FROM friend WHERE uid1=me())'],
     url: '/api/save-mutual',
     endpoint: '/me'
+  },
+  newsFeed: {
+    queryString: ['feed{id,type,from,created_time,message,story,link,name,tags,picture}'],
+    endpoint: false
   }
 }
