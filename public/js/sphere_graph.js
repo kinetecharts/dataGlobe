@@ -215,6 +215,7 @@ Drawing.SphereGraph = function(options) {
     //   document.body.appendChild( stats.domElement );
     // }
   }
+
   this.nodes = [];
   this.userNode;
   this.previousNode;
@@ -235,13 +236,17 @@ Drawing.SphereGraph = function(options) {
     var z = node.position.z * 2.2;
     createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 500)
     camera.lookAt( scene.position );
-    $('.info-header').text(node.data.name);
+    //$('.info-header').text(node.data.name);
     if(this.previousNode){
       if(graph.addEdge(node, this.previousNode)){
         drawEdge(node, this.previousNode, 'red', true);
       }
     }
     this.previousNode = node;
+  }
+
+  this.getCurrent = function(){
+    return this.previousNode;
   }
 
 

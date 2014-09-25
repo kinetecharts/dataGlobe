@@ -26,6 +26,10 @@ app.get('/render-friends', function(req, res){
   res.render('globe.html');
 })
 
+app.get('/fbconfig', function(req, res){
+  res.end(process.env.FBID);
+})
+
 app.use('/api/', router);
 
 

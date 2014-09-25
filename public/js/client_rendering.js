@@ -57,16 +57,8 @@ $(document).ready(function(){
         window.drawing.goToNode(current);
         FBData.get('newsFeed',current, function(data){
           data = JSON.parse(data);
-          if(data.posts){
-            data = data.posts.data;
-            console.log('posts: ',data)
-            for(var i = 0; i < data.length; i++){
-              var post = data[i];
-              console.log('post: ', post.type);
-              // display posts
-              displayInfo(post);
-            }
-          }
+          // display posts
+          displayInfo(data);
         })
       }, 2000)
     })
@@ -78,26 +70,43 @@ $(document).ready(function(){
     })
   });
 ///// for info display //////////////////////////////////////////////////
-  var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-heading info-header"></div><div class="panel-body info-data"></div></div>');
-  var displayInfo = function(post){
+var infoHTMLlog = [];
+var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-heading info-header"></div><div class="panel-body info-data"></div></div>');
+  var displayInfo = function(data){
     var $infoHTMLClone = $infoHTML.clone();
     var $info = $infoHTMLClone.find('.info-data');
-    if(post.message){
-      $info.append('<p>'+post.message+'</p>')
-      $info.append('<p>'+post.created_time+'</p>')
-    }
-    if(post.picture){
-      $info.append('<img src="'+post.picture+'"></img>');
-      $info.append('<p>'+post.created_time+'</p>')
-    }
-    if(post.story){
-      $info.append('<p>'+post.story+'</p>');
-      if(post.link){
-        $info.append('<a href="'+post.link+'">Take a Look</a>')
+    var header = $infoHTMLClone.find('.info-header');
+    if(data.posts){
+      var posts = data.posts.data;
+      for(var i = 0; i < posts.length; i++){
+        var post = posts[i];
+        header.text(post.from.name);
+        if(post.message){
+          $info.append('<p>'+post.message+'</p>')
+          $info.append('<p>'+post.created_time+'</p>')
+        }
+        if(post.picture){
+          $info.append('<img src="'+post.picture+'"></img>');
+          $info.append('<p>'+post.created_time+'</p>')
+        }
+        if(post.story){
+          $info.append('<p>'+post.story+'</p>');
+          if(post.link){
+            $info.append('<a href="'+post.link+'">Take a Look</a>')
+            }
+          }
+        }
+      } else {
+        var name = window.drawing.getCurrent().data.name;
+        header.text(name);
+        $info.append('<p>No new updates.</p>');
       }
+    $('.panel-wrapper').prepend($infoHTMLClone);
+    infoHTMLlog.push($infoHTMLClone);
+    if(infoHTMLlog.length > 2){
+      infoHTMLlog[0].fadeOut("slow");
+      infoHTMLlog.shift();
     }
-    $('panel-wrapper').append($infoHTMLClone);
-    $infoHTMLClone.fadeOut("8000");
   }
 //////////////////////////////////////////////////////////////////////////
 });
