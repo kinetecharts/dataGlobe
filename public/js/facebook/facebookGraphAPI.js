@@ -30,14 +30,16 @@ function checkLoginState() {
 }
 
 window.fbAsyncInit = function() {
-  $.get('/fbconfig', function(response){
+  $.get('/fbconfig').then(function(id){
     FB.init({
-      appId      : response,
+      appId      : id,
       cookie     : true,  // enable cookies to allow the server to access
                           // the session
       xfbml      : true,  // parse social plugins on this page
       version    : 'v1.0' // use version 2.1
     });
+    checkLoginState();
+  })
 
     // Now that we've initialized the JavaScript SDK, we call
     // FB.getLoginStatus() from within checkLoginState().  This function gets the state of the
@@ -50,8 +52,6 @@ window.fbAsyncInit = function() {
     //    your app or not.
     //
     // These three cases are handled in the callback function.
-    checkLoginState();
-  })
 
 };
 

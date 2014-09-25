@@ -78,7 +78,8 @@ var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-h
     var header = $infoHTMLClone.find('.info-header');
     if(data.posts){
       var posts = data.posts.data;
-      for(var i = 0; i < posts.length; i++){
+      var num = Math.min(posts.length, 2);
+      for(var i = 0; i < num; i++){
         var post = posts[i];
         header.text(post.from.name);
         if(post.message){
@@ -92,7 +93,7 @@ var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-h
         if(post.story){
           $info.append('<p>'+post.story+'</p>');
           if(post.link){
-            $info.append('<a href="'+post.link+'">Take a Look</a>')
+            $info.append('<p><a href="'+post.link+'">Take a Look</a><p>')
             }
           }
         }

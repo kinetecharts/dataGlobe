@@ -380,11 +380,16 @@ Number.prototype.toRadians = function(){
     var line = new THREE.Geometry();
     var material = new THREE.LineBasicMaterial({  color: 'white', linewidth: 1 })
     line.vertices.push(new THREE.Vector3(node.position.x*0, node.position.y*0, node.position.z*0));
-    line.vertices.push(new THREE.Vector3(node.position.x*1.2, node.position.y*1.2, node.position.z*1.2));
+    line.vertices.push(new THREE.Vector3(node.position.x*1.05, node.position.y*1.05, node.position.z*1.05));
     //set node.data.draw_object to equal the three.js sphere object
 
     var draw_object = new THREE.Line( line, material );
-    // draw_object.id = node.id;
+    draw_object.id = node.id;
+
+    // var ball = new THREE.SphereGeometry(10, 40, 30);
+    // material = new THREE.MeshBasicMaterial({ color: 'red' });
+    // draw_object = new THREE.Mesh(ball, material);
+    // draw_object.position.set(node.position.x, node.position.y,node.position.z);
 
     node.data.draw_object = draw_object;
     node.layout = {}
