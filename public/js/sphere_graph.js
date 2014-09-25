@@ -235,13 +235,16 @@ Drawing.SphereGraph = function(options) {
       drawEdge(fromNode, toNode, 'red');
     }
   }
-
+  /*
+  goToNode is the function used to "fly to friends"
+  */
   this.goToNode = function(id){
     var node = graph.getNode(id);
+    console.log('go to node: ', node);
     var x = node.position.x * 2.2;
     var y = node.position.y * 2.2;
     var z = node.position.z * 2.2;
-    createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 500)
+    createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 600)
     camera.lookAt( scene.position );
     //$('.info-header').text(node.data.name);
     if(this.previousNode){
@@ -254,6 +257,13 @@ Drawing.SphereGraph = function(options) {
 
   this.getCurrent = function(){
     return this.previousNode;
+  }
+
+/*
+getNode allows you to get graph nodes from the client
+*/
+  this.getNode = function(id){
+    return graph.getNode(id);
   }
 
 
@@ -450,7 +460,7 @@ Number.prototype.toRadians = function(){
 
     //create material for our line
     var curveMaterial = new THREE.LineBasicMaterial({
-      color: color, linewidth: 2
+      color: color, linewidth: 2, transparent: true
     });
 
     //create curved line and add to scene
@@ -458,7 +468,7 @@ Number.prototype.toRadians = function(){
     curvedLine.lookAt(scene.position);
     if(fade){
       curvedLine.material.transparent = true;
-      createjs.Tween.get(curvedLine.material).to({opacity: 100}, 3000);
+      createjs.Tween.get(curvedLine.material).wait(4000).to({opacity: 0}, 5000);
       console.log(curvedLine);
     }
     scene.add(curvedLine);
