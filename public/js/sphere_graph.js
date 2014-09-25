@@ -140,7 +140,7 @@ Drawing.SphereGraph = function(options) {
     renderer.setSize( window.innerWidth, window.innerHeight );
 
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
-    camera.position.z = 17000;
+    camera.position.z = 20000;
 
     controls = new THREE.OrbitControls(camera);
     controls.addEventListener( 'change', render );
@@ -150,8 +150,8 @@ Drawing.SphereGraph = function(options) {
 /////////////////////////////////////////////////////////////////////////////////
     // a sun like light source and ambient light so all parts of globe are visible
     // adding a specular map turns the globe black without having lighting
-    var sun = new THREE.DirectionalLight( 0x999999 );
-    sun.position.set(100000000, 100, 1000 );
+    var sun = new THREE.SpotLight( 0x999999 );
+    sun.position.set(10000, 100, 1000 );
     var ambientLight = new THREE.AmbientLight( 0xffffff );
     //add sphere geometry from google globe JHE
     var globeGeometry = new THREE.SphereGeometry(sphere_radius, 40, 30);
@@ -163,6 +163,21 @@ Drawing.SphereGraph = function(options) {
     globeMaterial.specularMap = THREE.ImageUtils.loadTexture('./img/earth_specular.jpg');
     globeMaterial.specular = new THREE.Color(0x444444);
 
+
+    // skybox
+    // var skyBoxGeometry = new THREE.CubeGeometry( 1000, 1000, 1000 );
+    // var skyBoxMaterial = new THREE.MeshBasicMaterial( {
+    //   map: THREE.ImageUtils.loadTexture('./img/stars.jpg'),
+    //   side: THREE.BackSide } );
+    // var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
+    // scene.add(skyBox);
+    var skyboxGeometry = new THREE.CubeGeometry(50000, 50000, 50000);
+    var skyboxMaterial = new THREE.MeshBasicMaterial({
+      map: THREE.ImageUtils.loadTexture('./img/stars.jpg')
+      , side: THREE.BackSide });
+    var skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
+
+    scene.add(skybox);
 /////////////////////////////////////////////////////////////////////////////////
     // shader = Shaders['earth'];
     // uniforms = THREE.UniformsUtils.clone(shader.uniforms);
