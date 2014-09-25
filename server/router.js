@@ -21,6 +21,7 @@ router.get('/friends', function (req, res){
 
 router.post('/save-user', function (req, res){
   var userData = req.body.user;
+  console.log('user: ', userData);
   userData = userData[0];
   User.findOneAndUpdate({fbId: userData.uid},{
     first_name: userData.first_name,
