@@ -13,3 +13,9 @@
 	right: 0;
 	width: 20%;
 }
+
+.info-img {
+	position: relative;
+	height: 30%;
+	width: 95%;
+}

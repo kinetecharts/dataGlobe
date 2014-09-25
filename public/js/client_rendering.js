@@ -52,15 +52,31 @@ $(document).ready(function(){
     $.get('/api/get-user').then(function(response){
       var friends = JSON.parse(response).friends;
       var current;
+      var currentNode;
+      var i = 0;
       setInterval(function(){
-        current = friends.pop();
+        if(i === friends.length){
+          i = 0;
+        }
+        current = friends[i];
+        currentNode = window.drawing.getNode(current);
+        while(!currentNode){
+          i += 1;
+          if(i === friends.length){
+            i = 0;
+          }
+          current = friends[i];
+          currentNode = window.drawing.getNode(current);
+          console.log('skipped: ',currentNode);
+        }
         window.drawing.goToNode(current);
         FBData.get('newsFeed',current, function(data){
           data = JSON.parse(data);
           // display posts
           displayInfo(data);
         })
-      }, 2000)
+        i += 1;
+      }, 4000)
     })
   });
   $('.newsFeed').on('click', function(){
@@ -87,7 +103,7 @@ var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-h
           $info.append('<p>'+post.created_time+'</p>')
         }
         if(post.picture){
-          $info.append('<img src="'+post.picture+'"></img>');
+          $info.append('<img class="info-img" src="'+post.picture+'"></img>');
           $info.append('<p>'+post.created_time+'</p>')
         }
         if(post.story){

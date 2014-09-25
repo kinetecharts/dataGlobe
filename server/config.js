@@ -27,8 +27,8 @@ app.get('/render-friends', function(req, res){
 })
 
 app.get('/fbconfig', function(req, res){
-  var response = process.env.FBID || 288494137936913
-  res.end(process.env.FBID);
+  var response = process.env.FBID || blahbityyboo
+  res.end(response);
 })
 
 app.use('/api/', router);
