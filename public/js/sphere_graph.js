@@ -248,7 +248,6 @@ Drawing.SphereGraph = function(options) {
   */
   this.goToNode = function(id){
     var node = graph.getNode(id);
-    console.log('go to node: ', node);
     var x = node.position.x * 2.2;
     var y = node.position.y * 2.2;
     var z = node.position.z * 2.2;

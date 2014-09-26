@@ -67,11 +67,11 @@ $(document).ready(function(){
           }
           current = friends[i];
           currentNode = window.drawing.getNode(current);
-          console.log('skipped: ',currentNode);
         }
         window.drawing.goToNode(current);
         FBData.get('newsFeed',current, function(data){
           data = JSON.parse(data);
+          console.log(data);
           // display posts
           displayInfo(data);
         })

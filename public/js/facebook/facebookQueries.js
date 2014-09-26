@@ -75,6 +75,10 @@ function getMutual(){
     console.log(response);
     response = JSON.parse(response);
     var friends = response.data;
+    $('.friends').text(friends.length.toString());
+    $('.helper').toggle();
+    $('.title').toggle();
+    var done = 0;
     var eachFriend = function(friendsArray){
       var current = friendsArray.pop();
       var id = current.fbId;
@@ -82,6 +86,8 @@ function getMutual(){
         var mutuals = filter(response.data);
         var payload = {userB: id, mutuals: mutuals}
         $.post('/api/save-mutual', payload).then(function(response){
+          done++;
+          $('.done').text(''+ done);
           if(friendsArray.length){
             return eachFriend(friendsArray);
           } else {
