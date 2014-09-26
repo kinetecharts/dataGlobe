@@ -4,18 +4,23 @@
 }
 
 .container {
-	width: 98%;
-	position: absolute;
+  width: 98%;
+  position: absolute;
 }
 
 .panel-wrapper {
-	position: absolute;
-	right: 0;
-	width: 20%;
+  position: absolute;
+  right: 0;
+  width: 20%;
 }
 
 .info-img {
-	position: relative;
-	height: 30%;
-	width: 95%;
+  position: relative;
+  height: 30%;
+  width: 95%;
+}
+
+#globe-splash-image {
+  display: block;
+  margin: auto;
 }
