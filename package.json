@@ -22,8 +22,13 @@
     "ejs": "^1.0.0",
     "express": "^4.9.4",
     "express-session": "^1.8.2",
+    "grunt": "~0.4.5",
+    "grunt-contrib-concat": "^0.5.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-uglify": "^0.6.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-nodemon": "^0.3.0",
     "mongoose": "^3.8.16",
-    "request": "^2.44.0",
-    "grunt": "~0.4.5"
+    "request": "^2.44.0"
   }
 }

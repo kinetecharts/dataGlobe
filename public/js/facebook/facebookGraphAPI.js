@@ -35,7 +35,7 @@ window.fbAsyncInit = function() {
     console.log(typeof id);
 
     FB.init({
-      appId      : id,
+      appId      : id || appConfig.fbId,
       cookie     : true,  // enable cookies to allow the server to access
                           // the session
       xfbml      : true,  // parse social plugins on this page
@@ -43,7 +43,7 @@ window.fbAsyncInit = function() {
     });
     setTimeout(function(){
       checkLoginState();
-    }, 100)
+    }, 3000)
   })
 
     // Now that we've initialized the JavaScript SDK, we call
