@@ -117,10 +117,10 @@ Drawing.SphereGraph = function(options) {
   var geometries = [];
 
   var sphere_radius = 4900;
-  var max_X = sphere_radius;
-  var min_X = -sphere_radius;
-  var max_Y = sphere_radius;
-  var min_Y = -sphere_radius;
+  var max_X = 10000;
+  var min_X = 10000;
+  var max_Y = 10000;
+  var min_Y = 10000;
 
   var that=this;
 
@@ -268,52 +268,43 @@ getNode allows you to get graph nodes from the client
 
   this.createGraph = function(current) {
       //only add if lat and lon are not null
-      if(current.longitude !== null && current.latitude !== null){
-        //make a new node object
-        var node = new Node(current.fbId);
-        //set position of node object to equal lat/lon of datum
-        node.position.x = current.latitude;
-        node.position.y = current.longitude;
-        node.data.name = current.name;
-        //add and render node
-        graph.addNode(node);
-        drawNode(node);
+    if(current.longitude !== null && current.latitude !== null){
+      //make a new node object
+      var node = new Node(current.fbId);
+      //set position of node object to equal lat/lon of datum
+      node.position.x = current.latitude;
+      node.position.y = current.longitude;
+      node.data.name = current.name;
+      //add and render node
+      graph.addNode(node);
+      drawNode(node);
 
 
-        this.nodes.push(node);
-      }
+      this.nodes.push(node);
+    }
+  }
 
-    /*
-    This is the force-directed layout for the graph, currently not set up for use
 
-    graph.layout = new Layout.ForceDirected(graph, {width: 2000, height: 2000, iterations: 1000, positionUpdated: function(node) {
+  this.createLayout = function(){
+    var layout_options = {};
+    layout_options.width = 2000;
+    layout_options.height = 2000;
+    layout_options.iterations = 100000;
+    layout_options.layout = "3d";
+    layout_options.positionUpdated = function(node) {
       max_X = Math.max(max_X, node.position.x);
       min_X = Math.min(min_X, node.position.x);
       max_Y = Math.max(max_Y, node.position.y);
       min_Y = Math.min(min_Y, node.position.y);
+      
+      node.data.draw_object.position.x = Math.random() * max_X;
+      node.data.draw_object.position.y = Math.random() * max_Y;
+      node.data.draw_object.position.z = Math.random() * max_X;
+    }
 
-      var lat, lng;
-      if(node.position.x < 0) {
-        lat = (-90/min_X) * node.position.x;
-      } else {
-        lat = (90/max_X) * node.position.x;
-      }
-      if(node.position.y < 0) {
-        lng = (-180/min_Y) * node.position.y;
-      } else {
-        lng = (180/max_Y) * node.position.y;
-      }
-
-      var area = 5000;
-      var phi = (90 - lat) * Math.PI / 180;
-      var theta = (180 - lng) * Math.PI / 180;
-      node.data.draw_object.position.x = area * Math.sin(phi) * Math.cos(theta);
-      node.data.draw_object.position.y = area * Math.cos(phi);
-      node.data.draw_object.position.z = area * Math.sin(phi) * Math.sin(theta);
-
-    }});
+    graph.layout = new Layout.ForceDirected(graph, layout_options);
     graph.layout.init();
-    */
+    graph.layout.generate();
   }
 
 var latlonDistance = function(a, b){
@@ -482,6 +473,11 @@ Number.prototype.toRadians = function(){
 
   function render() {
     // Generate layout if not finished
+    if(graph.layout){
+      if(!graph.layout.finished) {
+        graph.layout.generate();
+      } 
+    }
 
     // Update position of lines (edges)
     for(var i=0; i<geometries.length; i++) {
