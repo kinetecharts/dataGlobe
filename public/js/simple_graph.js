@@ -51,7 +51,7 @@ var Drawing = Drawing || {};
 Drawing.SimpleGraph = function(options) {
   var options = options || {};
 
-  this.layout = options.layout || "2d";
+  this.layout = options.layout || "3d";
   this.layout_options = options.graphLayout || {};
   this.show_stats = options.showStats || false;
   this.show_info = options.showInfo || false;
@@ -71,7 +71,6 @@ Drawing.SimpleGraph = function(options) {
   var that=this;
 
   init();
-  createGraph();
   animate();
 
   function init() {
@@ -82,19 +81,19 @@ Drawing.SimpleGraph = function(options) {
     camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 1, 1000000);
     camera.position.z = 5000;
 
-    controls = new THREE.TrackballControls(camera);
+    controls = new THREE.OrbitControls(camera);
 
-    controls.rotateSpeed = 0.5;
-    controls.zoomSpeed = 5.2;
-    controls.panSpeed = 1;
+    // controls.rotateSpeed = 0.5;
+    // controls.zoomSpeed = 5.2;
+    // controls.panSpeed = 1;
 
-    controls.noZoom = false;
-    controls.noPan = false;
+    // controls.noZoom = false;
+    // controls.noPan = false;
 
-    controls.staticMoving = false;
-    controls.dynamicDampingFactor = 0.3;
+    // controls.staticMoving = false;
+    // controls.dynamicDampingFactor = 0.3;
 
-    controls.keys = [ 65, 83, 68 ];
+    // controls.keys = [ 65, 83, 68 ];
 
     controls.addEventListener('change', render);
 
@@ -127,12 +126,12 @@ Drawing.SimpleGraph = function(options) {
     document.body.appendChild( renderer.domElement );
 
     // Stats.js
-    if(that.show_stats) {
-      stats = new Stats();
-      stats.domElement.style.position = 'absolute';
-      stats.domElement.style.top = '0px';
-      document.body.appendChild( stats.domElement );
-    }
+    // if(that.show_stats) {
+    //   stats = new Stats();
+    //   stats.domElement.style.position = 'absolute';
+    //   stats.domElement.style.top = '0px';
+    //   document.body.appendChild( stats.domElement );
+    // }
 
     // Create info box
     if(that.show_info) {
@@ -150,19 +149,34 @@ Drawing.SimpleGraph = function(options) {
    *  Number of nodes and edges can be set with
    *  numNodes and numEdges.
    */
-  this.createGraph = function(node) {
+  this.user;
+  this.createGraph = function(data, isUser) {
+    var node = new Node(data.fbId);
+    node.position.x = data.latitude;
+    node.position.y = data.longitude;
+    // node.data.name = data.name;
 
-    
+    if(isUser){
+      this.user = node;
+      graph.addNode(node);
+      drawNode(node);
+    } else {
+      graph.addNode(node);
+      drawNode(node);
+      if(graph.addEdge(node, this.user)){
+        drawEdge(node, this.user);
+      }
     }
-
-    that.layout_options.width = that.layout_options.width || 2000;
-    that.layout_options.height = that.layout_options.height || 2000;
-    that.layout_options.iterations = that.layout_options.iterations || 100000;
-    that.layout_options.layout = that.layout_options.layout || that.layout;
-    graph.layout = new Layout.ForceDirected(graph, that.layout_options);
-    graph.layout.init();
-    info_text.nodes = "Nodes " + graph.nodes.length;
-    info_text.edges = "Edges " + graph.edges.length;
+    if(graph.layout === undefined){
+      that.layout_options.width = that.layout_options.width || 2000;
+      that.layout_options.height = that.layout_options.height || 2000;
+      that.layout_options.iterations = that.layout_options.iterations || 100000;
+      that.layout_options.layout = that.layout_options.layout || that.layout;
+      graph.layout = new Layout.ForceDirected(graph, that.layout_options);
+      graph.layout.init();
+      info_text.nodes = "Nodes " + graph.nodes.length;
+      info_text.edges = "Edges " + graph.edges.length;
+    }
   }
 
 
@@ -229,11 +243,13 @@ Drawing.SimpleGraph = function(options) {
 
   function render() {
     // Generate layout if not finished
-    if(!graph.layout.finished) {
-      info_text.calc = "<span style='color: red'>Calculating layout...</span>";
-      graph.layout.generate();
-    } else {
-      info_text.calc = "";
+    if(graph.layout !== undefined){
+      if(!graph.layout.finished) {
+        info_text.calc = "<span style='color: red'>Calculating layout...</span>";
+        graph.layout.generate();
+      } else {
+        info_text.calc = "";
+      }
     }
 
     // Update position of lines (edges)
@@ -280,9 +296,9 @@ Drawing.SimpleGraph = function(options) {
     }
 
     // update stats
-    if(that.show_stats) {
-      stats.update();
-    }
+    // if(that.show_stats) {
+    //   stats.update();
+    // }
 
     // render scene
     renderer.render( scene, camera );
