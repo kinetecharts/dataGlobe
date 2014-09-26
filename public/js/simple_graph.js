@@ -173,9 +173,9 @@ Drawing.SimpleGraph = function(options) {
       that.layout_options.iterations = that.layout_options.iterations || 100000;
       that.layout_options.layout = that.layout_options.layout || that.layout;
       graph.layout = new Layout.ForceDirected(graph, that.layout_options);
-      graph.layout.init();
       info_text.nodes = "Nodes " + graph.nodes.length;
       info_text.edges = "Edges " + graph.edges.length;
+      graph.layout.init();
     }
   }
 
@@ -215,7 +215,7 @@ Drawing.SimpleGraph = function(options) {
    *  Create an edge object (line) and add it to the scene.
    */
   function drawEdge(source, target) {
-      material = new THREE.LineBasicMaterial({ color: 0xff0000, opacity: 1, linewidth: 0.5 });
+      material = new THREE.LineBasicMaterial({ color: 0xff0000, opacity: 1, linewidth: 1.5 });
 
       var tmp_geo = new THREE.Geometry();
       tmp_geo.vertices.push(source.data.draw_object.position);
