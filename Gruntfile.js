@@ -7,7 +7,7 @@ module.exports = function(grunt){
       options: {
         separator: ';',
       },
-      dist: {
+      globe: {
         src: [
           'public/js/Graph.js',
           'public/utils/Label.js',
@@ -19,18 +19,46 @@ module.exports = function(grunt){
           'public/js/facebook/queryObjects.js',
           'public/js/facebook/facebookQueries.js',
           'public/js/facebook/facebookGraphAPI.js',
+          'public/js/facebook/ui.js',
         ],
         dest: 'public/dist/<%= pkg.name %>.js',
+      },
+      index: {
+        src: [
+          'public/js/facebook/queryObjects.js',
+          'public/js/facebook/facebookQueries.js',
+          'public/js/facebook/facebookGraphAPI.js',
+          'public/js/facebook/ui.js',
+        ],
+        dest: 'public/dist/index.js',
       },
     },
 
     uglify: {
-      options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+      globe: {
+        options: {
+          banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+
+          mangle: {
+            except: ['jQuery', 'THREE', 'FB', 'createjs', 'Tween', 'Ease']
+          }
+        },
+        files: {
+          'public/dist/<%= pkg.name %>.min.js': ['public/dist/<%= pkg.name %>.js'],
+        },
+
       },
-      build: {
-        src: 'public/dist/<%= pkg.name %>.js',
-        dest: 'public/dist/<%= pkg.name %>.min.js'
+      index: {
+        options: {
+          banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+
+          mangle: {
+            except: ['jQuery', 'THREE', 'FB', 'createjs', 'Tween', 'Ease']
+          }
+        },
+        files: {
+          'public/dist/index.min.js':['public/dist/index.js'],
+        },
       },
     },
 
@@ -53,8 +81,10 @@ module.exports = function(grunt){
           'public/utils/*.js',
         ],
         tasks: [
-          'concat',
-          'uglify'
+          'concat:globe',
+          'concat:index',
+          'uglify:globe',
+          'uglify:index'
         ]
       },
     },
@@ -89,6 +119,6 @@ module.exports = function(grunt){
   });
 
   grunt.registerTask('test', ['jshint']);
-  grunt.registerTask('build', ['concat', 'uglify']);
+  grunt.registerTask('build', ['concat:index','concat:globe', 'uglify:globe','uglify:index']);
   grunt.registerTask('default', ['test','build']);
 };
