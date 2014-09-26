@@ -27,7 +27,7 @@ app.get('/render-friends', function(req, res){
 })
 
 app.get('/fbconfig', function(req, res){
-  var response = "288494137936913";
+  var response = process.env.DB;
   res.end(response);
 })
 
