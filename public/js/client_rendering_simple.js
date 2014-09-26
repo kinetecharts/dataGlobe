@@ -9,13 +9,21 @@ $(document).ready(function(){
     console.log('user: ', user)
     window.drawing.createGraph(user, true);
     $.get('/api/get-friends').then(function(response){
+      //get all friends from database and store in hashTable with fbId as key
+      //for later reference
       var friends = JSON.parse(response);
       friends = friends.data;
-      setInterval(function(){
-        if(friends.length){
-          window.drawing.createGraph(friends.pop());
-        }
-      }, 200)
+      var storage = {};
+      for(var i = 0; i < friends.length; i++){
+        var current = friends[i];
+        storage[current.fbId] = current;
+      }
+      FBData.get('newsFeed', 'me', function(data){
+      var myPosts = JSON.parse(data);
+      //for each post, get the likes.. if there are likes 
+      //render the post to the graph along with the friends
+      //friends who liked it and draw edges to all
+      })
     });
   });
 });
