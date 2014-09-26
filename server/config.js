@@ -26,6 +26,10 @@ app.get('/render-friends', function(req, res){
   res.render('globe.html');
 })
 
+app.get('/render-connections', function(req, res){
+	res.render('graph.html');
+})
+
 app.get('/fbconfig', function(req, res){
   var response = "288494137936913";
   res.end(response);
