@@ -23,6 +23,7 @@
     "express": "^4.9.4",
     "express-session": "^1.8.2",
     "mongoose": "^3.8.16",
-    "request": "^2.44.0"
+    "request": "^2.44.0",
+    "grunt": "~0.4.5"
   }
 }
