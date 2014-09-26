@@ -163,14 +163,6 @@ Drawing.SphereGraph = function(options) {
     globeMaterial.specularMap = THREE.ImageUtils.loadTexture('./img/earth_specular.jpg');
     globeMaterial.specular = new THREE.Color(0x444444);
 
-
-    // skybox
-    // var skyBoxGeometry = new THREE.CubeGeometry( 1000, 1000, 1000 );
-    // var skyBoxMaterial = new THREE.MeshBasicMaterial( {
-    //   map: THREE.ImageUtils.loadTexture('./img/stars.jpg'),
-    //   side: THREE.BackSide } );
-    // var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
-    // scene.add(skyBox);
     var skyboxGeometry = new THREE.CubeGeometry(50000, 50000, 50000);
     var skyboxMaterial = new THREE.MeshBasicMaterial({
       map: THREE.ImageUtils.loadTexture('./img/stars.jpg')
