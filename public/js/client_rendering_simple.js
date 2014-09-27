@@ -20,9 +20,17 @@ $(document).ready(function(){
       }
       FBData.get('newsFeed', 'me', function(data){
       var myPosts = JSON.parse(data);
-      //for each post, get the likes.. if there are likes 
-      //render the post to the graph along with the friends
-      //friends who liked it and draw edges to all
+      var investigatePosts = function(posts){
+        var current = posts.pop();
+        FBData.get('postLikes', '', function(data){
+          //deal with data
+          if(posts.length){
+            return investigatePosts(posts);
+          } else {
+            return;
+          }
+        })
+      }
       })
     });
   });

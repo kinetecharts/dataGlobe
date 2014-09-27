@@ -150,7 +150,7 @@ Drawing.SimpleGraph = function(options) {
    *  numNodes and numEdges.
    */
   this.user;
-  this.createGraph = function(data, isUser) {
+  this.insertNode = function(data, isUser) {
     var node = new Node(data.fbId);
     node.position.x = data.latitude;
     node.position.y = data.longitude;
@@ -176,6 +176,17 @@ Drawing.SimpleGraph = function(options) {
       info_text.nodes = "Nodes " + graph.nodes.length;
       info_text.edges = "Edges " + graph.edges.length;
       graph.layout.init();
+    }
+    return node;
+  }
+
+  this.getNode = function(id){
+    return graph.getNode(id);
+  }
+
+  this.addEdge = function(source, target){
+    if(graph.addEdge(source, target)){
+      drawEdge(source, target);
     }
   }
 
