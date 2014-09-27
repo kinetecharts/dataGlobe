@@ -296,7 +296,7 @@ getNode allows you to get graph nodes from the client
       min_X = Math.min(min_X, node.position.x);
       max_Y = Math.max(max_Y, node.position.y);
       min_Y = Math.min(min_Y, node.position.y);
-      
+
       node.data.draw_object.position.x = Math.random() * max_X;
       node.data.draw_object.position.y = Math.random() * max_Y;
       node.data.draw_object.position.z = Math.random() * max_X;
@@ -476,7 +476,7 @@ Number.prototype.toRadians = function(){
     if(graph.layout){
       if(!graph.layout.finished) {
         graph.layout.generate();
-      } 
+      }
     }
 
     // Update position of lines (edges)
