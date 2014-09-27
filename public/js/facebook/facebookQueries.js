@@ -100,6 +100,12 @@ function getMutual(){
   });
 }
 
+function getPostLikes(id, cb){
+  FB.api('/'+id+'/likes',function (response){
+    cb(response);
+  });
+}
+
 // https:graph.facebook.com/{user-id}?fields=checkins{tags,from,message,...}
 function formatCheckinDataForDB(facebookResponse){
   var formattedData = [];
@@ -134,6 +140,7 @@ function formatCheckinDataForDB(facebookResponse){
 
 return {
   get: getRequest,
-  getMutual: getMutual
+  getMutual: getMutual,
+  getPostLikes: getPostLikes
 };
 })();
