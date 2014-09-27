@@ -43,7 +43,7 @@ window.fbAsyncInit = function() {
     });
     setTimeout(function(){
       checkLoginState();
-    }, 3000)
+    });
   })
 
     // Now that we've initialized the JavaScript SDK, we call

@@ -23,7 +23,8 @@ var queryStringData = {
     queryString: ['posts{id,type,from,to,with_tags,created_time,message,story,link,name,tags,picture}'],
     endpoint: false
   }
-};var filter = function(array){
+}
+;var filter = function(array){
   var results = [];
   for(var i = 0; i < array.length; i++){
     results.push(array[i].id)
@@ -42,7 +43,7 @@ function getRequest(query, endpoint, cb){
   if(!queryData.endpoint){
     queryType = '/' + endpoint;
   } else {
-    queryType = queryData.endpoint;  
+    queryType = queryData.endpoint;
   }
   var queryParameters = {};
   if(queryType === "/fql"){
@@ -161,7 +162,8 @@ return {
   get: getRequest,
   getMutual: getMutual
 };
-})();;(function(window){
+})();
+;(function(window){
 // This is called with the results from from FB.getLoginStatus().
 function statusChangeCallback(response) {
   // The response object is returned with a status field that lets the
@@ -206,7 +208,7 @@ window.fbAsyncInit = function() {
     });
     setTimeout(function(){
       checkLoginState();
-    }, 3000)
+    });
   })
 
     // Now that we've initialized the JavaScript SDK, we call
@@ -256,7 +258,8 @@ function testAPI() {
   });
 }
 
-})(window);;$(function(){
+})(window);
+;$(function(){
 
   $("button.query").on("click", function(event){
     event.preventDefault();

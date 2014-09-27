@@ -17,7 +17,7 @@ function getRequest(query, endpoint, cb){
   if(!queryData.endpoint){
     queryType = '/' + endpoint;
   } else {
-    queryType = queryData.endpoint;  
+    queryType = queryData.endpoint;
   }
   var queryParameters = {};
   if(queryType === "/fql"){

@@ -3,16 +3,24 @@
 //then go through friends posts and render posts that mention/are with user
 
 $(document).ready(function(){
+  var drawing = new Drawing.SimpleGraph({numNodes: 50, showStats: false, showInfo: true});
   $.get('/api/get-user').then(function(response){
     var user = JSON.parse(response);
     var friendsList = user.friends;
     console.log('user: ', user)
-    window.drawing.createGraph(user, true);
+    drawing.createGraph(user, true);
     $.get('/api/get-friends').then(function(response){
       //get all friends from database and store in hashTable with fbId as key
       //for later reference
       var friends = JSON.parse(response);
       friends = friends.data;
+
+      setInterval(function(){
+        if(friends.length){
+          drawing.createGraph(friends.pop());
+        }
+      }, 500)
+
       var storage = {};
       for(var i = 0; i < friends.length; i++){
         var current = friends[i];
@@ -32,6 +40,7 @@ $(document).ready(function(){
         })
       }
       })
+
     });
   });
 });

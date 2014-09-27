@@ -1,10 +1,12 @@
 $(document).ready(function(){
+
+  var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: true});
 	$.get('/api/get-friends').then(function(response){
 		var friends = JSON.parse(response);
 		friends = friends.data;
 		setInterval(function(){
 			if(friends.length){
-				window.drawing.createGraph(friends.pop());
+				drawing.createGraph(friends.pop());
 			}
 		}, 0)
 	});
@@ -20,7 +22,7 @@ $(document).ready(function(){
           var mutualList = JSON.parse(response);
           var loadMutual = function(list){
             var currentMutual = list.pop();
-            window.drawing.addEdge(currentFriend, currentMutual);
+            drawing.addEdge(currentFriend, currentMutual);
             if(list.length){
               return loadMutual(list);
             } else {
@@ -44,7 +46,7 @@ $(document).ready(function(){
   $('.connect').on('click', function(){
     $.get('/api/get-user').then(function(response){
       var user = JSON.parse(response);
-      window.drawing.addUser(user, true);
+      drawing.addUser(user, true);
     })
   });
 
@@ -59,16 +61,16 @@ $(document).ready(function(){
           i = 0;
         }
         current = friends[i];
-        currentNode = window.drawing.getNode(current);
+        currentNode = drawing.getNode(current);
         while(!currentNode){
           i += 1;
           if(i === friends.length){
             i = 0;
           }
           current = friends[i];
-          currentNode = window.drawing.getNode(current);
+          currentNode = drawing.getNode(current);
         }
-        window.drawing.goToNode(current);
+        drawing.goToNode(current);
         FBData.get('newsFeed',current, function(data){
           data = JSON.parse(data);
           console.log(data);
@@ -86,8 +88,8 @@ $(document).ready(function(){
     })
   });
 ///// for info display //////////////////////////////////////////////////
-var infoHTMLlog = [];
-var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-heading info-header"></div><div class="panel-body info-data"></div></div>');
+  var infoHTMLlog = [];
+  var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-heading info-header"></div><div class="panel-body info-data"></div></div>');
   var displayInfo = function(data){
     var $infoHTMLClone = $infoHTML.clone();
     var $info = $infoHTMLClone.find('.info-data');
@@ -114,7 +116,7 @@ var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-h
           }
         }
       } else {
-        var name = window.drawing.getCurrent().data.name;
+        var name = drawing.getCurrent().data.name;
         header.text(name);
         $info.append('<p>No new updates.</p>');
       }
