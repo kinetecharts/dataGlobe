@@ -151,7 +151,12 @@ Drawing.SimpleGraph = function(options) {
    */
   this.user;
   this.insertNode = function(data, isUser) {
-    var node = new Node(data.fbId);
+    var node;
+    if(data.fbId){
+      node = new Node(data.fbId);  
+    } else {
+      node = new Node(data.id);
+    }
     node.position.x = data.latitude;
     node.position.y = data.longitude;
     // node.data.name = data.name;
@@ -184,9 +189,9 @@ Drawing.SimpleGraph = function(options) {
     return graph.getNode(id);
   }
 
-  this.addEdge = function(source, target){
+  this.addEdge = function(source, target, color){
     if(graph.addEdge(source, target)){
-      drawEdge(source, target);
+      drawEdge(source, target, color);
     }
   }
 
@@ -225,8 +230,8 @@ Drawing.SimpleGraph = function(options) {
   /**
    *  Create an edge object (line) and add it to the scene.
    */
-  function drawEdge(source, target) {
-      material = new THREE.LineBasicMaterial({ color: 0xff0000, opacity: 1, linewidth: 1.5 });
+  function drawEdge(source, target, color) {
+      material = new THREE.LineBasicMaterial({ color: color, opacity: 1, linewidth: 1.5 });
 
       var tmp_geo = new THREE.Geometry();
       tmp_geo.vertices.push(source.data.draw_object.position);
