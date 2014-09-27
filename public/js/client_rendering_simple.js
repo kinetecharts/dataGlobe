@@ -58,7 +58,7 @@ $(document).ready(function(){
     setInterval(function(){
       var current = nodes.pop();
       window.drawing.goToNode(current.id);
-    }, 4000)
+    }, 5000)
   })
 
 });
