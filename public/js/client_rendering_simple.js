@@ -36,7 +36,11 @@ $(document).ready(function(){
         data = data.data;
         for(var l = 0; l < data.length; l++){
           var liker = data[l];
-          liker = window.drawing.insertNode(liker);
+          if(window.drawing.getNode(liker.id) !== undefined){
+            liker = window.drawing.getNode(liker.id)
+          } else {
+            liker = window.drawing.insertNode(liker);  
+          }
           window.drawing.addEdge(current, liker, 'blue');
         }
         if(posts.length){
@@ -48,6 +52,13 @@ $(document).ready(function(){
     }
     investigatePosts(myPosts);
     })    
+  })
+  $('.fly').on('click', function(){
+    var nodes = window.drawing.getAllNodes();
+    setInterval(function(){
+      var current = nodes.pop();
+      window.drawing.goToNode(current.id);
+    }, 4000)
   })
 
 });

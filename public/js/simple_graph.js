@@ -159,19 +159,20 @@ Drawing.SimpleGraph = function(options) {
     }
     node.position.x = data.latitude;
     node.position.y = data.longitude;
-    // node.data.name = data.name;
+    if(data.name){
+      node.data.info = data.name;
+    } 
+    else if (data.message){
+      node.data.info = data.message;
+    }
+    else if (data.story){
+      node.data.info = data.story;
+    }
 
-    if(isUser){
       this.user = node;
       graph.addNode(node);
       drawNode(node);
-    } else {
-      graph.addNode(node);
-      drawNode(node);
-      if(graph.addEdge(node, this.user)){
-        drawEdge(node, this.user);
-      }
-    }
+
     if(graph.layout === undefined){
       that.layout_options.width = that.layout_options.width || 2000;
       that.layout_options.height = that.layout_options.height || 2000;
@@ -193,6 +194,24 @@ Drawing.SimpleGraph = function(options) {
     if(graph.addEdge(source, target)){
       drawEdge(source, target, color);
     }
+  }
+
+  this.getAllNodes = function(){
+    return graph.nodes;
+  }
+
+  this.goToNode = function(id){
+    var node = graph.getNode(id);
+    var x = node.position.x * 1.2;
+    var y = node.position.y * 1.2;
+    var z = node.position.z * 1.2;
+    var a = node.position.x * 2.2;
+    var b = node.position.y * 2.2;
+    var c = node.position.z * 2.2;
+    createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 600)
+    createjs.Tween.get(camera.position).to({x: a, y: b, z: c}, 600)
+    camera.lookAt( scene.position );
+    $('.info-header').text(node.data.info);
   }
 
 
@@ -231,6 +250,7 @@ Drawing.SimpleGraph = function(options) {
    *  Create an edge object (line) and add it to the scene.
    */
   function drawEdge(source, target, color) {
+    console.log(color);
       material = new THREE.LineBasicMaterial({ color: color, opacity: 1, linewidth: 1.5 });
 
       var tmp_geo = new THREE.Geometry();
