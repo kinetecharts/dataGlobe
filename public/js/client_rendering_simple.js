@@ -1,9 +1,14 @@
 var userNode;
-
+var friendsList;
 $(document).ready(function(){
+
+  // $('body').mousemove(function(event){
+  //   window.drawing.onMouseMove(event);
+  // })
+
   $.get('/api/get-user').then(function(response){
     var user = JSON.parse(response);
-    var friendsList = user.friends;
+    friendsList = user.friends;
     userNode = window.drawing.insertNode(user, true);
     $.get('/api/get-friends').then(function(response){
       //get all friends from database and store in hashTable with fbId as key
@@ -54,5 +59,49 @@ $(document).ready(function(){
       window.drawing.goToNode(current.id);
     }, 5000)
   })
+
+    $('.mutual').on('click', function(){
+      var getMutual = function(idArray){
+        var currentFriend = idArray.pop()
+        var inGraph = window.drawing.getNode(currentFriend);
+        if(inGraph !== undefined){
+          currentFriend = inGraph;
+        } else {
+          currentFriend = window.drawing.insertNode(currentFriend);
+        }
+        window.drawing.addEdge(currentFriend, userNode, 'red');
+        var payload = {id: currentFriend.id};
+        $.post('/api/get-mutual', payload).then(function(response){
+          var mutualList = JSON.parse(response);
+
+          var loadMutual = function(list){
+            var currentMutual = list.pop();
+            var inGraph = window.drawing.getNode(currentMutual);
+            if(inGraph !== undefined){
+              currentMutual = inGraph;
+            } else {
+              currentMutual = window.drawing.insertNode(currentMutual);
+            }
+            window.drawing.addEdge(currentFriend, currentMutual, 'green');
+            if(list.length){
+              return loadMutual(list);
+            } else {
+              return;
+            }
+          }
+
+          if(mutualList.length){
+            loadMutual(mutualList);
+          }
+        })
+
+        if(idArray.length){
+            return getMutual(idArray);
+        } else {
+            return;
+        }
+      }
+      getMutual(friendsList);
+  });
 
 });

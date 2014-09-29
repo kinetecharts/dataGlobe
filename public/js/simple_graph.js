@@ -56,7 +56,7 @@ Drawing.SimpleGraph = function(options) {
   this.show_stats = options.showStats || false;
   this.show_info = options.showInfo || false;
   this.show_labels = options.showLabels || false;
-  this.selection = options.selection || false;
+  this.selection = options.selection || true;
   this.limit = options.limit || 10;
   this.nodes_count = options.numNodes || 20;
   this.edges_count = options.numEdges || 10;
@@ -154,8 +154,12 @@ Drawing.SimpleGraph = function(options) {
     var node;
     if(data.fbId){
       node = new Node(data.fbId);  
-    } else {
+    } 
+    else if(data.id){
       node = new Node(data.id);
+    }
+    else {
+      node = new Node(data);
     }
     node.position.x = data.latitude;
     node.position.y = data.longitude;
@@ -174,8 +178,8 @@ Drawing.SimpleGraph = function(options) {
       drawNode(node);
 
     if(graph.layout === undefined){
-      that.layout_options.width = that.layout_options.width || 2000;
-      that.layout_options.height = that.layout_options.height || 2000;
+      that.layout_options.width = that.layout_options.width || 6000;
+      that.layout_options.height = that.layout_options.height || 6000;
       that.layout_options.iterations = that.layout_options.iterations || 100000;
       that.layout_options.layout = that.layout_options.layout || that.layout;
       graph.layout = new Layout.ForceDirected(graph, that.layout_options);
@@ -249,7 +253,6 @@ Drawing.SimpleGraph = function(options) {
    *  Create an edge object (line) and add it to the scene.
    */
   function drawEdge(source, target, color) {
-    console.log(color);
       material = new THREE.LineBasicMaterial({ color: color, opacity: 1, linewidth: 1 });
 
       var tmp_geo = new THREE.Geometry();
@@ -362,4 +365,20 @@ Drawing.SimpleGraph = function(options) {
   this.stop_calculating = function() {
     graph.layout.stop_calculating();
   }
-}
+  // this.directionVector = new THREE.Vector3();
+  // this.projector = new THREE.Projector()
+  // this.ray = new THREE.ReusableRay();
+  // this.onMouseMove = function( event ) {
+  // var x = (event.screenX / window.innerWidth) * 2 - 1;
+  // var y = -(event.screenY / window.innerHeight) * 2 + 1;
+  // this.directionVector.set(x, y, 1);
+  // this.projector.unprojectVector(this.directionVector, camera);
+  // this.directionVector.subSelf(camera.position);
+  // this.directionVector.normalize();
+  // this.ray.setSource(camera.position, this.directionVector);
+  // var intersects = this.ray.intersectObjects(scene.children);
+  // if(intersects.length > 0){
+  //   console.log(intersects);
+  //   }
+  // }
+} 

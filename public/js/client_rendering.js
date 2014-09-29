@@ -71,11 +71,25 @@ $(document).ready(function(){
           currentNode = drawing.getNode(current);
         }
         drawing.goToNode(current);
-        FBData.get('newsFeed',current, function(data){
+        FBData.get('userPhotos',current, function(data){
           data = JSON.parse(data);
-          console.log(data);
+          console.log('data: ', data)
+          var getPhotos = function(array){
+            var current = array.pop();
+            FBData.get('getPhoto', current.id, function(photoData){
+              photoData = JSON.parse(photoData);
+              displayInfo(photoData);
+              if(array.length){
+                return getPhotos(array);
+              } else {
+                return;
+              }
+            })
+          }
+          if(data.photos){
+            getPhotos(data.photos.data);
+          }
           // display posts
-          displayInfo(data);
         })
         i += 1;
       }, 5000)
@@ -94,32 +108,8 @@ $(document).ready(function(){
     var $infoHTMLClone = $infoHTML.clone();
     var $info = $infoHTMLClone.find('.info-data');
     var header = $infoHTMLClone.find('.info-header');
-    if(data.posts){
-      var posts = data.posts.data;
-      var num = Math.min(posts.length, 2);
-      for(var i = 0; i < num; i++){
-        var post = posts[i];
-        header.text(post.from.name);
-        if(post.message){
-          $info.append('<p>'+post.message+'</p>')
-          $info.append('<p>'+post.created_time+'</p>')
-        }
-        if(post.picture){
-          $info.append('<img class="info-img" src="'+post.picture+'"></img>');
-          $info.append('<p>'+post.created_time+'</p>')
-        }
-        if(post.story){
-          $info.append('<p>'+post.story+'</p>');
-          if(post.link){
-            $info.append('<p><a href="'+post.link+'">Take a Look</a><p>')
-            }
-          }
-        }
-      } else {
-        var name = drawing.getCurrent().data.name;
-        header.text(name);
-        $info.append('<p>No new updates.</p>');
-      }
+      //header.text(post.from.name);
+      $info.append('<img class="info-img" src="'+data.picture+'"></img>');
     $('.panel-wrapper').prepend($infoHTMLClone);
     infoHTMLlog.push($infoHTMLClone);
     if(infoHTMLlog.length > 2){
@@ -129,3 +119,41 @@ $(document).ready(function(){
   }
 //////////////////////////////////////////////////////////////////////////
 });
+
+  // var displayInfo = function(data){
+  //   var $infoHTMLClone = $infoHTML.clone();
+  //   var $info = $infoHTMLClone.find('.info-data');
+  //   var header = $infoHTMLClone.find('.info-header');
+  //   if(data.posts){
+  //     var posts = data.posts.data;
+  //     var num = Math.min(posts.length, 2);
+  //     for(var i = 0; i < num; i++){
+  //       var post = posts[i];
+  //       header.text(post.from.name);
+  //       if(post.message){
+  //         $info.append('<p>'+post.message+'</p>')
+  //         $info.append('<p>'+post.created_time+'</p>')
+  //       }
+  //       if(post.picture){
+  //         $info.append('<img class="info-img" src="'+post.picture+'"></img>');
+  //         $info.append('<p>'+post.created_time+'</p>')
+  //       }
+  //       if(post.story){
+  //         $info.append('<p>'+post.story+'</p>');
+  //         if(post.link){
+  //           $info.append('<p><a href="'+post.link+'">Take a Look</a><p>')
+  //           }
+  //         }
+  //       }
+  //     } else {
+  //       var name = drawing.getCurrent().data.name;
+  //       header.text(name);
+  //       $info.append('<p>No new updates.</p>');
+  //     }
+  //   $('.panel-wrapper').prepend($infoHTMLClone);
+  //   infoHTMLlog.push($infoHTMLClone);
+  //   if(infoHTMLlog.length > 2){
+  //     infoHTMLlog[0].fadeOut("slow");
+  //     infoHTMLlog.shift();
+  //   }
+  // }

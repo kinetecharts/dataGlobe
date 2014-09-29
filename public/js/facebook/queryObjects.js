@@ -22,5 +22,13 @@ var queryStringData = {
   newsFeed: {
     queryString: ['posts{id,type,from,to,with_tags,created_time,message,story,link,name,tags,picture}'],
     endpoint: false
+  },
+  userPhotos: {
+    queryString: ['photos{id}'],
+    endpoint: false
+  },
+  getPhoto: {
+    queryString:[''],
+    endpoint: false
   }
 }
