@@ -243,7 +243,7 @@ Drawing.SphereGraph = function(options) {
     var x = node.position.x * 2.2;
     var y = node.position.y * 2.2;
     var z = node.position.z * 2.2;
-    createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 600)
+    createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 1000, createjs.Ease.sineInOut)
     camera.lookAt( scene.position );
     //$('.info-header').text(node.data.name);
     if(this.previousNode){

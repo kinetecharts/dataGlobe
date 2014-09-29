@@ -78,7 +78,7 @@ $(document).ready(function(){
           displayInfo(data);
         })
         i += 1;
-      }, 4000)
+      }, 5000)
     })
   });
   $('.newsFeed').on('click', function(){

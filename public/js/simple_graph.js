@@ -250,7 +250,7 @@ Drawing.SimpleGraph = function(options) {
    */
   function drawEdge(source, target, color) {
     console.log(color);
-      material = new THREE.LineBasicMaterial({ color: color, opacity: 1, linewidth: 1.5 });
+      material = new THREE.LineBasicMaterial({ color: color, opacity: 1, linewidth: 1 });
 
       var tmp_geo = new THREE.Geometry();
       tmp_geo.vertices.push(source.data.draw_object.position);
