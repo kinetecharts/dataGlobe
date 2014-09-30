@@ -75,16 +75,15 @@ $(document).ready(function(){
           data = JSON.parse(data);
           console.log('data: ', data)
           var getPhotos = function(array){
-            var current = array.pop();
-            FBData.get('getPhoto', current.id, function(photoData){
-              photoData = JSON.parse(photoData);
-              displayInfo(photoData);
+            setInterval(function(){
               if(array.length){
-                return getPhotos(array);
-              } else {
-                return;
+                var current = array.pop();
+                FBData.get('getPhoto', current.id, function(photoData){
+                  photoData = JSON.parse(photoData);
+                  displayInfo(photoData);
+                })
               }
-            })
+            }, 1000)
           }
           if(data.photos){
             getPhotos(data.photos.data);
@@ -103,13 +102,13 @@ $(document).ready(function(){
   });
 ///// for info display //////////////////////////////////////////////////
   var infoHTMLlog = [];
-  var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-heading info-header"></div><div class="panel-body info-data"></div></div>');
+  var $infoHTML = $('<div><div class="info-data"></div></div>');
   var displayInfo = function(data){
     var $infoHTMLClone = $infoHTML.clone();
     var $info = $infoHTMLClone.find('.info-data');
-    var header = $infoHTMLClone.find('.info-header');
+    //var header = $infoHTMLClone.find('.info-header');
       //header.text(post.from.name);
-      $info.append('<img class="info-img" src="'+data.picture+'"></img>');
+      $info.append('<img class="info-img" src="'+data.source+'"></img>');
     $('.panel-wrapper').prepend($infoHTMLClone);
     infoHTMLlog.push($infoHTMLClone);
     if(infoHTMLlog.length > 2){
@@ -119,7 +118,7 @@ $(document).ready(function(){
   }
 //////////////////////////////////////////////////////////////////////////
 });
-
+  // var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-heading info-header"></div><div class="panel-body info-data"></div></div>');
   // var displayInfo = function(data){
   //   var $infoHTMLClone = $infoHTML.clone();
   //   var $info = $infoHTMLClone.find('.info-data');

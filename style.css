@@ -10,9 +10,11 @@ body {
   top: 0px;
   left: 40%;
   margin: 10px;
-  background-color: #ffffe0;
-  color: #333;
   padding: 5px 10px;
+}
+
+.user-name {
+  color: white;
 }
 #options {
   position: absolute;

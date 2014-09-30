@@ -30,5 +30,9 @@ var queryStringData = {
   getPhoto: {
     queryString:[''],
     endpoint: false
+  },
+  getUser: {
+    queryString:[''],
+    endpoint: false
   }
 }

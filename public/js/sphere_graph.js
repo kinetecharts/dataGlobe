@@ -107,7 +107,7 @@ Drawing.SphereGraph = function(options) {
   this.layout = options.layout || "2d";
   this.show_stats = options.showStats || false;
   this.show_info = options.showInfo || true;
-  this.selection = options.selection || false;
+  this.selection = options.selection || true;
   this.limit = options.limit || 10;
 
   var camera, controls, scene, renderer, interaction, geometry, object_selection;
@@ -115,6 +115,7 @@ Drawing.SphereGraph = function(options) {
   var graph = new Graph();
 
   var geometries = [];
+  var info_text = {};
 
   var sphere_radius = 4900;
   var max_X = 10000;
@@ -202,9 +203,8 @@ Drawing.SphereGraph = function(options) {
       object_selection = new THREE.ObjectSelection({
         domElement: renderer.domElement,
         selected: function(obj) {
-          // display info
-          if(obj != null) {
-            info_text.select = "Object " + obj.id;
+          if(obj != null && obj.fbId !== undefined) {
+            info_text.select = obj.name; //get this ID in printInfo to display shiz
           } else {
             delete info_text.select;
           }
@@ -376,7 +376,8 @@ Number.prototype.toRadians = function(){
     //set node.data.draw_object to equal the three.js sphere object
 
     var draw_object = new THREE.Line( line, material );
-    draw_object.id = node.id;
+    draw_object.fbId = node.id;
+    draw_object.name = node.data.name
 
     // var ball = new THREE.SphereGeometry(10, 40, 30);
     // material = new THREE.MeshBasicMaterial({ color: 'red' });
@@ -468,6 +469,9 @@ Number.prototype.toRadians = function(){
     requestAnimationFrame( animate );
     controls.update();
     render();
+    if(that.show_info) {
+      printInfo();
+    }
   }
 
 
@@ -507,4 +511,33 @@ Number.prototype.toRadians = function(){
   function randomFromTo(from, to) {
     return Math.floor(Math.random() * (to - from + 1) + from);
   }
+
+  function printInfo(text) {
+    var str = '';
+    for(var index in info_text) {
+      if(str != '' && info_text[index] != '') {
+        str += " - ";
+      }
+      str += info_text[index];
+    }
+    var names = document.getElementsByClassName('user-name');
+    if(!findElement(names, str)){
+      var p = document.createElement('p');
+      p.className = 'user-name';
+      p.textContent = str;
+      var first = document.getElementById("graph-info").firstElementChild;
+      document.getElementById("graph-info").insertBefore(p, first);
+    }
+  }
+
+  function findElement(tree, str){
+    var result = false;
+    for(var i = 0; i < tree.length; i++){
+      if(tree[i].textContent === str){
+        result = true;
+      }
+    }
+    return result;
+  }
+
 }
