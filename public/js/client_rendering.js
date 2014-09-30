@@ -108,7 +108,7 @@ $(document).ready(function(){
     var $info = $infoHTMLClone.find('.info-data');
     //var header = $infoHTMLClone.find('.info-header');
       //header.text(post.from.name);
-      $info.append('<img class="info-img" src="'+data.source+'"></img>');
+      $info.append('<img class="info-img animated zoomIn" src="'+data.source+'"></img>');
     $('.panel-wrapper').prepend($infoHTMLClone);
     infoHTMLlog.push($infoHTMLClone);
     if(infoHTMLlog.length > 2){
