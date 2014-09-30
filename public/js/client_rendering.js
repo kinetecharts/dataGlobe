@@ -37,7 +37,7 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
   });
 
   $(document).on('keydown', function( event ){
-    event.preventDefault();
+    //event.preventDefault();
     if(event.which === 32){
       nextFunc();
     }
@@ -78,12 +78,12 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
   //   })
   // });
 
-$('.newsFeed').on('click', function(){
-  FBData.get('newsFeed', 'me', function(data){
-    data = JSON.parse(data);
-    console.log(data);
+  $('.newsFeed').on('click', function(){
+    FBData.get('newsFeed', 'me', function(data){
+      data = JSON.parse(data);
+      console.log(data);
+    })
   })
-})
 ///// for info display //////////////////////////////////////////////////
   var infoHTMLlog = [];
   var $infoHTML = $('<div><div class="info-data img-box"></div></div>');
@@ -118,21 +118,24 @@ function flyToNext(cb){
           current = friends[i];
           currentNode = drawing.getNode(current);
         }
+        //go to next user on globe and draw mutual friends
         drawing.goToNode(current);
         getMutual(current);
         FBData.get('userPhotos',current, function(data){
+          //get photos of current friend
           data = JSON.parse(data);
           console.log('data: ', data)
           if(data.photos){
+            //if there are photos, display them
             getPhotos(data.photos.data);
           }
-          // display posts
         })
       })
   })
 }
 
 var getPhotos = function(array){
+  //every second, get a photo from FB and display
   setInterval(function(){
     if(array.length){
       var current = array.pop();
