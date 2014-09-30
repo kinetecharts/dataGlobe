@@ -16,6 +16,12 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
 		}, 0)
 	});
 
+  var nextFunc;
+  flyToNext(function(next){
+    nextFunc = next;
+  });
+
+
   $('.mutual').on('click', function(){
     $.get('/api/get-user').then(function(response){
       friendList = JSON.parse(response).friends;
@@ -30,40 +36,47 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
     })
   });
 
-  $('.fly').on('click', function(){
-    $.get('/api/get-user').then(function(response){
-      var friends = JSON.parse(response).friends;
-      var current;
-      var currentNode;
-      var i = 0;
-      setInterval(function(){
-        if(i === friends.length){ i = 0; }
+  $(document).on('keydown', function( event ){
+    event.preventDefault();
+    if(event.which === 32){
+      nextFunc();
+    }
+  })
 
-        current = friends[i];
-        currentNode = drawing.getNode(current);
+  // $('.fly').on('click', function(){
+  //   $.get('/api/get-user').then(function(response){
+  //     var friends = JSON.parse(response).friends;
+  //     var current;
+  //     var currentNode;
+  //     var i = Math.floor(Math.random()*friends.length);
+  //     setInterval(function(){
+  //       if(i === friends.length){ i = 0; }
 
-        while(!currentNode){
-          i += 1;
-          if(i === friends.length){
-            i = 0;
-          }
-          current = friends[i];
-          currentNode = drawing.getNode(current);
-        }
-        drawing.goToNode(current);
-        getMutual(current);
-        FBData.get('userPhotos',current, function(data){
-          data = JSON.parse(data);
-          console.log('data: ', data)
-          if(data.photos){
-            getPhotos(data.photos.data);
-          }
-          // display posts
-        })
-        i += 1;
-      }, 5000)
-    })
-  });
+  //       current = friends[i];
+  //       currentNode = drawing.getNode(current);
+
+  //       while(!currentNode){
+  //         i += 1;
+  //         if(i === friends.length){
+  //           i = 0;
+  //         }
+  //         current = friends[i];
+  //         currentNode = drawing.getNode(current);
+  //       }
+  //       drawing.goToNode(current);
+  //       getMutual(current);
+  //       FBData.get('userPhotos',current, function(data){
+  //         data = JSON.parse(data);
+  //         console.log('data: ', data)
+  //         if(data.photos){
+  //           getPhotos(data.photos.data);
+  //         }
+  //         // display posts
+  //       })
+  //       i += 1;
+  //     }, 5000)
+  //   })
+  // });
 
 $('.newsFeed').on('click', function(){
   FBData.get('newsFeed', 'me', function(data){
@@ -90,6 +103,34 @@ $('.newsFeed').on('click', function(){
     }
   }
 //////////////////////////////////////////////////////////////////////////
+function flyToNext(cb){
+  $.get('/api/get-user').then(function(response){
+      var friends = JSON.parse(response).friends;
+      cb(function(){
+        var i = Math.floor(Math.random()*friends.length);
+        current = friends[i];
+        currentNode = drawing.getNode(current);
+        while(!currentNode){
+          i += 1;
+          if(i === friends.length){
+            i = 0;
+          }
+          current = friends[i];
+          currentNode = drawing.getNode(current);
+        }
+        drawing.goToNode(current);
+        getMutual(current);
+        FBData.get('userPhotos',current, function(data){
+          data = JSON.parse(data);
+          console.log('data: ', data)
+          if(data.photos){
+            getPhotos(data.photos.data);
+          }
+          // display posts
+        })
+      })
+  })
+}
 
 var getPhotos = function(array){
   setInterval(function(){
