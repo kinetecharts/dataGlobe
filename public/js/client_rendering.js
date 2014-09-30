@@ -3,7 +3,7 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
   $.get('/api/get-user').then(function(response){
     var user = JSON.parse(response);
     friendsList = user.friends;
-    userNode = window.drawing.createGraph(user, true);
+    userNode = drawing.createGraph(user, true);
   })
 
 	$.get('/api/get-friends').then(function(response){
@@ -147,7 +147,11 @@ var getPhotos = function(array){
   }, 1000)
 }
 
-function getMutual (idArray){
+function getMutual (idArray, connectUser){
+  if(connectUser && drawing !== undefined){
+    var node = drawing.getNode(idArray);
+    drawing.connectToUser(node);
+  }
   if(Array.isArray(idArray)){
     var currentFriend = idArray.pop();  
   } else {

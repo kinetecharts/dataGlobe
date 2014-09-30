@@ -143,9 +143,15 @@ Drawing.SphereGraph = function(options) {
 
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
     camera.position.z = 20000;
-
-    controls = new THREE.OrbitControls(camera);
-    controls.addEventListener( 'change', render );
+    canvas = document.body;
+    clock = new THREE.Clock();
+    // control = new THREE.OrbitControls(camera);
+    control = new THREE.FlyControls(camera, canvas);
+    control.dragToLook = false;
+    control.autoForward = false;
+    control.movementSpeed = 1000;
+    control.rollSpeed = 0.5;
+    // control.addEventListener( 'change', render );
 
     scene = new THREE.Scene();
 
@@ -248,7 +254,11 @@ Drawing.SphereGraph = function(options) {
     var z = node.position.z * 2.2;
     createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 1000, createjs.Ease.sineInOut)
     camera.lookAt( scene.position );
+    this.connectToUser(node);
     //$('.info-header').text(node.data.name);
+  }
+
+  this.connectToUser = function(node){
     if(this.userNode){
       if(graph.addEdge(node, this.userNode)){
         drawEdge(node, this.userNode, 'blue', true);
@@ -472,7 +482,9 @@ Number.prototype.toRadians = function(){
 
   function animate() {
     requestAnimationFrame( animate );
-    controls.update();
+    var dt = clock.getDelta();
+    control.update(dt)
+    // control.update();
     render();
     if(that.show_info) {
       printInfo();
@@ -527,7 +539,10 @@ Number.prototype.toRadians = function(){
     }
     if(!watched[str]){
       watched[str] = true;
-      getMutual(parseInt(str));
+      var fbId = parseInt(str);
+      console.log(this);
+      // var node = this.getNode(fbId);
+      getMutual(fbId, true);
     }
     // var names = document.getElementsByClassName('user-name');
     // if(!findElement(names, str)){
