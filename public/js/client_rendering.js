@@ -1,6 +1,4 @@
-$(document).ready(function(){
-
-  var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: true});
+var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: true});
 	$.get('/api/get-friends').then(function(response){
 		var friends = JSON.parse(response);
 		friends = friends.data;
@@ -14,31 +12,6 @@ $(document).ready(function(){
   $('.mutual').on('click', function(){
     $.get('/api/get-user').then(function(response){
       friendList = JSON.parse(response).friends;
-      var getMutual = function(idArray){
-        var currentFriend = idArray.pop();
-        var payload = {id: currentFriend};
-        $.post('/api/get-mutual', payload).then(function(response){
-          console.log('response: ', response)
-          var mutualList = JSON.parse(response);
-          var loadMutual = function(list){
-            var currentMutual = list.pop();
-            drawing.addEdge(currentFriend, currentMutual);
-            if(list.length){
-              return loadMutual(list);
-            } else {
-              return;
-            }
-          }
-          if(mutualList.length){
-            loadMutual(mutualList);
-          }
-        })
-        if(idArray.length){
-            return getMutual(idArray);
-        } else {
-            return;
-        }
-      }
       getMutual(friendList);
     })
   });
@@ -99,16 +72,17 @@ $(document).ready(function(){
       data = JSON.parse(data);
       console.log(data);
     })
-  });
 ///// for info display //////////////////////////////////////////////////
   var infoHTMLlog = [];
-  var $infoHTML = $('<div><div class="info-data"></div></div>');
-  var displayInfo = function(data){
+  var $infoHTML = $('<div><div class="info-data img-box"></div></div>');
+  function displayInfo(data){
     var $infoHTMLClone = $infoHTML.clone();
     var $info = $infoHTMLClone.find('.info-data');
     //var header = $infoHTMLClone.find('.info-header');
-      //header.text(post.from.name);
-      $info.append('<img class="info-img animated zoomIn" src="'+data.source+'"></img>');
+    if($('.panel-wrapper').children().length){
+      $($('.panel-wrapper').children()[0]).addClass('target');
+    }
+    $info.append('<img class="info-img animated zoomIn" src="'+data.source+'"></img>');
     $('.panel-wrapper').prepend($infoHTMLClone);
     infoHTMLlog.push($infoHTMLClone);
     if(infoHTMLlog.length > 2){
@@ -118,6 +92,37 @@ $(document).ready(function(){
   }
 //////////////////////////////////////////////////////////////////////////
 });
+
+function getMutual (idArray){
+  if(Array.isArray(idArray)){
+    var currentFriend = idArray.pop();  
+  } else {
+    var currentFriend = idArray;
+    idArray = [];
+  }
+  var payload = {id: currentFriend};
+  $.post('/api/get-mutual', payload).then(function(response){
+    var mutualList = JSON.parse(response);
+    if(mutualList.length){
+      loadMutual(mutualList, currentFriend);
+    }
+  })
+  if(idArray.length){
+      return getMutual(idArray);
+  } else {
+      return;
+  }
+}
+
+function loadMutual(list, currentFriend){
+  var currentMutual = list.pop();
+  drawing.addEdge(currentFriend, currentMutual);
+  if(list.length){
+    return loadMutual(list, currentFriend);
+  } else {
+    return;
+  }
+}
   // var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-heading info-header"></div><div class="panel-body info-data"></div></div>');
   // var displayInfo = function(data){
   //   var $infoHTMLClone = $infoHTML.clone();

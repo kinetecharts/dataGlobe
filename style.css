@@ -29,3 +29,17 @@ body {
   height: 100px;
   width: 200px;
 }
+
+.img-box {
+   padding: 20px;
+   background: #ccc;
+   max-height:0;
+   overflow:hidden;
+   -webkit-transition:max-height 1s;
+   -moz-transition:max-height 1s;
+   transition:max-height 1s;
+}
+
+.img-box .target {
+    max-height:800px; /* you can't transistion to height:auto */
+}

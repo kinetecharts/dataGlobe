@@ -116,6 +116,7 @@ Drawing.SphereGraph = function(options) {
 
   var geometries = [];
   var info_text = {};
+  var watched = {};
 
   var sphere_radius = 4900;
   var max_X = 10000;
@@ -204,7 +205,7 @@ Drawing.SphereGraph = function(options) {
         domElement: renderer.domElement,
         selected: function(obj) {
           if(obj != null && obj.fbId !== undefined) {
-            info_text.select = obj.name; //get this ID in printInfo to display shiz
+            info_text.select = obj.fbId; //get this ID in printInfo to display shiz
           } else {
             delete info_text.select;
           }
@@ -520,14 +521,18 @@ Number.prototype.toRadians = function(){
       }
       str += info_text[index];
     }
-    var names = document.getElementsByClassName('user-name');
-    if(!findElement(names, str)){
-      var p = document.createElement('p');
-      p.className = 'user-name';
-      p.textContent = str;
-      var first = document.getElementById("graph-info").firstElementChild;
-      document.getElementById("graph-info").insertBefore(p, first);
+    if(!watched[str]){
+      watched[str] = true;
+      getMutual(parseInt(str));
     }
+    // var names = document.getElementsByClassName('user-name');
+    // if(!findElement(names, str)){
+    //   var p = document.createElement('p');
+    //   p.className = 'user-name';
+    //   p.textContent = str;
+    //   var first = document.getElementById("graph-info").firstElementChild;
+    //   document.getElementById("graph-info").insertBefore(p, first);
+    // }
   }
 
   function findElement(tree, str){
