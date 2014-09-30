@@ -1,4 +1,11 @@
 var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: true});
+
+  $.get('/api/get-user').then(function(response){
+    var user = JSON.parse(response);
+    friendsList = user.friends;
+    userNode = window.drawing.createGraph(user, true);
+  })
+
 	$.get('/api/get-friends').then(function(response){
 		var friends = JSON.parse(response);
 		friends = friends.data;
@@ -30,11 +37,11 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
       var currentNode;
       var i = 0;
       setInterval(function(){
-        if(i === friends.length){
-          i = 0;
-        }
+        if(i === friends.length){ i = 0; }
+
         current = friends[i];
         currentNode = drawing.getNode(current);
+
         while(!currentNode){
           i += 1;
           if(i === friends.length){
@@ -44,20 +51,10 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
           currentNode = drawing.getNode(current);
         }
         drawing.goToNode(current);
+        getMutual(current);
         FBData.get('userPhotos',current, function(data){
           data = JSON.parse(data);
           console.log('data: ', data)
-          var getPhotos = function(array){
-            setInterval(function(){
-              if(array.length){
-                var current = array.pop();
-                FBData.get('getPhoto', current.id, function(photoData){
-                  photoData = JSON.parse(photoData);
-                  displayInfo(photoData);
-                })
-              }
-            }, 1000)
-          }
           if(data.photos){
             getPhotos(data.photos.data);
           }
@@ -67,11 +64,13 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
       }, 5000)
     })
   });
-  $('.newsFeed').on('click', function(){
-    FBData.get('newsFeed', 'me', function(data){
-      data = JSON.parse(data);
-      console.log(data);
-    })
+
+$('.newsFeed').on('click', function(){
+  FBData.get('newsFeed', 'me', function(data){
+    data = JSON.parse(data);
+    console.log(data);
+  })
+})
 ///// for info display //////////////////////////////////////////////////
   var infoHTMLlog = [];
   var $infoHTML = $('<div><div class="info-data img-box"></div></div>');
@@ -91,7 +90,18 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
     }
   }
 //////////////////////////////////////////////////////////////////////////
-});
+
+var getPhotos = function(array){
+  setInterval(function(){
+    if(array.length){
+      var current = array.pop();
+      FBData.get('getPhoto', current.id, function(photoData){
+        photoData = JSON.parse(photoData);
+        displayInfo(photoData);
+      })
+    }
+  }, 1000)
+}
 
 function getMutual (idArray){
   if(Array.isArray(idArray)){
@@ -116,7 +126,7 @@ function getMutual (idArray){
 
 function loadMutual(list, currentFriend){
   var currentMutual = list.pop();
-  drawing.addEdge(currentFriend, currentMutual);
+  drawing.addEdge(currentFriend, currentMutual, 'red', true);
   if(list.length){
     return loadMutual(list, currentFriend);
   } else {

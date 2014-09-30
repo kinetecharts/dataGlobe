@@ -227,13 +227,15 @@ Drawing.SphereGraph = function(options) {
   this.nodes = [];
   this.userNode;
   this.previousNode;
-  this.addEdge = function(from, to){
+  this.addEdge = function(from, to, color, fade){
+    color = color || 'red';
+    fade = fade || false;
     console.log(from);
     console.log(to);
     var fromNode = graph.getNode(from);
     var toNode = graph.getNode(to);
     if(graph.addEdge(fromNode, toNode)){
-      drawEdge(fromNode, toNode, 'red');
+      drawEdge(fromNode, toNode, 'red', color, fade);
     }
   }
   /*
@@ -247,12 +249,11 @@ Drawing.SphereGraph = function(options) {
     createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 1000, createjs.Ease.sineInOut)
     camera.lookAt( scene.position );
     //$('.info-header').text(node.data.name);
-    if(this.previousNode){
-      if(graph.addEdge(node, this.previousNode)){
-        drawEdge(node, this.previousNode, 'red', true);
+    if(this.userNode){
+      if(graph.addEdge(node, this.userNode)){
+        drawEdge(node, this.userNode, 'blue', true);
       }
     }
-    this.previousNode = node;
   }
 
   this.getCurrent = function(){
@@ -267,7 +268,7 @@ getNode allows you to get graph nodes from the client
   }
 
 
-  this.createGraph = function(current) {
+  this.createGraph = function(current, isUser) {
       //only add if lat and lon are not null
     if(current.longitude !== null && current.latitude !== null){
       //make a new node object
@@ -276,6 +277,9 @@ getNode allows you to get graph nodes from the client
       node.position.x = current.latitude;
       node.position.y = current.longitude;
       node.data.name = current.name;
+      if(isUser){
+        this.userNode = node;
+      }
       //add and render node
       graph.addNode(node);
       drawNode(node);
