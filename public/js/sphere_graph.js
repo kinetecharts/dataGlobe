@@ -143,9 +143,15 @@ Drawing.SphereGraph = function(options) {
 
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
     camera.position.z = 20000;
-
-    controls = new THREE.OrbitControls(camera);
-    controls.addEventListener( 'change', render );
+    canvas = document.body;
+    clock = new THREE.Clock();
+    // control = new THREE.OrbitControls(camera);
+    control = new THREE.FlyControls(camera, canvas);
+    control.dragToLook = false;
+    control.autoForward = false;
+    control.movementSpeed = 1000;
+    control.rollSpeed = 0.5;
+    // control.addEventListener( 'change', render );
 
     scene = new THREE.Scene();
 
@@ -156,7 +162,7 @@ Drawing.SphereGraph = function(options) {
     sun.position.set(0.8, 0.3, -0.3 ).normalize();
     var ambientLight = new THREE.AmbientLight( 0x555555 );
     //add sphere geometry from google globe JHE
-    var globeGeometry = new THREE.SphereGeometry(sphere_radius, 100, 50);
+    var globeGeometry = new THREE.SphereGeometry(sphere_radius, 200, 100);
     // Adds bumps, shininess
     var globeMaterial  = new THREE.MeshPhongMaterial();
     globeMaterial.map    = THREE.ImageUtils.loadTexture('./img/earth_dark.jpg');
@@ -321,7 +327,11 @@ Drawing.SphereGraph = function(options) {
     var z = node.position.z * 2.2;
     createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 1000, createjs.Ease.sineInOut)
     camera.lookAt( scene.position );
+    this.connectToUser(node);
     //$('.info-header').text(node.data.name);
+  }
+
+  this.connectToUser = function(node){
     if(this.userNode){
       if(graph.addEdge(node, this.userNode)){
         drawEdge(node, this.userNode, 'blue', true);
@@ -457,7 +467,7 @@ Number.prototype.toRadians = function(){
     draw_object.fbId = node.id;
     draw_object.name = node.data.name
 
-    // var ball = new THREE.SphereGeometry(10, 40, 30);
+    // var ball = new THREE.SphereGeometry(10, 4, 3);
     // material = new THREE.MeshBasicMaterial({ color: 'red' });
     // draw_object = new THREE.Mesh(ball, material);
     // draw_object.position.set(node.position.x, node.position.y,node.position.z);
@@ -476,7 +486,6 @@ Number.prototype.toRadians = function(){
     scene.add( node.data.draw_object );
   }
 
-
   /**
    *  Create an edge object (line) and add it to the scene.
    */
@@ -484,31 +493,13 @@ Number.prototype.toRadians = function(){
     fade = fade || false;
     var distance = latlonDistance(source.position, target.position);
     var multiplier = 2.0;
-    // if(distance < 9000){
-    //   multiplier = 1.2;
-    // }
-    // else if(distance > 9000 && distance < 12000){
-    //   multiplier = 1.5;
-    // }
-    // else if(distance > 12000 && distance < 17000){
-    //   multiplier = 2.1;
-    // }
-    // else if(distance > 17000 && distance < 22000){
-    //   multiplier = 2.7;
-    // }
-    // else if(distance > 22000){
-    //   console.log(distance);
-    // }
+
     //make a 3js line object
     material = new THREE.LineBasicMaterial( { color: 0xCCCCCC, opacity: 0.5, linewidth: 1 } );
 
     //cache the coordinates of the source and target nodes
     var sourceXy = source.position;
     var targetXy = target.position;
-
-    /*
-    The following code is broken, it does not produce a nice curved line from the source to the larget
-    */
 
     //get averages (mid-point) between coordinates of source and target
     var AvgX = (sourceXy['x'] + targetXy['x'])/2;
@@ -545,7 +536,9 @@ Number.prototype.toRadians = function(){
 
   function animate() {
     requestAnimationFrame( animate );
-    controls.update();
+    var dt = clock.getDelta();
+    control.update(dt)
+    // control.update();
     render();
     if(that.show_info) {
       printInfo();
@@ -600,7 +593,13 @@ Number.prototype.toRadians = function(){
     }
     if(!watched[str]){
       watched[str] = true;
-      getMutual(parseInt(str));
+      var fbId = parseInt(str);
+      console.log(this);
+      // var node = this.getNode(fbId);
+      if(window.getProfilePic !== undefined){
+        window.getProfilePic(fbId);
+      }
+      getMutual(fbId, true);
     }
     // var names = document.getElementsByClassName('user-name');
     // if(!findElement(names, str)){

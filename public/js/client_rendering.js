@@ -3,7 +3,7 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
   $.get('/api/get-user').then(function(response){
     var user = JSON.parse(response);
     friendsList = user.friends;
-    userNode = window.drawing.createGraph(user, true);
+    userNode = drawing.createGraph(user, true);
   })
 
 	$.get('/api/get-friends').then(function(response){
@@ -37,7 +37,7 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
   });
 
   $(document).on('keydown', function( event ){
-    event.preventDefault();
+    //event.preventDefault();
     if(event.which === 32){
       nextFunc();
     }
@@ -78,23 +78,30 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
   //   })
   // });
 
-$('.newsFeed').on('click', function(){
-  FBData.get('newsFeed', 'me', function(data){
-    data = JSON.parse(data);
-    console.log(data);
+  $('.newsFeed').on('click', function(){
+    FBData.get('newsFeed', 'me', function(data){
+      data = JSON.parse(data);
+      console.log(data);
+    })
   })
-})
 ///// for info display //////////////////////////////////////////////////
   var infoHTMLlog = [];
   var $infoHTML = $('<div><div class="info-data img-box"></div></div>');
-  function displayInfo(data){
+
+  function displayInfo(data, isUrl){
+    var key;
+    if(isUrl){
+      key = data.url;
+    } else {
+      key = data.source;
+    }
     var $infoHTMLClone = $infoHTML.clone();
     var $info = $infoHTMLClone.find('.info-data');
     //var header = $infoHTMLClone.find('.info-header');
     if($('.panel-wrapper').children().length){
       $($('.panel-wrapper').children()[0]).addClass('target');
     }
-    $info.append('<img class="info-img animated zoomIn" src="'+data.source+'"></img>');
+    $info.append('<img class="info-img animated zoomIn" src="'+key+'"></img>');
     $('.panel-wrapper').prepend($infoHTMLClone);
     infoHTMLlog.push($infoHTMLClone);
     if(infoHTMLlog.length > 2){
@@ -118,21 +125,24 @@ function flyToNext(cb){
           current = friends[i];
           currentNode = drawing.getNode(current);
         }
+        //go to next user on globe and draw mutual friends
         drawing.goToNode(current);
         getMutual(current);
         FBData.get('userPhotos',current, function(data){
+          //get photos of current friend
           data = JSON.parse(data);
           console.log('data: ', data)
           if(data.photos){
+            //if there are photos, display them
             getPhotos(data.photos.data);
           }
-          // display posts
         })
       })
   })
 }
 
 var getPhotos = function(array){
+  //every second, get a photo from FB and display
   setInterval(function(){
     if(array.length){
       var current = array.pop();
@@ -142,9 +152,25 @@ var getPhotos = function(array){
       })
     }
   }, 1000)
+};
+
+window.getProfilePic = function(id){
+  getPic(id);  
+};
+
+var getPic = function(id){
+  FBData.get('getProfilePic', id, function(photo){
+    photo = JSON.parse(photo);
+    photo = photo.picture.data;
+    displayInfo(photo, true);
+  })
 }
 
-function getMutual (idArray){
+function getMutual (idArray, connectUser){
+  if(connectUser && drawing !== undefined){
+    var node = drawing.getNode(idArray);
+    drawing.connectToUser(node);
+  }
   if(Array.isArray(idArray)){
     var currentFriend = idArray.pop();  
   } else {
