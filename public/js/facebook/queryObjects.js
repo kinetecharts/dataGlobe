@@ -34,5 +34,9 @@ var queryStringData = {
   getUser: {
     queryString:[''],
     endpoint: false
+  },
+  getProfilePic: {
+    queryString:['picture.type(large)'],
+    endpoint: false
   }
 }

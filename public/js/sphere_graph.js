@@ -162,7 +162,7 @@ Drawing.SphereGraph = function(options) {
     sun.position.set(10000, 100, 1000 );
     var ambientLight = new THREE.AmbientLight( 0xffffff );
     //add sphere geometry from google globe JHE
-    var globeGeometry = new THREE.SphereGeometry(sphere_radius, 40, 30);
+    var globeGeometry = new THREE.SphereGeometry(sphere_radius, 200, 100);
     // Adds bumps, shininess
     var globeMaterial  = new THREE.MeshPhongMaterial();
     globeMaterial.map    = THREE.ImageUtils.loadTexture('./img/world.jpg');
@@ -394,7 +394,7 @@ Number.prototype.toRadians = function(){
     draw_object.fbId = node.id;
     draw_object.name = node.data.name
 
-    // var ball = new THREE.SphereGeometry(10, 40, 30);
+    // var ball = new THREE.SphereGeometry(10, 4, 3);
     // material = new THREE.MeshBasicMaterial({ color: 'red' });
     // draw_object = new THREE.Mesh(ball, material);
     // draw_object.position.set(node.position.x, node.position.y,node.position.z);
@@ -413,7 +413,6 @@ Number.prototype.toRadians = function(){
     scene.add( node.data.draw_object );
   }
 
-
   /**
    *  Create an edge object (line) and add it to the scene.
    */
@@ -421,31 +420,13 @@ Number.prototype.toRadians = function(){
     fade = fade || false;
     var distance = latlonDistance(source.position, target.position);
     var multiplier = 2.0;
-    // if(distance < 9000){
-    //   multiplier = 1.2;
-    // }
-    // else if(distance > 9000 && distance < 12000){
-    //   multiplier = 1.5;
-    // }
-    // else if(distance > 12000 && distance < 17000){
-    //   multiplier = 2.1;
-    // }
-    // else if(distance > 17000 && distance < 22000){
-    //   multiplier = 2.7;
-    // }
-    // else if(distance > 22000){
-    //   console.log(distance);
-    // }
+
     //make a 3js line object
     material = new THREE.LineBasicMaterial( { color: 0xCCCCCC, opacity: 0.5, linewidth: 1 } );
 
     //cache the coordinates of the source and target nodes
     var sourceXy = source.position;
     var targetXy = target.position;
-
-    /*
-    The following code is broken, it does not produce a nice curved line from the source to the larget
-    */
 
     //get averages (mid-point) between coordinates of source and target
     var AvgX = (sourceXy['x'] + targetXy['x'])/2;
@@ -542,6 +523,9 @@ Number.prototype.toRadians = function(){
       var fbId = parseInt(str);
       console.log(this);
       // var node = this.getNode(fbId);
+      if(window.getProfilePic !== undefined){
+        window.getProfilePic(fbId);
+      }
       getMutual(fbId, true);
     }
     // var names = document.getElementsByClassName('user-name');

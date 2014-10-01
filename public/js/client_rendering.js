@@ -87,14 +87,21 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
 ///// for info display //////////////////////////////////////////////////
   var infoHTMLlog = [];
   var $infoHTML = $('<div><div class="info-data img-box"></div></div>');
-  function displayInfo(data){
+
+  function displayInfo(data, isUrl){
+    var key;
+    if(isUrl){
+      key = data.url;
+    } else {
+      key = data.source;
+    }
     var $infoHTMLClone = $infoHTML.clone();
     var $info = $infoHTMLClone.find('.info-data');
     //var header = $infoHTMLClone.find('.info-header');
     if($('.panel-wrapper').children().length){
       $($('.panel-wrapper').children()[0]).addClass('target');
     }
-    $info.append('<img class="info-img animated zoomIn" src="'+data.source+'"></img>');
+    $info.append('<img class="info-img animated zoomIn" src="'+key+'"></img>');
     $('.panel-wrapper').prepend($infoHTMLClone);
     infoHTMLlog.push($infoHTMLClone);
     if(infoHTMLlog.length > 2){
@@ -145,6 +152,18 @@ var getPhotos = function(array){
       })
     }
   }, 1000)
+};
+
+window.getProfilePic = function(id){
+  getPic(id);  
+};
+
+var getPic = function(id){
+  FBData.get('getProfilePic', id, function(photo){
+    photo = JSON.parse(photo);
+    photo = photo.picture.data;
+    displayInfo(photo, true);
+  })
 }
 
 function getMutual (idArray, connectUser){
