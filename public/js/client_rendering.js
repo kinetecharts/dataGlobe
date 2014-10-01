@@ -128,15 +128,16 @@ function flyToNext(cb){
         //go to next user on globe and draw mutual friends
         drawing.goToNode(current);
         getMutual(current);
-        FBData.get('userPhotos',current, function(data){
-          //get photos of current friend
-          data = JSON.parse(data);
-          console.log('data: ', data)
-          if(data.photos){
-            //if there are photos, display them
-            getPhotos(data.photos.data);
-          }
-        })
+        getPic(current);
+        // FBData.get('userPhotos',current, function(data){
+        //   //get photos of current friend
+        //   data = JSON.parse(data);
+        //   console.log('data: ', data)
+        //   if(data.photos){
+        //     //if there are photos, display them
+        //     getPhotos(data.photos.data);
+        //   }
+        // })
       })
   })
 }

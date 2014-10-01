@@ -283,6 +283,7 @@ setInterval(function(){
       object_selection = new THREE.ObjectSelection({
         domElement: renderer.domElement,
         selected: function(obj) {
+          console.log(obj);
           if(obj != null && obj.fbId !== undefined) {
             info_text.select = obj.fbId; //get this ID in printInfo to display shiz
           } else {
@@ -457,21 +458,21 @@ Number.prototype.toRadians = function(){
     node.position.y = sphere_radius * Math.cos(phi);
     node.position.z = sphere_radius * Math.sin(phi) * Math.sin(theta);
 
-    var line = new THREE.Geometry();
-    var material = new THREE.LineBasicMaterial({  color: 'white', linewidth: 1 })
-    line.vertices.push(new THREE.Vector3(node.position.x*0, node.position.y*0, node.position.z*0));
-    line.vertices.push(new THREE.Vector3(node.position.x*1.05, node.position.y*1.05, node.position.z*1.05));
-    //set node.data.draw_object to equal the three.js sphere object
+    // var line = new THREE.Geometry();
+    // var material = new THREE.LineBasicMaterial({  color: 'white', linewidth: 1 })
+    // line.vertices.push(new THREE.Vector3(node.position.x*0, node.position.y*0, node.position.z*0));
+    // line.vertices.push(new THREE.Vector3(node.position.x*1.05, node.position.y*1.05, node.position.z*1.05));
+    // var draw_object = new THREE.Line( line, material );
+    
 
-    var draw_object = new THREE.Line( line, material );
+    //set node.data.draw_object to equal the three.js sphere object
+    var ball = new THREE.SphereGeometry(7, 4, 3);
+    material = new THREE.MeshBasicMaterial({ color: 'red' });
+    draw_object = new THREE.Mesh(ball, material);
+    draw_object.position.set(node.position.x, node.position.y,node.position.z);
+
     draw_object.fbId = node.id;
     draw_object.name = node.data.name
-
-    // var ball = new THREE.SphereGeometry(10, 4, 3);
-    // material = new THREE.MeshBasicMaterial({ color: 'red' });
-    // draw_object = new THREE.Mesh(ball, material);
-    // draw_object.position.set(node.position.x, node.position.y,node.position.z);
-
     node.data.draw_object = draw_object;
     node.layout = {}
     node.layout.max_X = 90;
