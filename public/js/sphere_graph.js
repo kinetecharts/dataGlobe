@@ -179,21 +179,21 @@ Drawing.SphereGraph = function(options) {
     scene.add(skybox);
 
 /////////////////////////////////////////////////////////////////////////////////
-// // clouds
-// var tilt = 0.41;
-// var rotationSpeed = 0.02;
-// var cloudsScale = 1.005;
+// clouds
+var tilt = 0.41;
+var rotationSpeed = 0.02;
+var cloudsScale = 1.005;
 
-// var cloudTexture = THREE.ImageUtils.loadTexture('./img/clouds.png');
-// var cloudGeometry = new THREE.SphereGeometry(sphere_radius+50, 40, 30);
-// var materialClouds = new THREE.MeshLambertMaterial( { color: 0xffffff, map: cloudTexture, transparent: true } );
+var cloudTexture = THREE.ImageUtils.loadTexture('./img/clouds.png');
+var cloudGeometry = new THREE.SphereGeometry(sphere_radius+50, 200, 100);
+var materialClouds = new THREE.MeshLambertMaterial( { color: 0xffffff, map: cloudTexture, transparent: true } );
 
-// meshClouds = new THREE.Mesh( cloudGeometry, materialClouds );
-// meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
-// meshClouds.rotation.z = tilt;
-// setInterval(function(){
-//   meshClouds.rotation.z +=0.0001;
-// },16)
+meshClouds = new THREE.Mesh( cloudGeometry, materialClouds );
+meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
+meshClouds.rotation.z = tilt;
+setInterval(function(){
+  meshClouds.rotation.z +=0.0001;
+},16)
 
 // // stars
 
