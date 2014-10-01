@@ -152,14 +152,14 @@ Drawing.SphereGraph = function(options) {
 /////////////////////////////////////////////////////////////////////////////////
     // a sun like light source and ambient light so all parts of globe are visible
     // adding a specular map turns the globe black without having lighting
-    var sun = new THREE.SpotLight( 0x999999 );
-    sun.position.set(10000, 100, 1000 );
-    var ambientLight = new THREE.AmbientLight( 0xffffff );
+    var sun = new THREE.DirectionalLight( 0xffffff , 0.8);
+    sun.position.set(0.8, 0.3, -0.3 ).normalize();
+    var ambientLight = new THREE.AmbientLight( 0x555555 );
     //add sphere geometry from google globe JHE
-    var globeGeometry = new THREE.SphereGeometry(sphere_radius, 40, 30);
+    var globeGeometry = new THREE.SphereGeometry(sphere_radius, 100, 50);
     // Adds bumps, shininess
     var globeMaterial  = new THREE.MeshPhongMaterial();
-    globeMaterial.map    = THREE.ImageUtils.loadTexture('./img/world.jpg');
+    globeMaterial.map    = THREE.ImageUtils.loadTexture('./img/earth_dark.jpg');
     globeMaterial.normalMap    = THREE.ImageUtils.loadTexture('./img/earth_normal.jpg');
     globeMaterial.bumpScale = 0.05;
     globeMaterial.specularMap = THREE.ImageUtils.loadTexture('./img/earth_specular.jpg');
@@ -170,8 +170,80 @@ Drawing.SphereGraph = function(options) {
       map: THREE.ImageUtils.loadTexture('./img/stars.jpg')
       , side: THREE.BackSide });
     var skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
-
     scene.add(skybox);
+
+/////////////////////////////////////////////////////////////////////////////////
+// // clouds
+// var tilt = 0.41;
+// var rotationSpeed = 0.02;
+// var cloudsScale = 1.005;
+
+// var cloudTexture = THREE.ImageUtils.loadTexture('./img/clouds.png');
+// var cloudGeometry = new THREE.SphereGeometry(sphere_radius+50, 40, 30);
+// var materialClouds = new THREE.MeshLambertMaterial( { color: 0xffffff, map: cloudTexture, transparent: true } );
+
+// meshClouds = new THREE.Mesh( cloudGeometry, materialClouds );
+// meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
+// meshClouds.rotation.z = tilt;
+// setInterval(function(){
+//   meshClouds.rotation.z +=0.0001;
+// },16)
+
+// // stars
+
+// var star_index, star_raid = sphere_radius, starsGeometry = [ new THREE.Geometry(), new THREE.Geometry() ];
+
+// for ( star_index = 0; star_index < 250; star_index ++ ) {
+
+//   var vertex = new THREE.Vector3();
+//   vertex.x = Math.random() * 2 - 1;
+//   vertex.y = Math.random() * 2 - 1;
+//   vertex.z = Math.random() * 2 - 1;
+//   vertex.multiplyScalar( star_raid );
+
+//   starsGeometry[ 0 ].vertices.push( vertex );
+
+// }
+
+// for ( star_index = 0; star_index < 1500; star_index ++ ) {
+
+//   var vertex = new THREE.Vector3();
+//   vertex.x = Math.random() * 2 - 1;
+//   vertex.y = Math.random() * 2 - 1;
+//   vertex.z = Math.random() * 2 - 1;
+//   vertex.multiplyScalar( star_raid );
+
+//   starsGeometry[ 1 ].vertices.push( vertex );
+
+// }
+
+// var stars;
+// var starsMaterials = [
+//   new THREE.PointCloudMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
+//   new THREE.PointCloudMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
+//   new THREE.PointCloudMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
+//   new THREE.PointCloudMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
+//   new THREE.PointCloudMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
+//   new THREE.PointCloudMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
+// ];
+
+// for ( star_index = 10; star_index < 30; star_index ++ ) {
+
+//   stars = new THREE.PointCloud( starsGeometry[ star_index % 2 ], starsMaterials[ star_index % 6 ] );
+
+//   stars.rotation.x = Math.random() * 6;
+//   stars.rotation.y = Math.random() * 6;
+//   stars.rotation.z = Math.random() * 6;
+
+//   s = star_index * 10;
+//   stars.scale.set( s, s, s );
+
+//   stars.matrixAutoUpdate = false;
+//   stars.updateMatrix();
+//   scene.add( stars );
+
+// }
+
 /////////////////////////////////////////////////////////////////////////////////
     // shader = Shaders['earth'];
     // uniforms = THREE.UniformsUtils.clone(shader.uniforms);
@@ -189,12 +261,13 @@ Drawing.SphereGraph = function(options) {
     globe = new THREE.Mesh(globeGeometry, globeMaterial);
     globe.rotation.y = Math.PI;
     scene.add(globe);
+    scene.add( meshClouds );
     scene.add(sun);
     scene.add(ambientLight);
 
     // end sphere geom JHE
 
-    // scene.add(new THREE.AxisHelper(9000))
+    // scene.add(new THREE.AxisHelper(9000));
 
     // Create node geometry (will be used in drawNode())
     geometry = new THREE.SphereGeometry( 50, 25, 0 );
