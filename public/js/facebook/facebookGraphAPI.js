@@ -73,9 +73,7 @@ window.fbAsyncInit = function() {
 function testAPI() {
   FB.api('/me',
     function(response) {
-      document.getElementById('status').innerHTML =
-        'Thanks for logging in, ' + response.name + '!';
-
+      document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.name + '!';
       FB.api('/fql',
         {
           q: "SELECT current_location.latitude, current_location.longitude, first_name, last_name, uid, pic_square FROM user WHERE uid = me()"

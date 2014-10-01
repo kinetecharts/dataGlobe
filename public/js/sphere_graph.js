@@ -117,6 +117,9 @@ Drawing.SphereGraph = function(options) {
   var geometries = [];
   var info_text = {};
   var watched = {};
+  setInterval(function(){
+    watched = {};
+  }, 5000)
 
   var sphere_radius = 4900;
   var max_X = 10000;
@@ -173,7 +176,7 @@ Drawing.SphereGraph = function(options) {
 
     var skyboxGeometry = new THREE.CubeGeometry(50000, 50000, 50000);
     var skyboxMaterial = new THREE.MeshBasicMaterial({
-      map: THREE.ImageUtils.loadTexture('./img/stars.jpg')
+      map: THREE.ImageUtils.loadTexture('./img/bsg-stars.png')
       , side: THREE.BackSide });
     var skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
     scene.add(skybox);
@@ -458,21 +461,25 @@ Number.prototype.toRadians = function(){
     node.position.y = sphere_radius * Math.cos(phi);
     node.position.z = sphere_radius * Math.sin(phi) * Math.sin(theta);
 
-    // var line = new THREE.Geometry();
-    // var material = new THREE.LineBasicMaterial({  color: 'white', linewidth: 1 })
-    // line.vertices.push(new THREE.Vector3(node.position.x*0, node.position.y*0, node.position.z*0));
-    // line.vertices.push(new THREE.Vector3(node.position.x*1.05, node.position.y*1.05, node.position.z*1.05));
-    // var draw_object = new THREE.Line( line, material );
+    //The original lines were made with this code:
+
+    var line = new THREE.Geometry();
+    var material = new THREE.LineBasicMaterial({  color: 'white', linewidth: 1 })
+    line.vertices.push(new THREE.Vector3(node.position.x*0, node.position.y*0, node.position.z*0));
+    line.vertices.push(new THREE.Vector3(node.position.x*1.05, node.position.y*1.05, node.position.z*1.05));
+    var draw_object = new THREE.Line( line, material );
     
 
-    //set node.data.draw_object to equal the three.js sphere object
-    var ball = new THREE.SphereGeometry(7, 4, 3);
-    material = new THREE.MeshBasicMaterial({ color: 'red' });
-    draw_object = new THREE.Mesh(ball, material);
-    draw_object.position.set(node.position.x, node.position.y,node.position.z);
+    //I changed it to this code to make the friends into red spheres:
+    // var ball = new THREE.SphereGeometry(20, 10, 10);
+    // material = new THREE.MeshBasicMaterial({ color: 'red' });
+    // draw_object = new THREE.Mesh(ball, material);
+    // draw_object.position.set(node.position.x*1.02, node.position.y*1.02,node.position.z*1.02);
 
+    //this code stays the same, I use the fbId to get friend data on mouseover
     draw_object.fbId = node.id;
     draw_object.name = node.data.name
+
     node.data.draw_object = draw_object;
     node.layout = {}
     node.layout.max_X = 90;
@@ -491,8 +498,9 @@ Number.prototype.toRadians = function(){
    *  Create an edge object (line) and add it to the scene.
    */
   function drawEdge(source, target, color, fade) {
+    console.log('source', source);
     fade = fade || false;
-    var distance = latlonDistance(source.position, target.position);
+    //var distance = latlonDistance(source.position, target.position);
     var multiplier = 2.0;
 
     //make a 3js line object

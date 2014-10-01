@@ -97,12 +97,14 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
     }
     var $infoHTMLClone = $infoHTML.clone();
     var $info = $infoHTMLClone.find('.info-data');
+
     //var header = $infoHTMLClone.find('.info-header');
     if($('.panel-wrapper').children().length){
-      $($('.panel-wrapper').children()[0]).addClass('target');
+      $($('.panel-wrapper').children()[0]).addClass('zoomOut');
     }
+    $('.panel-wrapper').empty();
     $info.append('<img class="info-img animated zoomIn" src="'+key+'"></img>');
-    $('.panel-wrapper').prepend($infoHTMLClone);
+    $('.panel-wrapper').append($infoHTMLClone);
     infoHTMLlog.push($infoHTMLClone);
     if(infoHTMLlog.length > 2){
       infoHTMLlog[0].fadeOut("slow");
@@ -156,7 +158,10 @@ var getPhotos = function(array){
 };
 
 window.getProfilePic = function(id){
-  getPic(id);  
+  console.log(id);
+  if(id === id){
+    getPic(id);  
+  }
 };
 
 var getPic = function(id){
