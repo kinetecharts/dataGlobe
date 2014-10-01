@@ -148,13 +148,13 @@ Drawing.SphereGraph = function(options) {
     camera.position.z = 20000;
     canvas = document.body;
     clock = new THREE.Clock();
-    // control = new THREE.OrbitControls(camera);
-    control = new THREE.FlyControls(camera, canvas);
-    control.dragToLook = false;
-    control.autoForward = false;
-    control.movementSpeed = 1000;
-    control.rollSpeed = 0.5;
-    // control.addEventListener( 'change', render );
+    control = new THREE.OrbitControls(camera);
+    // control = new THREE.FlyControls(camera, canvas);
+    // control.dragToLook = false;
+    // control.autoForward = false;
+    // control.movementSpeed = 1000;
+    // control.rollSpeed = 0.5;
+    control.addEventListener( 'change', render );
 
     scene = new THREE.Scene();
 
@@ -286,7 +286,6 @@ setInterval(function(){
       object_selection = new THREE.ObjectSelection({
         domElement: renderer.domElement,
         selected: function(obj) {
-          console.log(obj);
           if(obj != null && obj.fbId !== undefined) {
             info_text.select = obj.fbId; //get this ID in printInfo to display shiz
           } else {
@@ -313,8 +312,6 @@ setInterval(function(){
   this.addEdge = function(from, to, color, fade){
     color = color || 'red';
     fade = fade || false;
-    console.log(from);
-    console.log(to);
     var fromNode = graph.getNode(from);
     var toNode = graph.getNode(to);
     if(graph.addEdge(fromNode, toNode)){
@@ -326,10 +323,35 @@ setInterval(function(){
   */
   this.goToNode = function(id){
     var node = graph.getNode(id);
-    var x = node.position.x * 2.2;
-    var y = node.position.y * 2.2;
-    var z = node.position.z * 2.2;
-    createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 1000, createjs.Ease.sineInOut)
+    var finalX = node.position.x * 2.2;
+    var finalY = node.position.y * 2.2;
+    var finalZ = node.position.z * 2.2;
+
+    var midX = (camera.position.x + finalX)/2*1.2;
+    var midY = (camera.position.y + finalY)/2*1.2;
+    var midZ = (camera.position.z + finalZ)/2*1.2;
+
+    var vect1 = new THREE.Vector3(camera.position.x, camera.position.y, camera.position.z);
+    var vect2 = new THREE.Vector3(midX, midY, midZ);
+    var vect3 = new THREE.Vector3(finalX, finalY, finalZ);
+
+    var curve = new THREE.QuadraticBezierCurve3();
+    curve.v0 = vect1;
+    curve.v1 = vect2;
+    curve.v2 = vect3;
+
+    var flyTo1 = curve.getPointAt(0.25);
+    var flyTo2 = curve.getPointAt(0.5);
+    var flyTo3 = curve.getPointAt(0.75);
+
+    var tween = new createjs.Tween(camera.position)
+    .to({x: flyTo1.x, y: flyTo1.y, z: flyTo1.z}, 300, createjs.Ease.linearInOut)
+    .to({x: flyTo2.x, y: flyTo2.y, z: flyTo2.z}, 300, createjs.Ease.linearInOut)
+    .to({x: flyTo3.x, y: flyTo3.y, z: flyTo3.z}, 300, createjs.Ease.linearInOut)
+    .to({x: finalX, y: finalY, z: finalZ}, 300, createjs.Ease.linearInOut);
+    // createjs.Tween.get(camera.position).to({x: flyTo3.x, y: flyTo3.y, z: flyTo3.z}, 300, createjs.Ease.sineInOut)
+    // createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 300, createjs.Ease.sineInOut)
+    console.log('camera ', camera);
     camera.lookAt( scene.position );
     this.connectToUser(node);
     //$('.info-header').text(node.data.name);
@@ -498,7 +520,6 @@ Number.prototype.toRadians = function(){
    *  Create an edge object (line) and add it to the scene.
    */
   function drawEdge(source, target, color, fade) {
-    console.log('source', source);
     fade = fade || false;
     //var distance = latlonDistance(source.position, target.position);
     var multiplier = 2.0;
@@ -537,8 +558,7 @@ Number.prototype.toRadians = function(){
     curvedLine.lookAt(scene.position);
     if(fade){
       curvedLine.material.transparent = true;
-      createjs.Tween.get(curvedLine.material).wait(4000).to({opacity: 0}, 5000);
-      console.log(curvedLine);
+      createjs.Tween.get(curvedLine.material).wait(5000).to({opacity: 0}, 5000);
     }
     scene.add(curvedLine);
   }
@@ -603,11 +623,11 @@ Number.prototype.toRadians = function(){
     if(!watched[str]){
       watched[str] = true;
       var fbId = parseInt(str);
-      console.log(this);
       // var node = this.getNode(fbId);
       if(window.getProfilePic !== undefined){
         window.getProfilePic(fbId);
       }
+      window.currentId = fbId;
       getMutual(fbId, true);
     }
     // var names = document.getElementsByClassName('user-name');

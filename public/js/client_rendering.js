@@ -37,11 +37,15 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
   });
 
   $(document).on('keydown', function( event ){
-    //event.preventDefault();
+    console.log(event.which)
     if(event.which === 32){
       nextFunc();
     }
+    else if(event.which === 13){
+      getAllPhotos();
+    }
   })
+
 
   // $('.fly').on('click', function(){
   //   $.get('/api/get-user').then(function(response){
@@ -115,11 +119,12 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
 function flyToNext(cb){
   $.get('/api/get-user').then(function(response){
       var friends = JSON.parse(response).friends;
+      var last;
       cb(function(){
         var i = Math.floor(Math.random()*friends.length);
         current = friends[i];
         currentNode = drawing.getNode(current);
-        while(!currentNode){
+        while(!currentNode || current === last){
           i += 1;
           if(i === friends.length){
             i = 0;
@@ -129,18 +134,23 @@ function flyToNext(cb){
         }
         //go to next user on globe and draw mutual friends
         drawing.goToNode(current);
+        last = current;
         getMutual(current);
         getPic(current);
-        // FBData.get('userPhotos',current, function(data){
-        //   //get photos of current friend
-        //   data = JSON.parse(data);
-        //   console.log('data: ', data)
-        //   if(data.photos){
-        //     //if there are photos, display them
-        //     getPhotos(data.photos.data);
-        //   }
-        // })
       })
+  })
+}
+
+var getAllPhotos = function(id){
+  id = id || window.currentId;
+  FBData.get('userPhotos',current, function(data){
+    //get photos of current friend
+    data = JSON.parse(data);
+    console.log('data: ', data)
+    if(data.photos){
+      //if there are photos, display them
+      getPhotos(data.photos.data);
+    }
   })
 }
 
