@@ -286,8 +286,8 @@ setInterval(function(){
       object_selection = new THREE.ObjectSelection({
         domElement: renderer.domElement,
         selected: function(obj) {
-          if(obj != null && obj.fbId !== undefined) {
-            info_text.select = obj.fbId; //get this ID in printInfo to display shiz
+          if(obj !== null && obj.id !== undefined) {
+            info_text[obj.id] = obj.id; //get this ID in printInfo to display shiz
           } else {
             delete info_text.select;
           }
@@ -309,13 +309,19 @@ setInterval(function(){
   this.nodes = [];
   this.userNode;
   this.previousNode;
-  this.addEdge = function(from, to, color, fade){
+  this.addEdge = function(from, to, color, fade, width){
+    width = width || 2;
     color = color || 'red';
     fade = fade || false;
-    var fromNode = graph.getNode(from);
+    var fromNode;
+    if(from === 'user'){
+      fromNode = this.userNode;
+    } else {
+      fromNode = graph.getNode(from);
+    }
     var toNode = graph.getNode(to);
     if(graph.addEdge(fromNode, toNode)){
-      drawEdge(fromNode, toNode, 'red', color, fade);
+      drawEdge(fromNode, toNode, color, fade, width);
     }
   }
   /*
@@ -327,9 +333,9 @@ setInterval(function(){
     var finalY = node.position.y * 2.2;
     var finalZ = node.position.z * 2.2;
 
-    var midX = (camera.position.x + finalX)/2*1.2;
-    var midY = (camera.position.y + finalY)/2*1.2;
-    var midZ = (camera.position.z + finalZ)/2*1.2;
+    var midX = (camera.position.x + finalX)/2*1.1;
+    var midY = (camera.position.y + finalY)/2*1.1;
+    var midZ = (camera.position.z + finalZ)/2*1.1;
 
     var vect1 = new THREE.Vector3(camera.position.x, camera.position.y, camera.position.z);
     var vect2 = new THREE.Vector3(midX, midY, midZ);
@@ -395,7 +401,19 @@ getNode allows you to get graph nodes from the client
 
 
       this.nodes.push(node);
+      return node;
     }
+  }
+
+  this.addPost = function(id, post, context){
+    var source = context.getNode(id);
+    var node = new Node(post.id);
+    node.position.x = source.position.x * (Math.random()*3);
+    node.position.y = source.position.y * (Math.random()*3);
+    node.position.z = source.position.z * (1 + Math.random());
+    graph.addNode(node);
+    drawPost(source, node, context);
+    return node;
   }
 
 
@@ -485,18 +503,19 @@ Number.prototype.toRadians = function(){
 
     //The original lines were made with this code:
 
-    var line = new THREE.Geometry();
-    var material = new THREE.LineBasicMaterial({  color: 'white', linewidth: 1 })
-    line.vertices.push(new THREE.Vector3(node.position.x*0, node.position.y*0, node.position.z*0));
-    line.vertices.push(new THREE.Vector3(node.position.x*1.05, node.position.y*1.05, node.position.z*1.05));
-    var draw_object = new THREE.Line( line, material );
+    // var line = new THREE.Geometry();
+    // var material = new THREE.LineBasicMaterial({  color: 'white', linewidth: 1 })
+    // line.vertices.push(new THREE.Vector3(node.position.x*0, node.position.y*0, node.position.z*0));
+    // line.vertices.push(new THREE.Vector3(node.position.x*1.05, node.position.y*1.05, node.position.z*1.05));
+    // var draw_object = new THREE.Line( line, material );
     
 
     //I changed it to this code to make the friends into red spheres:
-    // var ball = new THREE.SphereGeometry(20, 10, 10);
-    // material = new THREE.MeshBasicMaterial({ color: 'red' });
-    // draw_object = new THREE.Mesh(ball, material);
-    // draw_object.position.set(node.position.x*1.02, node.position.y*1.02,node.position.z*1.02);
+    var ball = new THREE.SphereGeometry(10, 10, 10);
+    material = new THREE.MeshBasicMaterial({ color: 'red' });
+    // material.map = THREE.ImageUtils.loadTexture('./img/person.gif');
+    draw_object = new THREE.Mesh(ball, material);
+    draw_object.position.set(node.position.x*1.02, node.position.y*1.02,node.position.z*1.02);
 
     //this code stays the same, I use the fbId to get friend data on mouseover
     draw_object.fbId = node.id;
@@ -516,16 +535,75 @@ Number.prototype.toRadians = function(){
     scene.add( node.data.draw_object );
   }
 
+    function drawPost(source, node, context) {
+    //The original lines were made with this code:
+
+    // var line = new THREE.Geometry();
+    // var material = new THREE.LineBasicMaterial({  color: 'white', linewidth: 1 })
+    // line.vertices.push(new THREE.Vector3(node.position.x*0, node.position.y*0, node.position.z*0));
+    // line.vertices.push(new THREE.Vector3(node.position.x*1.05, node.position.y*1.05, node.position.z*1.05));
+    // var draw_object = new THREE.Line( line, material );
+
+    var ball = new THREE.SphereGeometry(20, 10, 10);
+    material = new THREE.MeshBasicMaterial({ color: 'yellow' });
+    draw_object = new THREE.Mesh(ball, material);
+    draw_object.position.set(source.position.x, source.position.y, source.position.z);
+    draw_object.fbId = node.id;
+    draw_object.name = node.data.name
+    node.data.draw_object = draw_object;
+    scene.add( node.data.draw_object );
+    node.data.draw_object.lookAt(scene.position);
+    
+    var finalX = node.position.x;
+    var finalY = node.position.y;
+    var finalZ = node.position.z;
+
+    var midX = (node.data.draw_object.position.x + finalX)/2*1.1;
+    var midY = (node.data.draw_object.position.y + finalY)/2*1.1;
+    var midZ = (node.data.draw_object.position.z + finalZ)/2*1.1;
+
+    var vect1 = new THREE.Vector3(node.data.draw_object.position.x, node.data.draw_object.position.y, node.data.draw_object.position.z);
+    var vect2 = new THREE.Vector3(midX, midY, midZ);
+    var vect3 = new THREE.Vector3(finalX, finalY, finalZ);
+
+    var curve = new THREE.QuadraticBezierCurve3();
+    curve.v0 = vect1;
+    curve.v1 = vect2;
+    curve.v2 = vect3;
+
+    var flyTo1 = curve.getPointAt(0.25);
+    var flyTo2 = curve.getPointAt(0.5);
+    var flyTo3 = curve.getPointAt(0.75);
+
+    var tween = new createjs.Tween(node.data.draw_object.position)
+    .to({x: flyTo1.x, y: flyTo1.y, z: flyTo1.z}, 300, createjs.Ease.linearInOut)
+    .to({x: flyTo2.x, y: flyTo2.y, z: flyTo2.z}, 300, createjs.Ease.linearInOut)
+    .to({x: flyTo3.x, y: flyTo3.y, z: flyTo3.z}, 300, createjs.Ease.linearInOut)
+    .to({x: finalX, y: finalY, z: finalZ}, 300, createjs.Ease.linearInOut).call(function(){
+      context.addEdge(source.id, node.id, 'yellow',true, 0.5)
+    })
+
+    //this code stays the same, I use the fbId to get friend data on mouseover
+    node.layout = {}
+    node.layout.max_X = 90;
+    node.layout.min_X = -90;
+    node.layout.max_Y = 180;
+    node.layout.min_Y = -180;
+
+    node.data.draw_object.material.transparent = true;
+    createjs.Tween.get(node.data.draw_object.material).wait(5000).to({opacity: 0}, 5000);
+  }
+
   /**
    *  Create an edge object (line) and add it to the scene.
    */
-  function drawEdge(source, target, color, fade) {
+  function drawEdge(source, target, color, fade, width) {
     fade = fade || false;
     //var distance = latlonDistance(source.position, target.position);
     var multiplier = 2.0;
 
     //make a 3js line object
-    material = new THREE.LineBasicMaterial( { color: 0xCCCCCC, opacity: 0.5, linewidth: 1 } );
+    material = new THREE.LineBasicMaterial( { color: 0xCCCCCC, opacity: 0.5, linewidth: width } );
 
     //cache the coordinates of the source and target nodes
     var sourceXy = source.position;
@@ -572,6 +650,11 @@ Number.prototype.toRadians = function(){
     if(that.show_info) {
       printInfo();
     }
+  }
+
+  this.moveOut = function(){
+    var newPos = {x: camera.position.x*1.5, y: camera.position.y*1.5, z: camera.position.z*1.5};
+    createjs.Tween.get(camera.position).to(newPos, 4000);
   }
 
 
@@ -621,14 +704,6 @@ Number.prototype.toRadians = function(){
       str += info_text[index];
     }
     if(!watched[str]){
-      watched[str] = true;
-      var fbId = parseInt(str);
-      // var node = this.getNode(fbId);
-      if(window.getProfilePic !== undefined){
-        window.getProfilePic(fbId);
-      }
-      window.currentId = fbId;
-      getMutual(fbId, true);
     }
     // var names = document.getElementsByClassName('user-name');
     // if(!findElement(names, str)){

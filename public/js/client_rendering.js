@@ -37,12 +37,21 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
   });
 
   $(document).on('keydown', function( event ){
-    console.log(event.which)
     if(event.which === 32){
       nextFunc();
     }
     else if(event.which === 13){
       getAllPhotos();
+    }
+    else if(event.which === 87){
+      var current = window.currentId
+      FBData.get('newsFeed', current, function(data){
+        var myPosts = JSON.parse(data);
+        if(myPosts.posts){
+          myPosts = myPosts.posts.data;
+          investigatePosts(current, myPosts);
+        }
+      })
     }
   })
 
@@ -133,6 +142,7 @@ function flyToNext(cb){
           currentNode = drawing.getNode(current);
         }
         //go to next user on globe and draw mutual friends
+        window.currentId = current
         drawing.goToNode(current);
         last = current;
         getMutual(current);
@@ -168,7 +178,7 @@ var getPhotos = function(array){
 };
 
 window.getProfilePic = function(id){
-  console.log(id);
+  console.log('getprofilepic:', id);
   if(id === id){
     getPic(id);  
   }
@@ -215,6 +225,31 @@ function loadMutual(list, currentFriend){
   } else {
     return;
   }
+}    
+
+var investigatePosts = function(id, posts){
+  drawing.moveOut()
+  setInterval(function(){
+    if(posts.length){
+      var current = posts.pop();
+      current = drawing.addPost(id, current, drawing);
+      FBData.getPostLikes(current.id, function(data){
+        data = data.data;
+        for(var l = 0; l < data.length; l++){
+          var liker = data[l];
+          liker = drawing.getNode(liker.id);
+          if(drawing.getNode(liker.id) !== undefined){
+          drawing.addEdge(current.id, liker.id, 'green', true);
+          } 
+        }
+        if(posts.length){
+          return investigatePosts(posts);
+        } else {
+          return;
+        }
+      })
+    }
+  }, 300)
 }
   // var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-heading info-header"></div><div class="panel-body info-data"></div></div>');
   // var displayInfo = function(data){

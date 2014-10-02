@@ -21,7 +21,6 @@ router.get('/friends', function (req, res){
 
 router.post('/save-user', function (req, res){
   var userData = req.body.user;
-  console.log('user: ', userData);
   userData = userData[0];
   User.findOneAndUpdate({fbId: userData.uid},{
     first_name: userData.first_name,
@@ -158,7 +157,6 @@ router.post('/get-mutual', function(req, res){
     if(err) console.log(err);
     if(data){
       var data = data.mutual_friends;
-      console.log(data);
       data = JSON.stringify(data);
       res.end(data);
     } else {
