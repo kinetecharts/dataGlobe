@@ -264,8 +264,12 @@ setInterval(function(){
       fromNode = graph.getNode(from);
     }
     var toNode = graph.getNode(to);
-    if(graph.addEdge(fromNode, toNode)){
-      drawEdge(fromNode, toNode, color, fade, width);
+    if(toNode==undefined){
+      console.log('Node '+to +' not in the graph');
+    }else{
+      if(graph.addEdge(fromNode, toNode)){
+        drawEdge(fromNode, toNode, color, fade, width);
+      }
     }
   }
   /*
@@ -522,18 +526,19 @@ setInterval(function(){
         });
       }
     }
-    // if(data.picture){
-    //   var texture = new Image();
-    //   texture.crossOrigin = "anonymous";
-    //   texture.onload = function(){
-    //     var material = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
-    //     var imageGeometry = new THREE.PlaneGeometry(texture.width, texture.height, 1, 1);
-    //     var image = new THREE.Mesh(imageGeometry, material);
-    //     image.position.set( node.position.x,node.position.y,node.position.z );
-    //     scene.add(image);
-    //   }
-    //   texture.src = data.picture;
-    // }
+    if(data.picture){
+      var texture = new Image();
+      texture.crossOrigin = "anonymous";
+      texture.onload = function(){
+        var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture(texture), side:THREE.DoubleSide } );
+        var imageGeometry = new THREE.PlaneGeometry(texture.width, texture.height, 1, 1);
+        var image = new THREE.Mesh(imageGeometry, material);
+        image.position.set( node.position.x,node.position.y,node.position.z );
+        image.material.map.needsUpdate = true;
+        scene.add(image);
+      }
+      texture.src = data.picture;
+    }
 
   }
 
