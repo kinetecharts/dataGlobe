@@ -159,7 +159,11 @@ var getPic = function(id){
 function getMutual (idArray, connectUser){
   if(connectUser && drawing !== undefined){
     var node = drawing.getNode(idArray);
-    drawing.connectToUser(node);
+    if(node==undefined){
+      console.log("node not found");
+    } else {
+      drawing.connectToUser(node);
+    }
   }
   if(Array.isArray(idArray)){
     var currentFriend = idArray.pop();  
@@ -203,7 +207,7 @@ var investigatePosts = function(id, posts){
           var liker = data[l];
           liker = drawing.getNode(liker.id);
           if(drawing.getNode(liker.id) !== undefined){
-          drawing.addEdge(current.id, liker.id, 'green', true);
+            drawing.addEdge(current.id, liker.id, 'green', true);
           } 
         }
         if(posts.length){

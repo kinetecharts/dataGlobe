@@ -493,9 +493,13 @@ setInterval(function(){
   // this function makes the "pieces" i.e. text or photos of a post fly out of the post sphere
   // when it reaches its resting spot
   this.postPieces = function(node){
+    var pos = camera.position;
     var rnd = Math.random;
     var data = node.data.post;
-    console.log('post data: ', data);
+    var onComplete = function(object){
+      scene.remove(object);
+      renderer.render( scene, camera );
+    }
     var text = data.message || data.story;
     if(text !== undefined){
       var text = text.split(' ');
@@ -515,25 +519,26 @@ setInterval(function(){
         
         textMesh.position.set( node.position.x, node.position.y, node.position.z );
         textMesh.lookAt(camera.position);
+        textMesh.data = 'TEXT';
         scene.add(textMesh);
-        var pos = camera.position;
-        createjs.Tween.get(textMesh.position).to({x: pos.x*(2+rnd()), y: pos.y*(2+rnd()), z: pos.z*(2+rnd())}, 8000).call(function(){
-          scene.remove(textMesh);
-        });
+        createjs.Tween.get(textMesh.position).to({x: pos.x*(2+rnd()), y: pos.y*(2+rnd()), z: pos.z*(2+rnd())}, 9000).call(onComplete, [textMesh]);
       }
     }
-    // if(data.picture){
-    //   var texture = new Image();
-    //   texture.crossOrigin = "anonymous";
-    //   texture.onload = function(){
-    //     var material = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
-    //     var imageGeometry = new THREE.PlaneGeometry(texture.width, texture.height, 1, 1);
-    //     var image = new THREE.Mesh(imageGeometry, material);
-    //     image.position.set( node.position.x,node.position.y,node.position.z );
-    //     scene.add(image);
-    //   }
-    //   texture.src = data.picture;
-    // }
+    if(data.picture){
+      var texture = new Image();
+      texture.crossOrigin = "anonymous";
+      texture.onload = function(){
+        var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture(texture), side:THREE.DoubleSide } );
+        var imageGeometry = new THREE.PlaneGeometry(texture.width, texture.height, 1, 1);
+        var image = new THREE.Mesh(imageGeometry, material);
+        image.position.set( node.position.x,node.position.y,node.position.z );
+        material.map.needsUpdate = true;
+        image.lookAt(camera.position);
+        scene.add(image);
+        createjs.Tween.get(image.position).to({x: pos.x*2, y: pos.y*2, z: pos.z*2}, 8000).call(onComplete, [image]);    
+      }
+      texture.src = data.picture;
+    }
 
   }
 
@@ -575,15 +580,20 @@ setInterval(function(){
     //create curved line and add to scene
     curvedLine = new THREE.Line(path.createPointsGeometry(100), curveMaterial);
     curvedLine.lookAt(scene.position);
+    var onComplete = function(){
+      scene.remove(curvedLine);
+      renderer.render( scene, camera );
+    }
     if(fade){
       curvedLine.material.transparent = true;
-      createjs.Tween.get(curvedLine.material).wait(5000).to({opacity: 0}, 5000);
+      createjs.Tween.get(curvedLine.material).wait(5000).to({opacity: 0}, 5000).call(onComplete);
     }
     scene.add(curvedLine);
   }
 
   // moves the camera away for post explosion
   this.moveOut = function(){
+    // ***** maybe keep a boolean to check if the camera has already moved out
     var newPos = {x: camera.position.x*1.4, y: camera.position.y*1.25, z: camera.position.z*1.3};
     createjs.Tween.get(camera.position).to(newPos, 4000);
   }
