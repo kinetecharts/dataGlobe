@@ -532,7 +532,7 @@ setInterval(function(){
       texture.crossOrigin = "anonymous";
       texture.onload = function(){
         var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture(texture), side:THREE.DoubleSide, transparent: true } );
-        material.opacity = 0.6;
+        material.opacity = 0.7;
         var imageGeometry = new THREE.PlaneGeometry(texture.width, texture.height, 1, 1);
         var image = new THREE.Mesh(imageGeometry, material);
         image.position.set( node.position.x,node.position.y,node.position.z );
@@ -546,6 +546,31 @@ setInterval(function(){
       }
       texture.src = data.picture;
     }
+  }
+
+  this.displayPhoto = function(data, node){
+    var onComplete = function(object){
+      scene.remove(object);
+      renderer.render( scene, camera );
+    }
+    var pos = camera.position;
+    var rnd = Math.random;
+    var texture = new Image();
+    texture.crossOrigin = "anonymous";
+    texture.onload = function(){
+      var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture(texture), side:THREE.DoubleSide, transparent: true } );
+      material.opacity = 0.7;
+      var imageGeometry = new THREE.PlaneGeometry(texture.width, texture.height, 1, 1);
+      var image = new THREE.Mesh(imageGeometry, material);
+      image.position.set( node.position.x,node.position.y,node.position.z );
+      image.material.map.needsUpdate = true;
+      image.lookAt(camera.position);
+      scene.add(image);
+      createjs.Tween.get(image.position)
+      .to({x: pos.x*(1+(rnd()*0.5)), y: pos.y*(1+(rnd()*0.5)), z: pos.z*(1+(rnd()*0.5))}, 8000)
+      .call(onComplete, [image]);
+    }
+    texture.src = data.picture;
   }
 
   // Create an edge object (line) and add it to the scene.

@@ -80,13 +80,16 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
       $($('.panel-wrapper').children()[0]).addClass('zoomOut');
     }
     $('.panel-wrapper').empty();
-    $info.append('<img class="info-img animated zoomIn" src="'+key+'"></img>');
-    $('.panel-wrapper').append($infoHTMLClone);
-    infoHTMLlog.push($infoHTMLClone);
-    if(infoHTMLlog.length > 2){
-      infoHTMLlog[0].fadeOut("slow");
-      infoHTMLlog.shift();
+    var image = new Image();
+    image.style.opacity = 0.6;
+    image.onload = function(){
+      var $image = $(image);
+      $image.addClass('info-img animated zoomIn');
+      $info.append($image);
+      $('.panel-wrapper').append($infoHTMLClone);
+      infoHTMLlog.push($infoHTMLClone);
     }
+    image.src = key;
   }
 //////////////////////////////////////////////////////////////////////////
 function flyToNext(cb){
@@ -117,28 +120,34 @@ function flyToNext(cb){
 
 var getAllPhotos = function(id){
   id = id || window.currentId;
+  if(current === undefined){
+    var current = window.currentId;
+  }
   FBData.get('userPhotos',current, function(data){
     //get photos of current friend
     data = JSON.parse(data);
     console.log('data: ', data)
     if(data.photos){
       //if there are photos, display them
-      getPhotos(data.photos.data);
+      getPhotos(data.photos.data, id);
     }
   })
 }
 
-var getPhotos = function(array){
+var getPhotos = function(array, id){
+  var friend = drawing.getNode(id);
   //every second, get a photo from FB and display
-  setInterval(function(){
-    if(array.length){
-      var current = array.pop();
-      FBData.get('getPhoto', current.id, function(photoData){
-        photoData = JSON.parse(photoData);
-        displayInfo(photoData);
-      })
-    }
-  }, 1000)
+  if(array.length){
+    setInterval(function(){
+      if(array.length){
+        var current = array.pop();
+        FBData.get('getPhoto', current.id, function(photoData){
+          photoData = JSON.parse(photoData);
+          drawing.displayPhoto(photoData, friend);
+        })
+      }
+    }, 20)
+  }
 };
 
 window.getProfilePic = function(id){
