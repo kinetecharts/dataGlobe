@@ -196,28 +196,36 @@ function loadMutual(list, currentFriend){
 }    
 
 var investigatePosts = function(id, posts){
-  drawing.moveOut()
-  setInterval(function(){
-    if(posts && posts.length){
-      var current = posts.pop();
-      current = drawing.addPost(id, current, drawing);
-      FBData.getPostLikes(current.id, function(data){
-        data = data.data;
-        for(var l = 0; l < data.length; l++){
-          var liker = data[l];
-          liker = drawing.getNode(liker.id);
-          if(drawing.getNode(liker.id) !== undefined){
-            drawing.addEdge(current.id, liker.id, 'green', true);
-          } 
-        }
-        if(posts.length){
-          return investigatePosts(posts);
-        } else {
-          return;
-        }
-      })
-    }
-  }, 300)
+  drawing.moveOut();
+  if(!posts || !posts.length){
+    return;
+  } else {
+    setInterval(function(){
+      drawPosts(id, posts);
+    }, 300)
+  }
+}
+
+var drawPosts = function(id, posts){
+  if(posts && posts.length){
+    var current = posts.pop();
+    current = drawing.addPost(id, current, drawing);
+    FBData.getPostLikes(current.id, function(data){
+      data = data.data;
+      for(var l = 0; l < data.length; l++){
+        var liker = data[l];
+        liker = drawing.getNode(liker.id);
+        if(drawing.getNode(liker.id) !== undefined){
+          drawing.addEdge(current.id, liker.id, 'green', true);
+        } 
+      }
+      if(posts.length){
+        return drawPosts(id, posts);
+      } else {
+        return;
+      }
+    })
+  }
 }
   // var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-heading info-header"></div><div class="panel-body info-data"></div></div>');
   // var displayInfo = function(data){

@@ -264,6 +264,9 @@ setInterval(function(){
       fromNode = graph.getNode(from);
     }
     var toNode = graph.getNode(to);
+    if (toNode === undefined){
+      console.log('Node '+ to +' not in the graph');
+      } else {
     if(graph.addEdge(fromNode, toNode)){
       drawEdge(fromNode, toNode, color, fade, width);
     }
@@ -501,7 +504,7 @@ setInterval(function(){
       renderer.render( scene, camera );
     }
     var text = data.message || data.story;
-    if(text !== undefined){
+    if(text !== undefined) {
       var text = text.split(' ');
       for(var i = 0; i < text.length; i++){
         var materialFront = new THREE.MeshBasicMaterial( { color: 'white' } );
@@ -535,11 +538,10 @@ setInterval(function(){
         material.map.needsUpdate = true;
         image.lookAt(camera.position);
         scene.add(image);
-        createjs.Tween.get(image.position).to({x: pos.x*2, y: pos.y*2, z: pos.z*2}, 8000).call(onComplete, [image]);    
+        createjs.Tween.get(image.position).to({x: pos.x*2, y: pos.y*2, z: pos.z*2}, 8000).call(onComplete, [image]);
       }
       texture.src = data.picture;
     }
-
   }
 
   // Create an edge object (line) and add it to the scene.

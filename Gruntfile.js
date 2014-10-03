@@ -88,10 +88,10 @@ module.exports = function(grunt){
 
     jshint: {
       files: [
-        'Gruntfile.js',
-        'public/js/**/*.js',
-        'server/*.js',
-        './*.js',
+        //'Gruntfile.js',
+        'public/js/**/sphere_graph.js'
+        //'server/*.js',
+        //'./*.js',
       ],
       options: {
         force: 'true',
