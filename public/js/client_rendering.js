@@ -93,7 +93,7 @@ function flyToNext(cb){
   $.get('/api/get-user').then(function(response){
       var friends = JSON.parse(response).friends;
       var last;
-      cb(function(){
+      cb(function(){ 
         var i = Math.floor(Math.random()*friends.length);
         current = friends[i];
         currentNode = drawing.getNode(current);
@@ -142,7 +142,6 @@ var getPhotos = function(array){
 };
 
 window.getProfilePic = function(id){
-  console.log('getprofilepic:', id);
   if(id === id){
     getPic(id);  
   }
@@ -154,6 +153,15 @@ var getPic = function(id){
     photo = photo.picture.data;
     displayInfo(photo, true);
   })
+}
+
+function goToRelay(id){
+  if(id === id){
+    window.currentId = id;
+  }
+  if(drawing !== undefined){
+    drawing.goToNode(id);
+  }
 }
 
 function getMutual (idArray, connectUser){

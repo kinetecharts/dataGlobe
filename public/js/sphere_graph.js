@@ -531,7 +531,8 @@ setInterval(function(){
       var texture = new Image();
       texture.crossOrigin = "anonymous";
       texture.onload = function(){
-        var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture(texture), side:THREE.DoubleSide } );
+        var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture(texture), side:THREE.DoubleSide, transparent: true } );
+        material.opacity = 0.6;
         var imageGeometry = new THREE.PlaneGeometry(texture.width, texture.height, 1, 1);
         var image = new THREE.Mesh(imageGeometry, material);
         image.position.set( node.position.x,node.position.y,node.position.z );
@@ -652,11 +653,11 @@ setInterval(function(){
     if(!watched[str]){
       watched[str] = true;
       var fbId = parseInt(str);
-      console.log(this);
-      window.currentId;
+      console.log('string: ',str);
       if(window.getProfilePic !== undefined){
         window.getProfilePic(fbId);
       }
+      goToRelay(fbId);
       getMutual(fbId, true);
     }
   }
