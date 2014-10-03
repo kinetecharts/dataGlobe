@@ -37,13 +37,13 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
   });
 
   $(document).on('keydown', function( event ){
-    if(event.which === 32){
+    if(event.which === 32){ // space key
       nextFunc();
     }
-    else if(event.which === 13){
+    else if(event.which === 13){ // enter key
       getAllPhotos();
     }
-    else if(event.which === 87){
+    else if(event.which === 87){ // w key
       var current = window.currentId
       FBData.get('newsFeed', current, function(data){
         var myPosts = JSON.parse(data);
@@ -54,42 +54,6 @@ var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: 
       })
     }
   })
-
-
-  // $('.fly').on('click', function(){
-  //   $.get('/api/get-user').then(function(response){
-  //     var friends = JSON.parse(response).friends;
-  //     var current;
-  //     var currentNode;
-  //     var i = Math.floor(Math.random()*friends.length);
-  //     setInterval(function(){
-  //       if(i === friends.length){ i = 0; }
-
-  //       current = friends[i];
-  //       currentNode = drawing.getNode(current);
-
-  //       while(!currentNode){
-  //         i += 1;
-  //         if(i === friends.length){
-  //           i = 0;
-  //         }
-  //         current = friends[i];
-  //         currentNode = drawing.getNode(current);
-  //       }
-  //       drawing.goToNode(current);
-  //       getMutual(current);
-  //       FBData.get('userPhotos',current, function(data){
-  //         data = JSON.parse(data);
-  //         console.log('data: ', data)
-  //         if(data.photos){
-  //           getPhotos(data.photos.data);
-  //         }
-  //         // display posts
-  //       })
-  //       i += 1;
-  //     }, 5000)
-  //   })
-  // });
 
   $('.newsFeed').on('click', function(){
     FBData.get('newsFeed', 'me', function(data){

@@ -1,52 +1,3 @@
-/**
-  @author David Piegza
-
-  Implements a sphere graph drawing with force-directed placement.
-
-  It uses the force-directed-layout implemented in:
-  https://github.com/davidpiegza/Graph-Visualization/blob/master/layouts/force-directed-layout.js
-
-  Drawing is done with Three.js: http://github.com/mrdoob/three.js
-
-  To use this drawing, include the graph-min.js file and create a SphereGraph object:
-
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <title>Graph Visualization</title>
-      <script type="text/javascript" src="path/to/graph-min.js"></script>
-    </head>
-    <body onload="new Drawing.SphereGraph({showStats: true, showInfo: true})">
-    </bod>
-  </html>
-
-  Parameters:
-  options = {
-    layout: "2d" or "3d"
-
-    showStats: <bool>, displays FPS box
-    showInfo: <bool>, displays some info on the graph and layout
-              The info box is created as <div id="graph-info">, it must be
-              styled and positioned with CSS.
-
-
-    selection: <bool>, enables selection of nodes on mouse over (it displays some info
-               when the showInfo flag is set)
-
-
-    limit: <int>, maximum number of nodes
-
-    numNodes: <int> - sets the number of nodes to create.
-    numEdges: <int> - sets the maximum number of edges for a node. A node will have
-              1 to numEdges edges, this is set randomly.
-  }
-
-
-  Feel free to contribute a new drawing!
-
- */
-
-
 var Drawing = Drawing || {};
 
 Drawing.SphereGraph = function(options) {
@@ -286,8 +237,8 @@ setInterval(function(){
       object_selection = new THREE.ObjectSelection({
         domElement: renderer.domElement,
         selected: function(obj) {
-          if(obj !== null && obj.id !== undefined) {
-            info_text[obj.id] = obj.id; //get this ID in printInfo to display shiz
+          if(obj !== null && obj.fbId !== undefined) {
+            info_text.select = obj.fbId; //get this ID in printInfo to display shiz
           } else {
             delete info_text.select;
           }
@@ -297,13 +248,6 @@ setInterval(function(){
 
     document.body.appendChild( renderer.domElement );
 
-    // Stats.js
-    // if(that.show_stats) {
-    //   stats = new Stats();
-    //   stats.domElement.style.position = 'absolute';
-    //   stats.domElement.style.top = '0px';
-    //   document.body.appendChild( stats.domElement );
-    // }
   }
 
   this.nodes = [];
@@ -355,8 +299,7 @@ setInterval(function(){
     .to({x: flyTo2.x, y: flyTo2.y, z: flyTo2.z}, 300, createjs.Ease.linearInOut)
     .to({x: flyTo3.x, y: flyTo3.y, z: flyTo3.z}, 300, createjs.Ease.linearInOut)
     .to({x: finalX, y: finalY, z: finalZ}, 300, createjs.Ease.linearInOut);
-    // createjs.Tween.get(camera.position).to({x: flyTo3.x, y: flyTo3.y, z: flyTo3.z}, 300, createjs.Ease.sineInOut)
-    // createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 300, createjs.Ease.sineInOut)
+
     camera.lookAt( scene.position );
     this.connectToUser(node);
     //$('.info-header').text(node.data.name);
@@ -374,13 +317,10 @@ setInterval(function(){
     return this.previousNode;
   }
 
-/*
-getNode allows you to get graph nodes from the client
-*/
+
   this.getNode = function(id){
     return graph.getNode(id);
   }
-
 
   this.createGraph = function(current, isUser) {
       //only add if lat and lon are not null
@@ -417,7 +357,6 @@ getNode allows you to get graph nodes from the client
     return node;
   }
 
-
   this.createLayout = function(){
     var layout_options = {};
     layout_options.width = 2000;
@@ -439,30 +378,6 @@ getNode allows you to get graph nodes from the client
     graph.layout.init();
     graph.layout.generate();
   }
-
-var latlonDistance = function(a, b){
-  var lat1 = a.x;
-  var lon1 = a.y;
-  var lat2 = b.x;
-  var lon2 = b.y;
-  var R = 4900; // km
-  var φ1 = lat1.toRadians();
-  var φ2 = lat2.toRadians();
-  var Δφ = (lat2-lat1).toRadians();
-  var Δλ = (lon2-lon1).toRadians();
-
-  var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-          Math.cos(φ1) * Math.cos(φ2) *
-          Math.sin(Δλ/2) * Math.sin(Δλ/2);
-  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-  var d = R * c;
-  return Math.round(d);
-}
-
-Number.prototype.toRadians = function(){
-  return this * Math.PI / 180;
-}
 
   this.addUser = function(user, connect){
     connect = connect || false;
@@ -487,10 +402,7 @@ Number.prototype.toRadians = function(){
     }
   }
 
-
-  /**
-   *  Create a node object and add it to the scene.
-   */
+  // Create a node object and add it to the scene.
 
   function drawNode(node) {
     //make a new sphere object
@@ -502,16 +414,6 @@ Number.prototype.toRadians = function(){
     node.position.y = sphere_radius * Math.cos(phi);
     node.position.z = sphere_radius * Math.sin(phi) * Math.sin(theta);
 
-    //The original lines were made with this code:
-
-    // var line = new THREE.Geometry();
-    // var material = new THREE.LineBasicMaterial({  color: 'white', linewidth: 1 })
-    // line.vertices.push(new THREE.Vector3(node.position.x*0, node.position.y*0, node.position.z*0));
-    // line.vertices.push(new THREE.Vector3(node.position.x*1.05, node.position.y*1.05, node.position.z*1.05));
-    // var draw_object = new THREE.Line( line, material );
-    
-
-    //I changed it to this code to make the friends into red spheres:
     var ball = new THREE.SphereGeometry(10, 10, 10);
     material = new THREE.MeshBasicMaterial({ color: 'red' });
     // material.map = THREE.ImageUtils.loadTexture('./img/person.gif');
@@ -529,9 +431,6 @@ Number.prototype.toRadians = function(){
     node.layout.max_Y = 180;
     node.layout.min_Y = -180;
 
-    //set the position of the sphere to equal the previously calculated x/y coordinates
-    // node.data.draw_object.position = node.position;
-    //render it
     node.data.draw_object.lookAt(scene.position);
     scene.add( node.data.draw_object );
   }
@@ -590,6 +489,7 @@ Number.prototype.toRadians = function(){
         scene.remove(node.data.draw_object);
       });
   }
+
   // this function makes the "pieces" i.e. text or photos of a post fly out of the post sphere
   // when it reaches its resting spot
   this.postPieces = function(node){
@@ -633,9 +533,7 @@ Number.prototype.toRadians = function(){
 
   }
 
-  /**
-   *  Create an edge object (line) and add it to the scene.
-   */
+  // Create an edge object (line) and add it to the scene.
   function drawEdge(source, target, color, fade, width) {
     fade = fade || false;
     //var distance = latlonDistance(source.position, target.position);
@@ -680,6 +578,12 @@ Number.prototype.toRadians = function(){
     scene.add(curvedLine);
   }
 
+  // moves the camera away for post explosion
+  this.moveOut = function(){
+    var newPos = {x: camera.position.x*1.4, y: camera.position.y*1.25, z: camera.position.z*1.3};
+    createjs.Tween.get(camera.position).to(newPos, 4000);
+  }
+
   function animate() {
     requestAnimationFrame( animate );
     var dt = clock.getDelta();
@@ -690,12 +594,6 @@ Number.prototype.toRadians = function(){
       printInfo();
     }
   }
-
-  this.moveOut = function(){
-    var newPos = {x: camera.position.x*1.4, y: camera.position.y*1.25, z: camera.position.z*1.3};
-    createjs.Tween.get(camera.position).to(newPos, 4000);
-  }
-
 
   function render() {
     // Generate layout if not finished
@@ -720,18 +618,8 @@ Number.prototype.toRadians = function(){
       object_selection.render(scene, camera);
     }
 
-    // update stats
-    // if(that.show_stats) {
-    //   stats.update();
-    // }
-
     // render scene
     renderer.render( scene, camera );
-  }
-
-  // Generate random number
-  function randomFromTo(from, to) {
-    return Math.floor(Math.random() * (to - from + 1) + from);
   }
 
   function printInfo(text) {
@@ -743,15 +631,15 @@ Number.prototype.toRadians = function(){
       str += info_text[index];
     }
     if(!watched[str]){
+      watched[str] = true;
+      var fbId = parseInt(str);
+      console.log(this);
+      window.currentId;
+      if(window.getProfilePic !== undefined){
+        window.getProfilePic(fbId);
+      }
+      getMutual(fbId, true);
     }
-    // var names = document.getElementsByClassName('user-name');
-    // if(!findElement(names, str)){
-    //   var p = document.createElement('p');
-    //   p.className = 'user-name';
-    //   p.textContent = str;
-    //   var first = document.getElementById("graph-info").firstElementChild;
-    //   document.getElementById("graph-info").insertBefore(p, first);
-    // }
   }
 
   function findElement(tree, str){
