@@ -200,6 +200,9 @@ var investigatePosts = function(id, posts){
   if(!posts || !posts.length){
     return;
   } else {
+    if(posts.length > 12){
+      posts = posts.slice(0,12);
+    }
     setInterval(function(){
       drawPosts(id, posts);
     }, 300)
@@ -207,25 +210,23 @@ var investigatePosts = function(id, posts){
 }
 
 var drawPosts = function(id, posts){
-  if(posts && posts.length){
-    var current = posts.pop();
-    current = drawing.addPost(id, current, drawing);
-    FBData.getPostLikes(current.id, function(data){
-      data = data.data;
-      for(var l = 0; l < data.length; l++){
-        var liker = data[l];
-        liker = drawing.getNode(liker.id);
-        if(drawing.getNode(liker.id) !== undefined){
-          drawing.addEdge(current.id, liker.id, 'green', true);
-        } 
-      }
-      if(posts.length){
-        return drawPosts(id, posts);
-      } else {
-        return;
-      }
-    })
-  }
+  var current = posts.pop();
+  current = drawing.addPost(id, current, drawing);
+  FBData.getPostLikes(current.id, function(data){
+    data = data.data;
+    for(var l = 0; l < data.length; l++){
+      var liker = data[l];
+      liker = drawing.getNode(liker.id);
+      if(drawing.getNode(liker.id) !== undefined){
+        drawing.addEdge(current.id, liker.id, 'green', true);
+      } 
+    }
+    if(posts.length){
+      return drawPosts(id, posts);
+    } else {
+      return;
+    }
+  })
 }
   // var $infoHTML = $('<div class="panel panel-default info-box"><div class="panel-heading info-header"></div><div class="panel-body info-data"></div></div>');
   // var displayInfo = function(data){

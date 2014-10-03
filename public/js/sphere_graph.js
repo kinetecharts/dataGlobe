@@ -264,11 +264,12 @@ setInterval(function(){
       fromNode = graph.getNode(from);
     }
     var toNode = graph.getNode(to);
-    if (toNode === undefined){
-      console.log('Node '+ to +' not in the graph');
-      } else {
-    if(graph.addEdge(fromNode, toNode)){
-      drawEdge(fromNode, toNode, color, fade, width);
+    if(toNode === undefined){
+      console.log('Node '+to +' not in the graph');
+    } else {
+      if(graph.addEdge(fromNode, toNode)){
+        drawEdge(fromNode, toNode, color, fade, width);
+      }
     }
   }
   /*
@@ -511,8 +512,7 @@ setInterval(function(){
         var textGeom = new THREE.TextGeometry( text[i], {
           size: 30, height: 4, curveSegments: 3,
           font: "helvetiker", weight: "bold", style: "normal",
-          bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
-          material: 0, extrudeMaterial: 1
+          bevelEnabled: false, material: 0
           });
         
         var textMesh = new THREE.Mesh(textGeom, materialFront );
@@ -535,10 +535,13 @@ setInterval(function(){
         var imageGeometry = new THREE.PlaneGeometry(texture.width, texture.height, 1, 1);
         var image = new THREE.Mesh(imageGeometry, material);
         image.position.set( node.position.x,node.position.y,node.position.z );
-        material.map.needsUpdate = true;
+
+        image.material.map.needsUpdate = true;
         image.lookAt(camera.position);
         scene.add(image);
-        createjs.Tween.get(image.position).to({x: pos.x*2, y: pos.y*2, z: pos.z*2}, 8000).call(onComplete, [image]);
+        createjs.Tween.get(image.position)
+        .to({x: pos.x*(1+rnd()), y: pos.y*(1+rnd()), z: pos.z*(1+rnd())}, 8000)
+        .call(onComplete, [image]);
       }
       texture.src = data.picture;
     }

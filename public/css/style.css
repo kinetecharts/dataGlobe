@@ -32,3 +32,21 @@ button.btn {
   display: block;
   margin: auto;
 }
+
+.key {
+  position: absolute;
+  margin-top: 8px;
+  left: 0;
+}
+.key p {
+  color: white;
+}
+.bottom {
+  position: fixed;
+  bottom: 0;
+  margin-bottom: 10px;
+}
+
+.bottom p {
+  color: white;
+}
