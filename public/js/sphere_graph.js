@@ -667,5 +667,4 @@ setInterval(function(){
     }
     return result;
   }
-
 }
