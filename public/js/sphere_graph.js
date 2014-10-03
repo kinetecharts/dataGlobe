@@ -357,7 +357,6 @@ setInterval(function(){
     .to({x: finalX, y: finalY, z: finalZ}, 300, createjs.Ease.linearInOut);
     // createjs.Tween.get(camera.position).to({x: flyTo3.x, y: flyTo3.y, z: flyTo3.z}, 300, createjs.Ease.sineInOut)
     // createjs.Tween.get(camera.position).to({x: x, y: y, z: z}, 300, createjs.Ease.sineInOut)
-    console.log('camera ', camera);
     camera.lookAt( scene.position );
     this.connectToUser(node);
     //$('.info-header').text(node.data.name);
@@ -406,11 +405,13 @@ getNode allows you to get graph nodes from the client
   }
 
   this.addPost = function(id, post, context){
+    var postData = {story: post.story, message: post.message, picture: post.picture};
     var source = context.getNode(id);
     var node = new Node(post.id);
     node.position.x = source.position.x * (Math.random()*3);
     node.position.y = source.position.y * (Math.random()*3);
     node.position.z = source.position.z * (1 + Math.random());
+    node.data.post = postData;
     graph.addNode(node);
     drawPost(source, node, context);
     return node;
@@ -536,62 +537,100 @@ Number.prototype.toRadians = function(){
   }
 
     function drawPost(source, node, context) {
-    //The original lines were made with this code:
 
-    // var line = new THREE.Geometry();
-    // var material = new THREE.LineBasicMaterial({  color: 'white', linewidth: 1 })
-    // line.vertices.push(new THREE.Vector3(node.position.x*0, node.position.y*0, node.position.z*0));
-    // line.vertices.push(new THREE.Vector3(node.position.x*1.05, node.position.y*1.05, node.position.z*1.05));
-    // var draw_object = new THREE.Line( line, material );
+      var ball = new THREE.SphereGeometry(20, 10, 10);
+      material = new THREE.MeshBasicMaterial({ color: 'yellow' });
+      draw_object = new THREE.Mesh(ball, material);
+      draw_object.position.set(source.position.x, source.position.y, source.position.z);
+      draw_object.fbId = node.id;
+      draw_object.name = node.data.name
+      node.data.draw_object = draw_object;
+      scene.add( node.data.draw_object );
+      node.data.draw_object.lookAt(scene.position);
+      
+      var finalX = node.position.x;
+      var finalY = node.position.y;
+      var finalZ = node.position.z;
 
-    var ball = new THREE.SphereGeometry(20, 10, 10);
-    material = new THREE.MeshBasicMaterial({ color: 'yellow' });
-    draw_object = new THREE.Mesh(ball, material);
-    draw_object.position.set(source.position.x, source.position.y, source.position.z);
-    draw_object.fbId = node.id;
-    draw_object.name = node.data.name
-    node.data.draw_object = draw_object;
-    scene.add( node.data.draw_object );
-    node.data.draw_object.lookAt(scene.position);
-    
-    var finalX = node.position.x;
-    var finalY = node.position.y;
-    var finalZ = node.position.z;
+      var midX = (node.data.draw_object.position.x + finalX)/2*1.1;
+      var midY = (node.data.draw_object.position.y + finalY)/2*1.1;
+      var midZ = (node.data.draw_object.position.z + finalZ)/2*1.1;
 
-    var midX = (node.data.draw_object.position.x + finalX)/2*1.1;
-    var midY = (node.data.draw_object.position.y + finalY)/2*1.1;
-    var midZ = (node.data.draw_object.position.z + finalZ)/2*1.1;
+      var vect1 = new THREE.Vector3(node.data.draw_object.position.x, node.data.draw_object.position.y, node.data.draw_object.position.z);
+      var vect2 = new THREE.Vector3(midX, midY, midZ);
+      var vect3 = new THREE.Vector3(finalX, finalY, finalZ);
 
-    var vect1 = new THREE.Vector3(node.data.draw_object.position.x, node.data.draw_object.position.y, node.data.draw_object.position.z);
-    var vect2 = new THREE.Vector3(midX, midY, midZ);
-    var vect3 = new THREE.Vector3(finalX, finalY, finalZ);
+      var curve = new THREE.QuadraticBezierCurve3();
+      curve.v0 = vect1;
+      curve.v1 = vect2;
+      curve.v2 = vect3;
 
-    var curve = new THREE.QuadraticBezierCurve3();
-    curve.v0 = vect1;
-    curve.v1 = vect2;
-    curve.v2 = vect3;
+      var flyTo1 = curve.getPointAt(0.25);
+      var flyTo2 = curve.getPointAt(0.5);
+      var flyTo3 = curve.getPointAt(0.75);
 
-    var flyTo1 = curve.getPointAt(0.25);
-    var flyTo2 = curve.getPointAt(0.5);
-    var flyTo3 = curve.getPointAt(0.75);
+      var tween = new createjs.Tween(node.data.draw_object.position)
+      .to({x: flyTo1.x, y: flyTo1.y, z: flyTo1.z}, 300, createjs.Ease.linearInOut)
+      .to({x: flyTo2.x, y: flyTo2.y, z: flyTo2.z}, 300, createjs.Ease.linearInOut)
+      .to({x: flyTo3.x, y: flyTo3.y, z: flyTo3.z}, 300, createjs.Ease.linearInOut)
+      .to({x: finalX, y: finalY, z: finalZ}, 300, createjs.Ease.linearInOut).call(function(){
+        context.postPieces(node);
+        context.addEdge(source.id, node.id, 'yellow',true, 0.5);
+      })
 
-    var tween = new createjs.Tween(node.data.draw_object.position)
-    .to({x: flyTo1.x, y: flyTo1.y, z: flyTo1.z}, 300, createjs.Ease.linearInOut)
-    .to({x: flyTo2.x, y: flyTo2.y, z: flyTo2.z}, 300, createjs.Ease.linearInOut)
-    .to({x: flyTo3.x, y: flyTo3.y, z: flyTo3.z}, 300, createjs.Ease.linearInOut)
-    .to({x: finalX, y: finalY, z: finalZ}, 300, createjs.Ease.linearInOut).call(function(){
-      context.addEdge(source.id, node.id, 'yellow',true, 0.5)
-    })
+      //this code stays the same, I use the fbId to get friend data on mouseover
+      node.layout = {}
+      node.layout.max_X = 90;
+      node.layout.min_X = -90;
+      node.layout.max_Y = 180;
+      node.layout.min_Y = -180;
 
-    //this code stays the same, I use the fbId to get friend data on mouseover
-    node.layout = {}
-    node.layout.max_X = 90;
-    node.layout.min_X = -90;
-    node.layout.max_Y = 180;
-    node.layout.min_Y = -180;
+      node.data.draw_object.material.transparent = true;
+      createjs.Tween.get(node.data.draw_object.material).wait(5000).to({opacity: 0}, 5000).call(function(){
+        scene.remove(node.data.draw_object);
+      });
+  }
+  // this function makes the "pieces" i.e. text or photos of a post fly out of the post sphere
+  // when it reaches its resting spot
+  this.postPieces = function(node){
+    var data = node.data.post;
+    console.log('post data: ', data);
+    var text = data.message || data.story;
+    if(text !== undefined){
+      var materialFront = new THREE.MeshBasicMaterial( { color: 'white' } );
+      var textGeom = new THREE.TextGeometry( text, {
+        size: 30, height: 4, curveSegments: 3,
+        font: "helvetiker", weight: "bold", style: "normal",
+        bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+        material: 0, extrudeMaterial: 1
+        });
+      
+      var textMesh = new THREE.Mesh(textGeom, materialFront );
+      
+      textGeom.computeBoundingBox();
+      var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+      
+      textMesh.position.set( node.position.x, node.position.y, node.position.z );
+      textMesh.lookAt(camera.position);
+      scene.add(textMesh);
+      var pos = camera.position;
+      createjs.Tween.get(textMesh.position).to({x: pos.x*3, y: pos.y*3, z: pos.z*3}, 8000).call(function(){
+        scene.remove(textMesh);
+      });
+    }
+    if(data.picture){
+      var texture = new Image();
+      texture.crossOrigin = "anonymous";
+      texture.onload = function(){
+        var material = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
+        var imageGeometry = new THREE.PlaneGeometry(texture.width, texture.height, 1, 1);
+        var image = new THREE.Mesh(imageGeometry, material);
+        image.position.set( node.position.x,node.position.y,node.position.z );
+        scene.add(image);
+      }
+      texture.src = data.picture;
+    }
 
-    node.data.draw_object.material.transparent = true;
-    createjs.Tween.get(node.data.draw_object.material).wait(5000).to({opacity: 0}, 5000);
   }
 
   /**
@@ -653,7 +692,7 @@ Number.prototype.toRadians = function(){
   }
 
   this.moveOut = function(){
-    var newPos = {x: camera.position.x*1.5, y: camera.position.y*1.5, z: camera.position.z*1.5};
+    var newPos = {x: camera.position.x*1.4, y: camera.position.y*1.25, z: camera.position.z*1.3};
     createjs.Tween.get(camera.position).to(newPos, 4000);
   }
 

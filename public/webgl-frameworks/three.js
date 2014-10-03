@@ -14321,7 +14321,6 @@ THREE.Material.prototype = {
   constructor: THREE.Material,
 
   setValues: function ( values ) {
-
     if ( values === undefined ) return;
 
     for ( var key in values ) {

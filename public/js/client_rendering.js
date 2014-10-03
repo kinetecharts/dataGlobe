@@ -230,7 +230,7 @@ function loadMutual(list, currentFriend){
 var investigatePosts = function(id, posts){
   drawing.moveOut()
   setInterval(function(){
-    if(posts.length){
+    if(posts && posts.length){
       var current = posts.pop();
       current = drawing.addPost(id, current, drawing);
       FBData.getPostLikes(current.id, function(data){
