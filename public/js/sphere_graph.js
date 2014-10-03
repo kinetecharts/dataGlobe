@@ -593,43 +593,47 @@ Number.prototype.toRadians = function(){
   // this function makes the "pieces" i.e. text or photos of a post fly out of the post sphere
   // when it reaches its resting spot
   this.postPieces = function(node){
+    var rnd = Math.random;
     var data = node.data.post;
     console.log('post data: ', data);
     var text = data.message || data.story;
     if(text !== undefined){
-      var materialFront = new THREE.MeshBasicMaterial( { color: 'white' } );
-      var textGeom = new THREE.TextGeometry( text, {
-        size: 30, height: 4, curveSegments: 3,
-        font: "helvetiker", weight: "bold", style: "normal",
-        bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
-        material: 0, extrudeMaterial: 1
+      var text = text.split(' ');
+      for(var i = 0; i < text.length; i++){
+        var materialFront = new THREE.MeshBasicMaterial( { color: 'white' } );
+        var textGeom = new THREE.TextGeometry( text[i], {
+          size: 30, height: 4, curveSegments: 3,
+          font: "helvetiker", weight: "bold", style: "normal",
+          bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+          material: 0, extrudeMaterial: 1
+          });
+        
+        var textMesh = new THREE.Mesh(textGeom, materialFront );
+        
+        textGeom.computeBoundingBox();
+        var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+        
+        textMesh.position.set( node.position.x, node.position.y, node.position.z );
+        textMesh.lookAt(camera.position);
+        scene.add(textMesh);
+        var pos = camera.position;
+        createjs.Tween.get(textMesh.position).to({x: pos.x*(2+rnd()), y: pos.y*(2+rnd()), z: pos.z*(2+rnd())}, 8000).call(function(){
+          scene.remove(textMesh);
         });
-      
-      var textMesh = new THREE.Mesh(textGeom, materialFront );
-      
-      textGeom.computeBoundingBox();
-      var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
-      
-      textMesh.position.set( node.position.x, node.position.y, node.position.z );
-      textMesh.lookAt(camera.position);
-      scene.add(textMesh);
-      var pos = camera.position;
-      createjs.Tween.get(textMesh.position).to({x: pos.x*3, y: pos.y*3, z: pos.z*3}, 8000).call(function(){
-        scene.remove(textMesh);
-      });
-    }
-    if(data.picture){
-      var texture = new Image();
-      texture.crossOrigin = "anonymous";
-      texture.onload = function(){
-        var material = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
-        var imageGeometry = new THREE.PlaneGeometry(texture.width, texture.height, 1, 1);
-        var image = new THREE.Mesh(imageGeometry, material);
-        image.position.set( node.position.x,node.position.y,node.position.z );
-        scene.add(image);
       }
-      texture.src = data.picture;
     }
+    // if(data.picture){
+    //   var texture = new Image();
+    //   texture.crossOrigin = "anonymous";
+    //   texture.onload = function(){
+    //     var material = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
+    //     var imageGeometry = new THREE.PlaneGeometry(texture.width, texture.height, 1, 1);
+    //     var image = new THREE.Mesh(imageGeometry, material);
+    //     image.position.set( node.position.x,node.position.y,node.position.z );
+    //     scene.add(image);
+    //   }
+    //   texture.src = data.picture;
+    // }
 
   }
 
