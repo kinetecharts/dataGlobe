@@ -611,13 +611,13 @@ setInterval(function(){
     //create curved line and add to scene
     curvedLine = new THREE.Line(path.createPointsGeometry(100), curveMaterial);
     curvedLine.lookAt(scene.position);
-    var onComplete = function(){
+    var onComplete = function(curvedLine){
       scene.remove(curvedLine);
       renderer.render( scene, camera );
     }
     if(fade){
       curvedLine.material.transparent = true;
-      createjs.Tween.get(curvedLine.material).wait(5000).to({opacity: 0}, 5000).call(onComplete);
+      createjs.Tween.get(curvedLine.material).wait(5000).to({opacity: 0}, 5000).call(onComplete, [curvedLine]);
     }
     scene.add(curvedLine);
   }

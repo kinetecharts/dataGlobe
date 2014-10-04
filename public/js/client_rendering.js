@@ -134,6 +134,18 @@ var getAllPhotos = function(id){
   })
 }
 
+var batchPhotos = function(idArray){
+  var dataArray = [];
+  if(idArray.length){
+    idArray.forEach(function(id){
+      dataArray.push({method: 'GET', relative_url: '/'+id});
+    })
+  }
+  FBData.batch(dataArray, function(data){
+    console.log(data);
+  })
+}
+
 var getPhotos = function(array, id){
   var friend = drawing.getNode(id);
   //every second, get a photo from FB and display

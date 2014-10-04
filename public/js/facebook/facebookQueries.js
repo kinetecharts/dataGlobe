@@ -70,6 +70,14 @@ function fetchPaginatedCheckinData(initialGetResponse){
   }
 }
 
+function postBatch(queryArray, cb){
+  FB.api('/', 'GET', {
+    batch: queryArray 
+  }, function(response){
+    cb(response);
+  })
+}
+
 function getMutual(){
   $.get('/api/get-friends').then(function(response){
     console.log(response);
@@ -141,6 +149,7 @@ function formatCheckinDataForDB(facebookResponse){
 return {
   get: getRequest,
   getMutual: getMutual,
-  getPostLikes: getPostLikes
+  getPostLikes: getPostLikes,
+  batch: postBatch
 };
 })();

@@ -155,7 +155,7 @@ router.post('/get-mutual', function(req, res){
   var fbId = req.body.id;
   Mutual.findOne({ mutual_of: {$all:[req.session.fbId, fbId]} }).exec(function(err, data){
     if(err) console.log(err);
-    if(data){
+    if(data && data.mutual_friends){
       var data = data.mutual_friends;
       data = JSON.stringify(data);
       res.end(data);
