@@ -4,6 +4,7 @@
 node_modules/
 node_modules/*
 public/dist/
+public/lib/
 
 # private
 public/js/config.js
