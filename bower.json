@@ -1,0 +1,27 @@
+{
+  "name": "dataGlobe",
+  "version": "0.0.1",
+  "homepage": "https://github.com/kinetecharts/dataGlobe",
+  "authors": [
+    "Kim Marquardt <kim.marquardt@gmail.com>"
+  ],
+  "description": "Visualizing Your Global connections",
+  "main": "index.js",
+  "keywords": [
+    "facebook",
+    "threejs",
+    "webgl",
+    "visualization"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "backbone": "~1.1.2"
+  }
+}
