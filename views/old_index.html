@@ -1,0 +1,72 @@
+<!--
+  This is an example html file with some options added. The minimum html file for
+  the graph visualization is:
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>Graph Visualization</title>
+      <script type="text/javascript" src="build/graph.min.js"></script>
+    </head>
+    <body onload="new Drawing.SimpleGraph({layout: '3d', showStats: true, showInfo: true})">
+    </bod>
+  </html>
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Graph Visualization</title>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="dist/index.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+
+  </head>
+  <div class='row'>
+    <h1 class='text-center'>Global Data</h1>
+  </div>
+  <div class='row center-block'>
+    <div class='col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-6 col-xs-offset-3'>
+      <img id="globe-splash-image" src="/img/smallGlobe.png">
+      <br>
+      <fb:login-button
+        scope="
+          public_profile,
+          user_friends,
+          user_location,
+          user_hometown,
+          user_checkins,
+          user_photos,
+          friends_location,
+          friends_hometown,
+          friends_photos,
+          friends_checkins
+          read_friendlists,
+          read_stream,
+          user_status,
+          friends_status"
+        onlogin="checkLoginState();"> Login </fb:login-button>
+      <div id="status"></div>
+      <button id="friendsQuery" class="btn btn-default btn-block query">Load Friend Data</button>
+      <button id="mutualFriends" class="btn btn-default btn-block query">Load Mutual Friends</button>
+<!--       <button id="checkinsQuery" class="btn btn-default btn-block query">Load Checkin Data</button> -->
+      <a href="render-friends" class="btn btn-default btn-block explore">Explore the Globe</a>
+      <!--<a href="render-connections" class="btn btn-default btn-block">View Connections</a>-->
+    </div>
+    <div class="col-md-4">
+      <p class="lead text-center title">Calculating Mutual Friends:</p>
+      <h2 class="done text-center"></h2>
+      <p class="lead helper text-center">Out Of</p>
+      <h2 class="friends text-center"></h2>
+      <script type="text/javascript" charset="utf-8">
+        $('.helper').toggle();
+        $('.title').toggle();
+      </script>
+    </div>
+
+  </div>
+  </body>
+</html>
