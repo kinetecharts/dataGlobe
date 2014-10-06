@@ -23,7 +23,8 @@ function statusChangeCallback(response) {
 // This function is called when someone finishes with the Login
 // Button.  See the onlogin handler attached to it in the sample
 // code below.
-function checkLoginState() {
+// It is attached to window so <fb-login> element can access it onload
+window.checkLoginState = function() {
   FB.getLoginStatus(function(response) {
     statusChangeCallback(response);
   });
@@ -80,6 +81,10 @@ function testAPI() {
         },
         function(response){
           $.post('/api/save-user', {user: response.data})
+          // globeView.render
+            // clear out dom
+            // load client_rendering
+            // else login view
         }
       );
   });
