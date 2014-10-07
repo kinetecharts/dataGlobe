@@ -1,51 +1,53 @@
-var loginModel = new (Backbone.Model.extend({
-  initialize: function(){
-    this.set('loginStatus', 'unknown');
-    this.set('rendered', false);
-  }
-}));
-
-
 var appView = new (Backbone.View.extend({
 
   model: loginModel,
 
   initialize: function(){
-    this.keepTabsOnLoginState();
+    var appViewContext = this;
+    this.loginView = new LoginView;
+    this.globeView = new GlobeView;
+    // this.keepTabsOnLoginState();
+    this.model.on('change:loginStatus', function (model){
+      var newStatus = model.get('loginStatus');
+      if(newStatus === 'connected'){
+        appViewContext.render('globeView');
+        return;
+      }
+      if(newStatus !== 'connected'){
+        appViewContext.render('loginView');
+        return;
+      }
+      appViewContext.render('loginView');
+    });
   },
 
   // check Facebook login status every once and a while to check which view to display
-  keepTabsOnLoginState: function (){
-    var appViewContext = this;
-    setInterval(function(){
-      if(FB){
-        FB.getLoginStatus(function (response){
-          // var currentStatus = appViewContext.model.get('loginStatus');
-          var newStatus = response.status;
-          // if(newStatus !== currentStatus){
-          //   appViewContext.model.set('loginStatus', newStatus);
-          // }
-          if(newStatus === 'connected'){
-            appViewContext.render('globeView');
-          }
-          if(newStatus !== 'connected'){
-            appViewContext.render('loginView');
-          }
-        });
-      }
-    }, 100);
-  },
+  // keepTabsOnLoginState: function (){
+  //   var appViewContext = this;
+  //   setInterval(function(){
+  //     if(FB){
+  //       FB.getLoginStatus(function (response){
+  //         // var currentStatus = appViewContext.model.get('loginStatus');
+  //         var newStatus = response.status;
+  //         // if(newStatus !== currentStatus){
+  //         //   appViewContext.model.set('loginStatus', newStatus);
+  //         // }
+  //         if(newStatus === 'connected'){
+  //           appViewContext.render('globeView');
+  //         }
+  //         if(newStatus !== 'connected'){
+  //           appViewContext.render('loginView');
+  //         }
+  //       });
+  //     }
+  //   }, 100);
+  // },
 
   render: function(view){
-    console.log('in render');
     if(view === 'globeView'){
-      if(this.model.get('rendered') === false){
-        initialize3d();
-        this.model.set('rendered', true);
-      }
+      $('body').html('globe');
     } else if(view === 'loginView'){
-      console.log('render', view);
-      $('body').html('scoobydoo');
+      $('body').html('Log');
     }
   }
 
