@@ -100,12 +100,12 @@ Drawing.SphereGraph = function(options) {
     canvas = document.body;
     clock = new THREE.Clock();
     control = new THREE.OrbitControls(camera);
+    control.addEventListener( 'change', render );
     // control = new THREE.FlyControls(camera, canvas);
     // control.dragToLook = false;
     // control.autoForward = false;
     // control.movementSpeed = 1000;
     // control.rollSpeed = 0.5;
-    control.addEventListener( 'change', render );
 
     scene = new THREE.Scene();
 
@@ -134,89 +134,20 @@ Drawing.SphereGraph = function(options) {
 
 /////////////////////////////////////////////////////////////////////////////////
 // clouds
-var tilt = 0.41;
-var rotationSpeed = 0.02;
-var cloudsScale = 1.005;
+    var tilt = 0.41;
+    var rotationSpeed = 0.02;
+    var cloudsScale = 1.005;
 
-var cloudTexture = THREE.ImageUtils.loadTexture('./img/clouds.png');
-var cloudGeometry = new THREE.SphereGeometry(sphere_radius+50, 200, 100);
-var materialClouds = new THREE.MeshLambertMaterial( { color: 0xffffff, map: cloudTexture, transparent: true } );
+    var cloudTexture = THREE.ImageUtils.loadTexture('./img/clouds.png');
+    var cloudGeometry = new THREE.SphereGeometry(sphere_radius+50, 200, 100);
+    var materialClouds = new THREE.MeshLambertMaterial( { color: 0xffffff, map: cloudTexture, transparent: true } );
 
-meshClouds = new THREE.Mesh( cloudGeometry, materialClouds );
-meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
-meshClouds.rotation.z = tilt;
-setInterval(function(){
-  meshClouds.rotation.z +=0.0001;
-},16)
-
-// // stars
-
-// var star_index, star_raid = sphere_radius, starsGeometry = [ new THREE.Geometry(), new THREE.Geometry() ];
-
-// for ( star_index = 0; star_index < 250; star_index ++ ) {
-
-//   var vertex = new THREE.Vector3();
-//   vertex.x = Math.random() * 2 - 1;
-//   vertex.y = Math.random() * 2 - 1;
-//   vertex.z = Math.random() * 2 - 1;
-//   vertex.multiplyScalar( star_raid );
-
-//   starsGeometry[ 0 ].vertices.push( vertex );
-
-// }
-
-// for ( star_index = 0; star_index < 1500; star_index ++ ) {
-
-//   var vertex = new THREE.Vector3();
-//   vertex.x = Math.random() * 2 - 1;
-//   vertex.y = Math.random() * 2 - 1;
-//   vertex.z = Math.random() * 2 - 1;
-//   vertex.multiplyScalar( star_raid );
-
-//   starsGeometry[ 1 ].vertices.push( vertex );
-
-// }
-
-// var stars;
-// var starsMaterials = [
-//   new THREE.PointCloudMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
-//   new THREE.PointCloudMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
-//   new THREE.PointCloudMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
-//   new THREE.PointCloudMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
-//   new THREE.PointCloudMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
-//   new THREE.PointCloudMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
-// ];
-
-// for ( star_index = 10; star_index < 30; star_index ++ ) {
-
-//   stars = new THREE.PointCloud( starsGeometry[ star_index % 2 ], starsMaterials[ star_index % 6 ] );
-
-//   stars.rotation.x = Math.random() * 6;
-//   stars.rotation.y = Math.random() * 6;
-//   stars.rotation.z = Math.random() * 6;
-
-//   s = star_index * 10;
-//   stars.scale.set( s, s, s );
-
-//   stars.matrixAutoUpdate = false;
-//   stars.updateMatrix();
-//   scene.add( stars );
-
-// }
-
-/////////////////////////////////////////////////////////////////////////////////
-    // shader = Shaders['earth'];
-    // uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-
-    // uniforms['texture'].value = THREE.ImageUtils.loadTexture('./img/world.jpg');
-
-    // material = new THREE.ShaderMaterial({
-
-    //       uniforms: uniforms,
-    //       vertexShader: shader.vertexShader,
-    //       fragmentShader: shader.fragmentShader
-
-    //     });
+    meshClouds = new THREE.Mesh( cloudGeometry, materialClouds );
+    meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
+    meshClouds.rotation.z = tilt;
+    setInterval(function(){
+      meshClouds.rotation.z +=0.0001;
+    },16)
 
     globe = new THREE.Mesh(globeGeometry, globeMaterial);
     globe.rotation.y = Math.PI;
@@ -225,11 +156,6 @@ setInterval(function(){
     scene.add(sun);
     scene.add(ambientLight);
 
-    // end sphere geom JHE
-
-    // scene.add(new THREE.AxisHelper(9000));
-
-    // Create node geometry (will be used in drawNode())
     geometry = new THREE.SphereGeometry( 50, 25, 0 );
 
     // Create node selection, if set
@@ -238,7 +164,7 @@ setInterval(function(){
         domElement: renderer.domElement,
         selected: function(obj) {
           if(obj !== null && obj.fbId !== undefined) {
-            info_text.select = obj.fbId; //get this ID in printInfo to display shiz
+            info_text.select = obj.fbId; //get this ID in printInfo for display
           } else {
             delete info_text.select;
           }
@@ -682,8 +608,12 @@ setInterval(function(){
       if(window.getProfilePic !== undefined){
         window.getProfilePic(fbId);
       }
-      goToRelay(fbId);
-      getMutual(fbId, true);
+      if(window.goToRelay !== undefined){
+        window.goToRelay(fbId);
+      }
+      // postExplosion();
+      // getAllPhotos();
+      // getMutual(fbId, true);
     }
   }
 

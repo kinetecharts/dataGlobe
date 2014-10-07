@@ -7,7 +7,7 @@ function statusChangeCallback(response) {
   // for FB.getLoginStatus().
 
   // backbone model
-  loginModel.set('loginStatus', response.status);
+  //loginModel.set('loginStatus', response.status);
 
   if (response.status === 'connected') {
     // Logged into your app and Facebook.
@@ -86,10 +86,8 @@ function testAPI() {
         },
         function(response){
           $.post('/api/save-user', {user: response.data}, function(){
-            console.log('test data', response);
+            login.trigger('render');
           });
-
-
           // globeView.render
             // clear out dom
             // load client_rendering

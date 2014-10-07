@@ -12,14 +12,22 @@
 
   <script src="js/helvetiker_bold.typeface.js"></script>
   <script src="js/config.js"></script>
-  <script src="js/facebook/facebookGraphAPI.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="lib/underscore/underscore-min.js"></script>
+  <script src="lib/backbone/backbone.js"></script>
+  <script src="js/backbone/LoginModel.js"></script>
+  <script src="js/backbone/LoginView.js"></script>
+  <script src="js/backbone/GlobeView.js"></script>
+  <script src="js/backbone/AppView.js"></script>
 
-  <script type="text/template"
-
-  ></script>
+  <script type="text/template"></script>
 
 </head>
 <body>
+  <script type="text/javascript">
+  var login = new LoginModel();
+  var appView = new AppView({model: login});
+  </script>
   <div class='row'>
     <h1 class='text-center'>Global Data</h1>
   </div>
@@ -48,14 +56,8 @@
     </div>
   </div>
 
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="lib/underscore/underscore-min.js"></script>
-  <script src="lib/backbone/backbone.js"></script>
-  <script src="js/backbone/LoginModel.js"></script>
-  <script src="js/backbone/LoginView.js"></script>
-  <script src="js/backbone/GlobeView.js"></script>
-  <script src="js/backbone/AppView.js"></script>
 
+  <script src="js/facebook/facebookGraphAPI.js"></script>
   <script src="webgl-frameworks/three.js"></script>
   <script src="webgl-frameworks/OrbitControls.js"></script>
   <script src="webgl-frameworks/FlyControls.js"></script>

@@ -1,97 +1,76 @@
 var initialize3d = function(){
   var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: true});
 
-    $.get('/api/get-user').then(function(response){
-      var user = JSON.parse(response);
-      friendsList = user.friends;
-      userNode = drawing.createGraph(user, true);
-    })
+  $.get('/api/get-user').then(function(response){
+    var user = JSON.parse(response);
+    friendsList = user.friends;
+    userNode = drawing.createGraph(user, true);
+  })
 
-  	$.get('/api/get-friends').then(function(response){
-  		var friends = JSON.parse(response);
-  		friends = friends.data;
-  		setInterval(function(){
-  			if(friends.length){
-  				drawing.createGraph(friends.pop());
-  			}
-  		}, 0)
-  	});
+	$.get('/api/get-friends').then(function(response){
+		var friends = JSON.parse(response);
+		friends = friends.data;
+		setInterval(function(){
+			if(friends.length){
+				drawing.createGraph(friends.pop());
+			}
+		}, 0)
+	});
 
-    var nextFunc;
-    flyToNext(function(next){
-      nextFunc = next;
-    });
+  var nextFunc;
+  flyToNext(function(next){
+    nextFunc = next;
+  });
 
-
-    $('.mutual').on('click', function(){
-      $.get('/api/get-user').then(function(response){
-        friendList = JSON.parse(response).friends;
-        getMutual(friendList);
-      })
-    });
-
-    $('.connect').on('click', function(){
-      $.get('/api/get-user').then(function(response){
-        var user = JSON.parse(response);
-        drawing.addUser(user, true);
-      })
-    });
-
-    $(document).on('keydown', function( event ){
-      if(event.which === 32){ // space key
-        nextFunc();
-      }
-      else if(event.which === 13){ // enter key
-        getAllPhotos();
-      }
-      else if(event.which === 87){ // w key
-        var current = window.currentId
-        FBData.get('newsFeed', current, function(data){
-          var myPosts = JSON.parse(data);
-          if(myPosts.posts){
-            myPosts = myPosts.posts.data;
-            investigatePosts(current, myPosts);
-          }
-        })
-      }
-    })
-
-    $('.newsFeed').on('click', function(){
-      FBData.get('newsFeed', 'me', function(data){
-        data = JSON.parse(data);
-        console.log(data);
-      })
-    })
-  ///// for info display //////////////////////////////////////////////////
-    var infoHTMLlog = [];
-    var $infoHTML = $('<div><div class="info-data img-box"></div></div>');
-
-    function displayInfo(data, isUrl){
-      var key;
-      if(isUrl){
-        key = data.url;
-      } else {
-        key = data.source;
-      }
-      var $infoHTMLClone = $infoHTML.clone();
-      var $info = $infoHTMLClone.find('.info-data');
-
-      //var header = $infoHTMLClone.find('.info-header');
-      if($('.panel-wrapper').children().length){
-        $($('.panel-wrapper').children()[0]).addClass('zoomOut');
-      }
-      $('.panel-wrapper').empty();
-      var image = new Image();
-      image.style.opacity = 0.6;
-      image.onload = function(){
-        var $image = $(image);
-        $image.addClass('info-img animated zoomIn');
-        $info.append($image);
-        $('.panel-wrapper').append($infoHTMLClone);
-        infoHTMLlog.push($infoHTMLClone);
-      }
-      image.src = key;
+  $(document).on('keydown', function( event ){
+    if(event.which === 32){ // space key
+      nextFunc();
     }
+    else if(event.which === 13){ // enter key
+      getAllPhotos();
+    }
+    else if(event.which === 87){ // w key
+      var current = window.currentId
+      FBData.get('newsFeed', current, function(data){
+        var myPosts = JSON.parse(data);
+        if(myPosts.posts){
+          myPosts = myPosts.posts.data;
+          investigatePosts(current, myPosts);
+        }
+      })
+    }
+  })
+
+  ///// for info display //////////////////////////////////////////////////
+  var infoHTMLlog = [];
+  var $infoHTML = $('<div><div class="info-data img-box"></div></div>');
+
+  function displayInfo(data, isUrl){
+    var key;
+    if(isUrl){
+      key = data.url;
+    } else {
+      key = data.source;
+    }
+    var $infoHTMLClone = $infoHTML.clone();
+    var $info = $infoHTMLClone.find('.info-data');
+
+    //var header = $infoHTMLClone.find('.info-header');
+    if($('.panel-wrapper').children().length){
+      $($('.panel-wrapper').children()[0]).addClass('zoomOut');
+    }
+    $('.panel-wrapper').empty();
+    var image = new Image();
+    image.style.opacity = 0.6;
+    image.onload = function(){
+      var $image = $(image);
+      $image.addClass('info-img animated zoomIn');
+      $info.append($image);
+      $('.panel-wrapper').append($infoHTMLClone);
+      infoHTMLlog.push($infoHTMLClone);
+    }
+    image.src = key;
+  }
   //////////////////////////////////////////////////////////////////////////
   function flyToNext(cb){
     $.get('/api/get-user').then(function(response){
@@ -135,6 +114,17 @@ var initialize3d = function(){
     })
   }
 
+  var postExplosion = function(){
+    var current = window.currentId;
+      FBData.get('newsFeed', current, function(data){
+        var myPosts = JSON.parse(data);
+        if(myPosts.posts){
+          myPosts = myPosts.posts.data;
+          investigatePosts(current, myPosts);
+        }
+      })
+  }
+
   var batchPhotos = function(idArray){
     var dataArray = [];
     if(idArray.length){
@@ -147,9 +137,8 @@ var initialize3d = function(){
     })
   }
 
-  var getPhotos = function(array, id){
+  function getPhotos(array, id){
     var friend = drawing.getNode(id);
-    //every second, get a photo from FB and display
     if(array.length){
       setInterval(function(){
         if(array.length){
@@ -177,7 +166,7 @@ var initialize3d = function(){
     })
   }
 
-  function goToRelay(id){
+  window.goToRelay = function(id){
     if(id === id){
       window.currentId = id;
     }
