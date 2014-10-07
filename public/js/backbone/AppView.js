@@ -53,7 +53,7 @@ var appView = new (Backbone.View.extend({
       document.body.appendChild(sphere_script);
       document.body.appendChild(rendering_script);
     } else if(view === 'loginView'){
-      console.log('render':, view);
+      console.log('render', view);
       $('body').html('scoobydoo');
     }
   }
