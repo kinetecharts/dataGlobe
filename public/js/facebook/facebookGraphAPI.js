@@ -35,6 +35,7 @@ window.fbAsyncInit = function() {
 
     FB.init({
       appId      : id || appConfig.fbId,
+      status     : true,
       cookie     : true,  // enable cookies to allow the server to access
                           // the session
       xfbml      : true,  // parse social plugins on this page
@@ -80,7 +81,9 @@ function testAPI() {
           q: "SELECT current_location.latitude, current_location.longitude, first_name, last_name, uid, pic_square FROM user WHERE uid = me()"
         },
         function(response){
-          $.post('/api/save-user', {user: response.data})
+          $.post('/api/save-user', {user: response.data}, function(){
+            console.log('test data', response);
+          });
           // globeView.render
             // clear out dom
             // load client_rendering
