@@ -18,15 +18,15 @@
 
     positionUpdated: <function>, called when the position of the node has been updated
   }
-  
+
   Examples:
-  
+
   create:
   layout = new Layout.ForceDirected(graph, {width: 2000, height: 2000, iterations: 1000, layout: "3d"});
-  
+
   call init when graph is loaded (and for reset or when new nodes has been added to the graph):
   layout.init();
-  
+
   call generate in a render method, returns true if it's still calculating and false if it's finished
   layout.generate();
    */
@@ -35,7 +35,7 @@ var Layout = Layout || {};
 
 Layout.ForceDirected = function(graph, options) {
   var options = options || {};
-  
+
   // this.layout = options.layout || "2d";
   this.layout = "3d"; //force 3D for now
   this.attraction_multiplier = options.attraction || 5; // r^2 smaller the stronger
@@ -69,7 +69,7 @@ Layout.ForceDirected = function(graph, options) {
   var random_cnt = 0;
 
   var callback_positionUpdated = options.positionUpdated;
-  
+
   var EPSILON = 0.000001;
   var attraction_constant;
   var repulsion_constant;
@@ -102,7 +102,7 @@ Layout.ForceDirected = function(graph, options) {
 
   var drift = new THREE.Vector3(0,0,0);
   var torc = new THREE.Vector3(0,0,0);
-  
+
   // performance test
   var mean_time = 0;
   var repulsion_time = 0;
@@ -132,7 +132,7 @@ Layout.ForceDirected = function(graph, options) {
    */
   this.init = function() {
     // console.log(this.layout);
-    
+
     this.finished = false;
     _temperature = this.width * 0.1; //used to be divided by 10, increast by 100 to make far nodes travel faster
     defaultTemperature = _temperature;
@@ -188,7 +188,7 @@ Layout.ForceDirected = function(graph, options) {
       //drifts and torc for excitement
       drift.multiplyScalar(0.9);
       torc.multiplyScalar(0.9);
-      
+
       //initialize
       graph.nodes.forEach(function(n){
         n.layout = n.layout || {};
@@ -237,7 +237,7 @@ Layout.ForceDirected = function(graph, options) {
 
             var delta_length;
             delta_length = Math.max(EPSILON, vec3length(delta_x, delta_y, delta_z));
-            
+
             //repulsion is 1/r
             var force = effective_repulsion / delta_length;
 
@@ -301,7 +301,7 @@ Layout.ForceDirected = function(graph, options) {
 
         // node_v.layout.offset_z *=0.1;
       }
-      
+
       //black holes
       for(var bh_id = 0; bh_id<num_black_hole; bh_id++){
         if(black_holes[bh_id].gravity > 0.1){
@@ -340,7 +340,7 @@ Layout.ForceDirected = function(graph, options) {
             var delta_z = node_v.layout.tmp_pos_z - pos.z;
 
             var delta_length;
-            delta_length = Math.max(EPSILON, vec3length(delta_x, delta_y, delta_z/1000)); //make z less 
+            delta_length = Math.max(EPSILON, vec3length(delta_x, delta_y, delta_z/1000)); //make z less
             if(delta_length<influence_radius){
               node_v.layout.temperature = influence_temperature;
               affected+=1;
@@ -366,7 +366,7 @@ Layout.ForceDirected = function(graph, options) {
         if(this.use_weight){
           force *= weights[edge.log_weight];
         }
-        
+
         edge.source.layout.force -= force;
         edge.target.layout.force += force;
 
@@ -378,7 +378,7 @@ Layout.ForceDirected = function(graph, options) {
         edge.target.layout.offset_y += (delta_y / delta_length) * force;
         edge.target.layout.offset_z += (delta_z / delta_length) * force;
       }
-      
+
       var attraction_end = new Date().getTime();
       attraction_time += (attraction_end - repulsion_end)
 
@@ -453,8 +453,8 @@ Layout.ForceDirected = function(graph, options) {
       move_time += (end - attraction_end);
       mean_time += end - start;
     } else {
-      if(!this.finished) {        
-        console.log("Average time: " + (mean_time/layout_iterations) + " ms", " repulsion: " + (repulsion_time/layout_iterations) + 
+      if(!this.finished) {
+        console.log("Average time: " + (mean_time/layout_iterations) + " ms", " repulsion: " + (repulsion_time/layout_iterations) +
           " attraction: " + (attraction_time/layout_iterations) + " move: "+ (move_time/layout_iterations));
       }
       this.finished = true;
