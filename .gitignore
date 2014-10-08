@@ -5,6 +5,7 @@ node_modules/
 node_modules/*
 public/dist/
 public/lib/
+views/index.html
 
 # private
 public/js/config.js
