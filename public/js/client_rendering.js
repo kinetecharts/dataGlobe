@@ -1,4 +1,11 @@
 var initialize3d = function(){
+
+  // this will kickoff Facebook API get requests and subsequent posts to app server
+  // for data needed by Graph.js
+  FBData.get('friendsQuery');
+  FBData.getMutual();
+
+  // this will kickoff WebGL rendering
   var drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: true});
 
   $.get('/api/get-user').then(function(response){
