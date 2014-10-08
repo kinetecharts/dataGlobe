@@ -86,7 +86,6 @@ function postBatch(queryArray, cb){
 
 function getMutual(){
   $.get('/api/get-friends').then(function(response){
-    console.log(response);
     response = JSON.parse(response);
     var friends = response.data;
     $('.friends').text(friends.length.toString());
