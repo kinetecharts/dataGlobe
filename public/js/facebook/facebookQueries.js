@@ -45,9 +45,12 @@ function getRequest(query, endpoint, cb){
         }
         data = data || Qresponse;
         payload = JSON.stringify(data)
-        if(queryData.url && cb === undefined){
+        if(queryData.url){
           $.post(queryData.url, {response: payload}).then(function(response){
             console.log('ajax success:', queryData.url, response);
+            if(cb !== undefined){
+              cb();
+            }
           })
         } else {
           return cb(payload);
