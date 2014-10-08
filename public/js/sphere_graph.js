@@ -552,8 +552,8 @@ Drawing.SphereGraph = function(options) {
   // moves the camera away for post explosion
   this.moveOut = function(){
     // ***** maybe keep a boolean to check if the camera has already moved out
-    var newPos = {x: camera.position.x*1.4, y: camera.position.y*1.25, z: camera.position.z*1.3};
-    createjs.Tween.get(camera.position).to(newPos, 4000);
+    //var newPos = {x: camera.position.x*1.4, y: camera.position.y*1.25, z: camera.position.z*1.3};
+    //createjs.Tween.get(camera.position).to(newPos, 4000);
   }
 
   function animate() {

@@ -16,7 +16,7 @@ var flyToNext = function(cb){
         }
         //go to next user on globe and draw mutual friends
         window.currentId = current
-        drawing.goToNode(current);
+        //drawing.goToNode(current);
         last = current;
         getMutual(current);
         getPic(current);
@@ -144,7 +144,7 @@ var goToRelay = function(id){
   if(id === id){
     window.currentId = id;
   }
-  drawing.goToNode(id);
+  //drawing.goToNode(id);
   getAllPhotos(id);
   getMutual(id);
 }
