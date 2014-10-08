@@ -20,34 +20,34 @@ module.exports = function(grunt){
       options: {
         separator: ';',
       },
+      appBackbone: {
+        src: [
+          'public/js/backbone/LoginModel.js',
+          'public/js/backbone/AppView.js'
+        ],
+        dest: 'public/dist/appBackbone.js'
+      },
       index: {
         src: [
-           "js/facebook/facebookGraphAPI.js",
-           "js/helvetiker_bold.typeface.js",
-           "webgl-frameworks/three.js" ,
-           "webgl-frameworks/OrbitControls.js",
-           "webgl-frameworks/FlyControls.js",
-           "webgl-frameworks/easeljs-0.7.1.min.js",
-           "webgl-frameworks/tweenjs-0.5.1.min.js",
-           "webgl-frameworks/ease.js",
-           "utils/Label.js",
-           "utils/ObjectSelection.js",
-           "js/Graph.js",
-           "js/graph_actions.js",
-           "js/sphere_graph.js",
-           "js/client_rendering.js",
-           "js/facebook/queryObjects.js",
-           "js/facebook/facebookQueries.js"
+           'public/js/facebook/facebookGraphAPI.js',
+           'public/js/helvetiker_bold.typeface.js',
+           'public/webgl-frameworks/three.js' ,
+           'public/webgl-frameworks/OrbitControls.js',
+           'public/webgl-frameworks/FlyControls.js',
+           'public/webgl-frameworks/easeljs-0.7.1.min.js',
+           'public/webgl-frameworks/tweenjs-0.5.1.min.js',
+           'public/webgl-frameworks/ease.js',
+           'public/utils/Label.js',
+           'public/utils/ObjectSelection.js',
+           'public/js/Graph.js',
+           'public/js/graph_actions.js',
+           'public/js/sphere_graph.js',
+           'public/js/client_rendering.js',
+           'public/js/facebook/queryObjects.js',
+           'public/js/facebook/facebookQueries.js'
         ],
         dest: 'public/dist/index.js'
       },
-      appBackbone: {
-        src: [
-          "js/backbone/LoginModel.js",
-          "js/backbone/AppView.js"
-        ],
-        dest: 'public/dist/appBackbone.js'
-      }
     },
 
     uglify: {
@@ -78,7 +78,8 @@ module.exports = function(grunt){
       scripts: {
         files: [
           'public/js/**/*.js',
-          'public/utils/*.js'
+          'public/utils/*.js',
+          'views/template.html'
         ],
         tasks: [
           'jshint',
@@ -119,13 +120,13 @@ module.exports = function(grunt){
     grunt.task.run([ 'watch' ]);
   });
 
-  grunt.registerTask('concatAll', ['concat:index']);
+  grunt.registerTask('concatAll', ['concat:index', 'concat:appBackbone']);
   grunt.registerTask('uglifyAll', ['uglify:index']);
   grunt.registerTask('test', ['jshint']);
   grunt.registerTask('build', ['concatAll', 'uglifyAll']);
 
   // <grunt> to run app in localhost with dependencies stored locally and sans concat, uglified files.
-  grunt.registerTask('default', ['test','processhtml:dev', 'server-dev']);
+  grunt.registerTask('default', ['test', 'processhtml:dev', 'server-dev']);
   // <gunt serve-dev> to run app with dependencies served from CDN's and with concatted, minified public files.
-  grunt.registerTask('serve-dist', ['test','processhtml:dist', 'server-dev']);
+  grunt.registerTask('serve-dist', ['test','build', 'processhtml:dist', 'server-dev']);
 };
