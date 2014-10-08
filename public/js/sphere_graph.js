@@ -494,7 +494,7 @@ Drawing.SphereGraph = function(options) {
       image.lookAt(camera.position);
       scene.add(image);
       createjs.Tween.get(image.position)
-      .to({x: pos.x*(1+(rnd()*0.5)), y: pos.y*(1+(rnd()*0.5)), z: pos.z*(1+(rnd()*0.5))}, 8000)
+      .to({x: pos.x*(0.9+(rnd()*0.4)), y: pos.y*(0.9+(rnd()*0.4)), z: pos.z*(0.9+(rnd()*0.4))}, 8000)
       .call(onComplete, [image]);
     }
     texture.src = data.picture;

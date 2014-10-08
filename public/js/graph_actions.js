@@ -32,7 +32,6 @@ var getAllPhotos = function(id){
   FBData.get('userPhotos',current, function(data){
     //get photos of current friend
     data = JSON.parse(data);
-    console.log('data: ', data)
     if(data.photos){
       //if there are photos, display them
       getPhotos(data.photos.data, id);
@@ -82,24 +81,24 @@ flyToNext(function(next){
   nextFunc = next;
 });
 
-$(document).on('keydown', function( event ){
-  if(event.which === 32){ // space key
-    nextFunc();
-  }
-  else if(event.which === 13){ // enter key
-    getAllPhotos();
-  }
-  else if(event.which === 87){ // w key
-    var current = window.currentId
-    FBData.get('newsFeed', current, function(data){
-      var myPosts = JSON.parse(data);
-      if(myPosts.posts){
-        myPosts = myPosts.posts.data;
-        investigatePosts(current, myPosts);
-      }
-    })
-  }
-})
+// $(document).on('keydown', function( event ){
+//   if(event.which === 32){ // space key
+//     nextFunc();
+//   }
+//   // else if(event.which === 13){ // enter key
+//   //   getAllPhotos();
+//   // }
+//   // else if(event.which === 87){ // w key
+//   //   var current = window.currentId
+//   //   FBData.get('newsFeed', current, function(data){
+//   //     var myPosts = JSON.parse(data);
+//   //     if(myPosts.posts){
+//   //       myPosts = myPosts.posts.data;
+//   //       investigatePosts(current, myPosts);
+//   //     }
+//   //   })
+//   // }
+// })
 
 ///// for info display //////////////////////////////////////////////////
 var infoHTMLlog = [];
@@ -136,7 +135,6 @@ function displayInfo(data, isUrl){
 var getPic = function(id){
   FBData.get('getProfilePic', id, function(photo){
     photo = JSON.parse(photo);
-    console.log('PHOTO: ',photo);
     photo = photo.picture.data;
     displayInfo(photo, true);
   })
@@ -191,7 +189,6 @@ var loadMutual = function(list, currentFriend){
 }
 
 var investigatePosts = function(id, posts){
-  console.log('investigate');
   drawing.moveOut();
   if(!posts || !posts.length){
     return;
@@ -199,14 +196,16 @@ var investigatePosts = function(id, posts){
     if(posts.length > 12){
       posts = posts.slice(0,12);
     }
+    console.log(posts);
     setInterval(function(){
-      drawPosts(id, posts);
+      if(posts.length){
+        drawPosts(id, posts.pop());
+      }
     }, 300)
   }
 }
 
-var drawPosts = function(id, posts){
-  var current = posts.pop();
+var drawPosts = function(id, current){
   current = drawing.addPost(id, current, drawing);
   FBData.getPostLikes(current.id, function(data){
     data = data.data;
