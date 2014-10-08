@@ -39,7 +39,14 @@ module.exports = function(grunt){
            "js/facebook/queryObjects.js",
            "js/facebook/facebookQueries.js"
         ],
-        dest: 'public/dist/index.js',
+        dest: 'public/dist/index.js'
+      },
+      appBackbone: {
+        src: [
+          "js/backbone/LoginModel.js",
+          "js/backbone/AppView.js"
+        ],
+        dest: 'public/dist/appBackbone.js'
       }
     },
 
