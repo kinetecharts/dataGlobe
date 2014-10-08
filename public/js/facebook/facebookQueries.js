@@ -11,6 +11,9 @@ var FBData = (function(){
 var queryMap = queryStringData;
 
 function getRequest(query, endpoint, cb){
+  if(typeof endpoint === "function"){
+    cb = endpoint;
+  };
   var queryData = queryMap[query];
   // generate a parameter object for either FQL or Graph API syntax
   var queryType;
@@ -42,7 +45,7 @@ function getRequest(query, endpoint, cb){
         }
         data = data || Qresponse;
         payload = JSON.stringify(data)
-        if(queryData.url){
+        if(queryData.url && cb === undefined){
           $.post(queryData.url, {response: payload}).then(function(response){
             console.log('ajax success:', queryData.url, response);
           })

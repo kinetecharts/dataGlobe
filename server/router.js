@@ -128,9 +128,7 @@ router.get('/get-friends', function(req, res){
 })
 
 router.post('/save-mutual', function(req, res){
-  console.log('my fbid: ', req.session.fbId);
   var data = req.body;
-  console.log('theirs: ', data.userB);
   var userArray = [req.session.fbId, data.userB];
   Mutual.findOneAndUpdate({mutual_of: {$all: userArray}},{
     $addToSet: {mutual_of: {$each: userArray}, mutual_friends: {$each: data.mutuals}},
