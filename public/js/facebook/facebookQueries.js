@@ -45,9 +45,12 @@ function getRequest(query, endpoint, cb){
         }
         data = data || Qresponse;
         payload = JSON.stringify(data)
-        if(queryData.url && cb === undefined){
+        if(queryData.url){
           $.post(queryData.url, {response: payload}).then(function(response){
             console.log('ajax success:', queryData.url, response);
+            if(cb !== undefined){
+              cb();
+            }
           })
         } else {
           return cb(payload);
@@ -83,7 +86,6 @@ function postBatch(queryArray, cb){
 
 function getMutual(){
   $.get('/api/get-friends').then(function(response){
-    console.log(response);
     response = JSON.parse(response);
     var friends = response.data;
     $('.friends').text(friends.length.toString());

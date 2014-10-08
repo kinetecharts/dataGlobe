@@ -3,23 +3,24 @@ var flyToNext = function(cb){
       var friends = JSON.parse(response).friends;
       var last;
       cb(function(){
-        var i = Math.floor(Math.random()*friends.length);
-        current = friends[i];
-        currentNode = drawing.getNode(current);
-        while(!currentNode || current === last){
-          i += 1;
-          if(i === friends.length){
-            i = 0;
-          }
+          var i = Math.floor(Math.random()*friends.length);
           current = friends[i];
           currentNode = drawing.getNode(current);
-        }
-        //go to next user on globe and draw mutual friends
-        window.currentId = current
-        drawing.goToNode(current);
-        last = current;
-        getMutual(current);
-        getPic(current);
+          while(!currentNode || current === last){
+            i += 1;
+            if(i === friends.length){
+              i = 0;
+            }
+            current = friends[i];
+            currentNode = drawing.getNode(current);
+          }
+          //go to next user on globe and draw mutual friends
+          window.currentId = current
+          last = current;
+          drawing.goToNode(current);
+          getPic(current);
+          goToRelay(current);
+          postExplosion(current);
       })
   })
 };
@@ -81,24 +82,24 @@ flyToNext(function(next){
   nextFunc = next;
 });
 
-// $(document).on('keydown', function( event ){
-//   if(event.which === 32){ // space key
-//     nextFunc();
-//   }
-//   // else if(event.which === 13){ // enter key
-//   //   getAllPhotos();
-//   // }
-//   // else if(event.which === 87){ // w key
-//   //   var current = window.currentId
-//   //   FBData.get('newsFeed', current, function(data){
-//   //     var myPosts = JSON.parse(data);
-//   //     if(myPosts.posts){
-//   //       myPosts = myPosts.posts.data;
-//   //       investigatePosts(current, myPosts);
-//   //     }
-//   //   })
-//   // }
-// })
+$(document).on('keydown', function( event ){
+  if(event.which === 32){ // space key
+    nextFunc();
+  }
+  // else if(event.which === 13){ // enter key
+  //   getAllPhotos();
+  // }
+  // else if(event.which === 87){ // w key
+  //   var current = window.currentId
+  //   FBData.get('newsFeed', current, function(data){
+  //     var myPosts = JSON.parse(data);
+  //     if(myPosts.posts){
+  //       myPosts = myPosts.posts.data;
+  //       investigatePosts(current, myPosts);
+  //     }
+  //   })
+  // }
+})
 
 ///// for info display //////////////////////////////////////////////////
 var infoHTMLlog = [];
@@ -144,7 +145,7 @@ var goToRelay = function(id){
   if(id === id){
     window.currentId = id;
   }
-  drawing.goToNode(id);
+  //drawing.goToNode(id);
   getAllPhotos(id);
   getMutual(id);
 }

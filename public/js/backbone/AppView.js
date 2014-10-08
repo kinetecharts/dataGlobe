@@ -11,9 +11,11 @@ var AppView = Backbone.View.extend({
 
   render: function(view){
     if(view === 'globeView'){
-      $('.loginView').empty();
-      $('.loginView').append('<div class="panel-wrapper"></div>');
-      initialize3d();
+      setTimeout(function(){
+        $('.loginView').empty();
+        $('.loginView').append('<div class="panel-wrapper"></div>');
+        initialize3d();
+      }, 2000)
     }
   }
 

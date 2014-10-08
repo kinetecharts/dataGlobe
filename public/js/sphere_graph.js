@@ -435,6 +435,7 @@ Drawing.SphereGraph = function(options) {
     if(text !== undefined) {
       var text = text.split(' ');
       for(var i = 0; i < text.length; i++){
+        if(text[i].toLowerCase() !== 'the'){
         var materialFront = new THREE.MeshBasicMaterial( { color: 'white' } );
         var textGeom = new THREE.TextGeometry( text[i], {
           size: 30, height: 4, curveSegments: 3,
@@ -451,7 +452,8 @@ Drawing.SphereGraph = function(options) {
         textMesh.lookAt(camera.position);
         textMesh.data = 'TEXT';
         scene.add(textMesh);
-        createjs.Tween.get(textMesh.position).to({x: pos.x*(2+rnd()), y: pos.y*(2+rnd()), z: pos.z*(2+rnd())}, 9000).call(onComplete, [textMesh]);
+        createjs.Tween.get(textMesh.position).to({x: pos.x*(2+rnd()), y: pos.y*(2+rnd()), z: pos.z*(2+rnd())}, 9000).call(onComplete, [textMesh]);       
+        }
       }
     }
     if(data.picture){
@@ -552,8 +554,8 @@ Drawing.SphereGraph = function(options) {
   // moves the camera away for post explosion
   this.moveOut = function(){
     // ***** maybe keep a boolean to check if the camera has already moved out
-    var newPos = {x: camera.position.x*1.4, y: camera.position.y*1.25, z: camera.position.z*1.3};
-    createjs.Tween.get(camera.position).to(newPos, 4000);
+    //var newPos = {x: camera.position.x*1.4, y: camera.position.y*1.25, z: camera.position.z*1.3};
+    //createjs.Tween.get(camera.position).to(newPos, 4000);
   }
 
   function animate() {
