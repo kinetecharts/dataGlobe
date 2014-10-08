@@ -47,6 +47,7 @@ function getRequest(query, endpoint, cb){
             console.log('ajax success:', queryData.url, response);
           })
         } else {
+          console.log(payload);
           return cb(payload);
         }
       }

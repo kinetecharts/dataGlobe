@@ -11,7 +11,8 @@ var AppView = Backbone.View.extend({
 
   render: function(view){
     if(view === 'globeView'){
-      $('body').empty();
+      $('.loginView').empty();
+      $('.loginView').append('<div class="panel-wrapper"></div>');
       initialize3d();
     }
   }

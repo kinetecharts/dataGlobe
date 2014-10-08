@@ -202,6 +202,7 @@ Drawing.SphereGraph = function(options) {
   goToNode is the function used to "fly to friends"
   */
   this.goToNode = function(id){
+    console.log('WENT TO NODE');
     var node = graph.getNode(id);
     var finalX = node.position.x * 2.2;
     var finalY = node.position.y * 2.2;
@@ -604,18 +605,13 @@ Drawing.SphereGraph = function(options) {
     if(!watched[str]){
       watched[str] = true;
       var fbId = parseInt(str);
-      console.log('string: ',str);
-      if(window.getProfilePic !== undefined){
-        window.getProfilePic(fbId);
+      if(str !== ""){
+          getPic(fbId);
+          goToRelay(fbId);
+          postExplosion(fbId);
+        }
       }
-      if(window.goToRelay !== undefined){
-        window.goToRelay(fbId);
-      }
-      // postExplosion();
-      // getAllPhotos();
-      // getMutual(fbId, true);
     }
-  }
 
   function findElement(tree, str){
     var result = false;
