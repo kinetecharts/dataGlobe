@@ -3,6 +3,19 @@ module.exports = function(grunt){
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    processhtml: {
+      dist: {
+        files: {
+          'views/index.html': ['views/template.html']
+        }
+      },
+      // dev target necessary to overwrite processed index.html to new a dev version
+      dev: {
+        files: {
+          'views/index.html': ['views/template.html']
+        }
+      },
+    },
     concat: {
       options: {
         separator: ';',
@@ -20,20 +33,6 @@ module.exports = function(grunt){
           'public/js/facebook/ui.js',
         ],
         dest: 'public/dist/globe.js',
-      },
-      graph: {
-        src: [
-          'public/js/Graph.js',
-          'public/utils/Label.js',
-          'public/utils/ObjectSelection.js',
-          'public/js/force-directed-layout.js',
-          'public/js/simple_graph.js',
-          'public/js/client_rendering_simple.js',
-          'public/js/facebook/queryObjects.js',
-          'public/js/facebook/facebookQueries.js',
-          'public/js/facebook/facebookGraphAPI.js',
-        ],
-        dest: 'public/dist/graph.js',
       },
       index: {
         src: [
@@ -72,26 +71,11 @@ module.exports = function(grunt){
           'public/dist/index.min.js':['public/dist/index.js'],
         },
       },
-      graph: {
-        options: {
-          banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
-
-          mangle: {
-            except: ['jQuery', 'THREE', 'FB', 'createjs', 'Tween', 'Ease', 'Drawing']
-          }
-        },
-        files: {
-          'public/dist/graph.min.js':['public/dist/graph.js'],
-        },
-      },
     },
 
     jshint: {
       files: [
-        //'Gruntfile.js',
         'public/js/**/sphere_graph.js'
-        //'server/*.js',
-        //'./*.js',
       ],
       options: {
         force: 'true',
@@ -102,15 +86,13 @@ module.exports = function(grunt){
       scripts: {
         files: [
           'public/js/**/*.js',
-          'public/utils/*.js',
+          'public/utils/*.js'
         ],
         tasks: [
+          'jshint',
+          'processhtml:dev',
           'concat:index',
-          'concat:globe',
-          'concat:graph',
-          'uglify:globe',
-          'uglify:index',
-          'uglify:graph'
+          'uglify:index'
         ]
       },
     },
@@ -145,9 +127,13 @@ module.exports = function(grunt){
     grunt.task.run([ 'watch' ]);
   });
 
-  grunt.registerTask('concatAll', ['concat:index','concat:globe','concat:graph']);
-  grunt.registerTask('uglifyAll', ['uglify:index','uglify:globe','uglify:graph']);
+  grunt.registerTask('concatAll', ['concat:index']);
+  grunt.registerTask('uglifyAll', ['uglify:index']);
   grunt.registerTask('test', ['jshint']);
   grunt.registerTask('build', ['concatAll', 'uglifyAll']);
-  grunt.registerTask('default', ['test','build', 'server-dev']);
+
+  // <grunt> to run app in localhost with dependencies stored locally and sans concat, uglified files.
+  grunt.registerTask('default', ['test','processhtml:dev', 'server-dev']);
+  // <gunt serve-dev> to run app with dependencies served from CDN's and with concatted, minified public files.
+  grunt.registerTask('serve-dist', ['test','processhtml:dist', 'server-dev']);
 };
