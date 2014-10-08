@@ -30,8 +30,8 @@ module.exports = function(grunt){
       index: {
         src: [
            'public/js/facebook/facebookGraphAPI.js',
-           'public/js/helvetiker_bold.typeface.js',
            'public/webgl-frameworks/three.js' ,
+           'public/js/helvetiker_bold.typeface.js',
            'public/webgl-frameworks/OrbitControls.js',
            'public/webgl-frameworks/FlyControls.js',
            'public/webgl-frameworks/easeljs-0.7.1.min.js',
