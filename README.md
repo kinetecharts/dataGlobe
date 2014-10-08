@@ -3,7 +3,7 @@
 
 ===
 
-> Tired of using multiple sites to plan your night? Nite-Out is your one-stop-shop for people looking to spend a night out on the town. 
+> Experience your facebook friends on a 3D globe and immerse yourself in a three dimensional explosion of data.
 
 ## Credits
 .
