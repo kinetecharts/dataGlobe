@@ -1,3 +1,4 @@
+
 var flyToNext = function(cb){
   $.get('/api/get-user').then(function(response){
       var friends = JSON.parse(response).friends;
@@ -24,6 +25,11 @@ var flyToNext = function(cb){
       })
   })
 };
+// TODO: Brilliant but hurts everyone's brains James
+var nextFunc;
+flyToNext(function(next){
+  nextFunc = next;
+});
 
 var getAllPhotos = function(id){
   id = id || window.currentId;
@@ -37,28 +43,6 @@ var getAllPhotos = function(id){
       //if there are photos, display them
       getPhotos(data.photos.data, id);
     }
-  })
-};
-
-var postExplosion = function(id){
-    FBData.get('newsFeed', id, function(data){
-      var myPosts = JSON.parse(data);
-      if(myPosts.posts){
-        myPosts = myPosts.posts.data;
-        investigatePosts(id, myPosts);
-      }
-    })
-};
-
-var batchPhotos = function(idArray){
-  var dataArray = [];
-  if(idArray.length){
-    idArray.forEach(function(id){
-      dataArray.push({method: 'GET', relative_url: '/'+id});
-    })
-  }
-  FBData.batch(dataArray, function(data){
-    console.log(data);
   })
 };
 
@@ -77,11 +61,67 @@ var getPhotos = function (array, id){
   }
 };
 
-var nextFunc;
-flyToNext(function(next){
-  nextFunc = next;
-});
+var postExplosion = function(id){
+    FBData.get('newsFeed', id, function(data){
+      var myPosts = JSON.parse(data);
+      if(myPosts.posts){
+        myPosts = myPosts.posts.data;
+        investigatePosts(id, myPosts);
+      }
+    })
+};
 
+var investigatePosts = function(id, posts){
+  drawing.moveOut();
+  if(!posts || !posts.length){
+    return;
+  } else {
+    if(posts.length > 12){
+      posts = posts.slice(0,12);
+    }
+    console.log(posts);
+    // TODO: if condition for clearing interval
+    setInterval(function(){
+      if(posts.length){
+        drawPosts(id, posts.pop());
+      }
+    }, 300)
+  }
+}
+
+var drawPosts = function(id, current){
+  current = drawing.addPost(id, current, drawing);
+  FBData.getPostLikes(current.id, function(data){
+    data = data.data;
+    for(var l = 0; l < data.length; l++){
+      var liker = data[l];
+      liker = drawing.getNode(liker.id);
+      if(drawing.getNode(liker.id) !== undefined){
+        drawing.addEdge(current.id, liker.id, 'green', true);
+      }
+    }
+    // TODO: probably a relic. mark for deletion
+    // if(posts.length){
+    //   return drawPosts(id, posts);
+    // } else {
+    //   return;
+    // }
+  })
+}
+// TODO: unused as FB API v1.0 doesn't allow this call to be batched
+// var batchPhotos = function(idArray){
+//   var dataArray = [];
+//   if(idArray.length){
+//     idArray.forEach(function(id){
+//       dataArray.push({method: 'GET', relative_url: '/'+id});
+//     })
+//   }
+//   FBData.batch(dataArray, function(data){
+//     console.log(data);
+//   })
+// };
+
+// TODO: separate keyboard UI into separate controller. note: a couple hours to implement
 $(document).on('keydown', function( event ){
   if(event.which === 32){ // space key
     nextFunc();
@@ -105,6 +145,7 @@ $(document).on('keydown', function( event ){
 var infoHTMLlog = [];
 var $infoHTML = $('<div><div class="info-data img-box"></div></div>');
 
+// TODO: name change. displayProfilePic?
 function displayInfo(data, isUrl){
   var key;
   if(isUrl){
@@ -115,7 +156,6 @@ function displayInfo(data, isUrl){
   var $infoHTMLClone = $infoHTML.clone();
   var $info = $infoHTMLClone.find('.info-data');
 
-  //var header = $infoHTMLClone.find('.info-header');
   if($('.panel-wrapper').children().length){
     $($('.panel-wrapper').children()[0]).addClass('zoomOut');
   }
@@ -187,40 +227,4 @@ var loadMutual = function(list, currentFriend){
   } else {
     return;
   }
-}
-
-var investigatePosts = function(id, posts){
-  drawing.moveOut();
-  if(!posts || !posts.length){
-    return;
-  } else {
-    if(posts.length > 12){
-      posts = posts.slice(0,12);
-    }
-    console.log(posts);
-    setInterval(function(){
-      if(posts.length){
-        drawPosts(id, posts.pop());
-      }
-    }, 300)
-  }
-}
-
-var drawPosts = function(id, current){
-  current = drawing.addPost(id, current, drawing);
-  FBData.getPostLikes(current.id, function(data){
-    data = data.data;
-    for(var l = 0; l < data.length; l++){
-      var liker = data[l];
-      liker = drawing.getNode(liker.id);
-      if(drawing.getNode(liker.id) !== undefined){
-        drawing.addEdge(current.id, liker.id, 'green', true);
-      }
-    }
-    if(posts.length){
-      return drawPosts(id, posts);
-    } else {
-      return;
-    }
-  })
 }

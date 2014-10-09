@@ -10,7 +10,8 @@ var initialize3d = function(){
   // this will kickoff WebGL rendering
   $.get('/api/get-user').then(function(response){
     var user = JSON.parse(response);
-    friendsList = user.friends;
+
+    // TODO: creategraph->addNode or addUserNode
     userNode = drawing.createGraph(user, true);
   })
 
@@ -21,9 +22,19 @@ var initialize3d = function(){
 			if(friends.length){
 				drawing.createGraph(friends.pop());
 			}
+      /*
+      TODO: bjhb
+      check if friends list empty && maybe 15s later then clear interval
+      var idleTime =
+      if(friends.length){
+        drawing.createGraph(friends.pop());
+      } else if(friends.length === 0 && idleTime){
+
+      }
+      */
 		}, 0)
 	});
-    
+
   });
 
 }

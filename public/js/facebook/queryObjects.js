@@ -19,6 +19,7 @@ var queryStringData = {
     url: '/api/save-mutual',
     endpoint: '/me'
   },
+  // TODO: rename to posts
   newsFeed: {
     queryString: ['posts{id,type,from,to,with_tags,created_time,message,story,link,name,tags,picture}'],
     endpoint: false

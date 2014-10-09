@@ -377,7 +377,7 @@ Drawing.SphereGraph = function(options) {
       node.data.draw_object = draw_object;
       scene.add( node.data.draw_object );
       node.data.draw_object.lookAt(scene.position);
-      
+
       var finalX = node.position.x;
       var finalY = node.position.y;
       var finalZ = node.position.z;
@@ -442,17 +442,17 @@ Drawing.SphereGraph = function(options) {
           font: "helvetiker", weight: "bold", style: "normal",
           bevelEnabled: false, material: 0
           });
-        
+
         var textMesh = new THREE.Mesh(textGeom, materialFront );
-        
+
         textGeom.computeBoundingBox();
         var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
-        
+
         textMesh.position.set( node.position.x, node.position.y, node.position.z );
         textMesh.lookAt(camera.position);
         textMesh.data = 'TEXT';
         scene.add(textMesh);
-        createjs.Tween.get(textMesh.position).to({x: pos.x*(2+rnd()), y: pos.y*(2+rnd()), z: pos.z*(2+rnd())}, 9000).call(onComplete, [textMesh]);       
+        createjs.Tween.get(textMesh.position).to({x: pos.x*(2+rnd()), y: pos.y*(2+rnd()), z: pos.z*(2+rnd())}, 9000).call(onComplete, [textMesh]);
         }
       }
     }
@@ -480,7 +480,8 @@ Drawing.SphereGraph = function(options) {
   this.displayPhoto = function(data, node){
     var onComplete = function(object){
       scene.remove(object);
-      renderer.render( scene, camera );
+      // TODO: Note: check what happens with and without render call
+      // renderer.render( scene, camera );
     }
     var pos = camera.position;
     var rnd = Math.random;
@@ -497,7 +498,7 @@ Drawing.SphereGraph = function(options) {
       scene.add(image);
       createjs.Tween.get(image.position)
       .to({x: pos.x*(0.9+(rnd()*0.4)), y: pos.y*(0.9+(rnd()*0.4)), z: pos.z*(0.9+(rnd()*0.4))}, 8000)
-      .call(onComplete, [image]);
+      .call(onComplete, [image]); // Tween hijacked .call() -> .call( callback, parameter )
     }
     texture.src = data.picture;
   }

@@ -4,6 +4,7 @@ module.exports = function(grunt){
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     processhtml: {
+      // replaces script src's from bower install libraries to CDN's in template.html
       dist: {
         files: {
           'views/index.html': ['views/template.html']
@@ -123,10 +124,10 @@ module.exports = function(grunt){
   grunt.registerTask('concatAll', ['concat:index', 'concat:appBackbone']);
   grunt.registerTask('uglifyAll', ['uglify:index']);
   grunt.registerTask('test', ['jshint']);
-  grunt.registerTask('build', ['concatAll', 'uglifyAll']);
+  grunt.registerTask('build', ['concatAll', 'uglifyAll', 'processhtml:dist']);
 
   // <grunt> to run app in localhost with dependencies stored locally and sans concat, uglified files.
   grunt.registerTask('default', ['test', 'processhtml:dev', 'server-dev']);
   // <gunt serve-dev> to run app with dependencies served from CDN's and with concatted, minified public files.
-  grunt.registerTask('serve-dist', ['test','build', 'processhtml:dist', 'server-dev']);
+  grunt.registerTask('serve-dist', ['test','build','server-dev']);
 };
