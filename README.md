@@ -1,6 +1,6 @@
 # dataGlobe
 
-![alt tag](https://raw.github.com/robotBones/dataGlobe/public/img/fireworks.png)
+![alt tag](https://github.com/kinetecharts/dataGlobe/blob/master/public/img/fireworks.png)
 ===
 
 > Experience your facebook friends on a 3D globe and immerse yourself in a three dimensional explosion of data.
