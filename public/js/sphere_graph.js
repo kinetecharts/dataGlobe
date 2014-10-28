@@ -95,12 +95,29 @@ Drawing.SphereGraph = function(options) {
     renderer = new THREE.WebGLRenderer({alpha: true});
     renderer.setSize( window.innerWidth, window.innerHeight );
 
-    camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
-    camera.position.z = 20000;
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
+    camera.position.z = 100;
     canvas = document.body;
     clock = new THREE.Clock();
+
+
     control = new THREE.OrbitControls(camera);
     control.addEventListener( 'change', render );
+
+    var controller = new Leap.Controller();
+
+    controls = new THREE.LeapTrackballControls( camera , controller );
+    //controls.addEventListener( 'drop', render );
+    controls.rotationSpeed            = 1;
+    controls.rotationDampening        = 2;
+    controls.zoom                     = 40;
+    controls.zoomDampening            = .6;
+    controls.zoomCutoff               = .9;
+    controls.zoomEnabled              = true;
+
+    controls.minZoom                  = 20;
+    controls.maxZoom                  = 80;
+
     // control = new THREE.FlyControls(camera, canvas);
     // control.dragToLook = false;
     // control.autoForward = false;
@@ -108,6 +125,7 @@ Drawing.SphereGraph = function(options) {
     // control.rollSpeed = 0.5;
 
     scene = new THREE.Scene();
+
 
 /////////////////////////////////////////////////////////////////////////////////
     // a sun like light source and ambient light so all parts of globe are visible
@@ -173,6 +191,8 @@ Drawing.SphereGraph = function(options) {
     }
 
     document.body.appendChild( renderer.domElement );
+
+    controller.connect();
 
   }
 
@@ -560,14 +580,24 @@ Drawing.SphereGraph = function(options) {
   }
 
   function animate() {
-    requestAnimationFrame( animate );
+    //controls.update();
+    controls.update();
+
+    controls.object.matrixAutoUpdate = true;
+
     var dt = clock.getDelta();
     control.update(dt)
-    // control.update();
+
+    // console.log(camera.position.x);
+    // console.log(camera.position.y);
+    // console.log(camera.position.z);
+
     render();
     if(that.show_info) {
       printInfo();
     }
+    requestAnimationFrame( animate );
+
   }
 
   function render() {
