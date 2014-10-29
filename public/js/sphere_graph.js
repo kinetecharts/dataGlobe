@@ -1,6 +1,9 @@
+// "use strict";
+
 var Drawing = Drawing || {};
 
 Drawing.SphereGraph = function(options) {
+  var bLeapOn = false;
   var options = options || {};
 
   //color fn and shaders from google globe JHE
@@ -95,8 +98,8 @@ Drawing.SphereGraph = function(options) {
     renderer = new THREE.WebGLRenderer({alpha: true});
     renderer.setSize( window.innerWidth, window.innerHeight );
 
-    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.z = 100;
+    camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
+    camera.position.z = 20000;
     canvas = document.body;
     clock = new THREE.Clock();
 
@@ -104,25 +107,28 @@ Drawing.SphereGraph = function(options) {
     control = new THREE.OrbitControls(camera);
     control.addEventListener( 'change', render );
 
-    var controller = new Leap.Controller();
+    var controller;
+    if(bLeapOn){
+      controller = new Leap.Controller();
 
-    controls = new THREE.LeapTrackballControls( camera , controller );
-    //controls.addEventListener( 'drop', render );
-    controls.rotationSpeed            = 1;
-    controls.rotationDampening        = 2;
-    controls.zoom                     = 40;
-    controls.zoomDampening            = .6;
-    controls.zoomCutoff               = .9;
-    controls.zoomEnabled              = true;
+      controls = new THREE.LeapTrackballControls( camera , controller );
+      //controls.addEventListener( 'drop', render );
+      controls.rotationSpeed            = 1;
+      controls.rotationDampening        = 2;
+      controls.zoom                     = 40;
+      controls.zoomDampening            = .6;
+      controls.zoomCutoff               = .9;
+      controls.zoomEnabled              = true;
 
-    controls.minZoom                  = 20;
-    controls.maxZoom                  = 80;
+      controls.minZoom                  = 20;
+      controls.maxZoom                  = 80;
 
-    // control = new THREE.FlyControls(camera, canvas);
-    // control.dragToLook = false;
-    // control.autoForward = false;
-    // control.movementSpeed = 1000;
-    // control.rollSpeed = 0.5;
+      control = new THREE.FlyControls(camera, canvas);
+      control.dragToLook = false;
+      control.autoForward = false;
+      control.movementSpeed = 1000;
+      control.rollSpeed = 0.5;
+    }
 
     scene = new THREE.Scene();
 
@@ -181,7 +187,9 @@ Drawing.SphereGraph = function(options) {
       object_selection = new THREE.ObjectSelection({
         domElement: renderer.domElement,
         selected: function(obj) {
+          // console.log('selected');
           if(obj !== null && obj.fbId !== undefined) {
+            console.log("selected: " + obj.fbId);
             info_text.select = obj.fbId; //get this ID in printInfo for display
           } else {
             delete info_text.select;
@@ -192,7 +200,7 @@ Drawing.SphereGraph = function(options) {
 
     document.body.appendChild( renderer.domElement );
 
-    controller.connect();
+    if(bLeapOn) controller.connect();
 
   }
 
@@ -580,10 +588,10 @@ Drawing.SphereGraph = function(options) {
   }
 
   function animate() {
-    //controls.update();
-    controls.update();
-
-    controls.object.matrixAutoUpdate = true;
+    if(bLeapOn){
+      controls.update();
+      controls.object.matrixAutoUpdate = true;
+    }
 
     var dt = clock.getDelta();
     control.update(dt)
@@ -627,7 +635,14 @@ Drawing.SphereGraph = function(options) {
     renderer.render( scene, camera );
   }
 
+  var bAllowPrintInfo = true;
+  var pauseAllowPrintInfo = function(){
+    bAllowPrintInfo = false;
+    setTimeout(function(){bAllowPrintInfo = true;}, 5000);
+  };
+
   function printInfo(text) {
+    // console.log('in printInfo: '+ text);
     var str = '';
     for(var index in info_text) {
       if(str != '' && info_text[index] != '') {
@@ -638,10 +653,12 @@ Drawing.SphereGraph = function(options) {
     if(!watched[str]){
       watched[str] = true;
       var fbId = parseInt(str);
-      if(str !== ""){
-          getPic(fbId);
+      if(bAllowPrintInfo && str !== ""){
+          console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+          // getPic(fbId);
           goToRelay(fbId);
           postExplosion(fbId);
+          pauseAllowPrintInfo();
         }
       }
     }
