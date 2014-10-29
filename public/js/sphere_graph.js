@@ -301,15 +301,31 @@ Drawing.SphereGraph = function(options) {
       this.nodes.push(node);
       return node;
     }
-  }
+  };
+
+  this.displace=function(pos, R){
+    var p = new THREE.Vector3(pos.x, pos.y, pos.z);
+    var v = p.clone();
+    v.x += R * (Math.random()-0.5);
+    v.y += R * (Math.random()-0.5);
+    v.z += R * (Math.random()-0.5);
+    var scale = p.length()/v.length();
+    v.multiplyScalar(scale); // put v to the globe 
+    return v;
+  };
 
   this.addPost = function(id, post, context){
     var postData = {story: post.story, message: post.message, picture: post.picture};
     var source = context.getNode(id);
     var node = new Node(post.id);
-    node.position.x = source.position.x * (Math.random()*3);
-    node.position.y = source.position.y * (Math.random()*3);
-    node.position.z = source.position.z * (1 + Math.random());
+    // node.position.x = source.position.x * (Math.random()*3);
+    // node.position.y = source.position.y * (Math.random()*3);
+    // node.position.z = source.position.z * (1 + Math.random());
+    var newPos = this.displace(source.position, 3000);
+    node.position.x = newPos.x;
+    node.position.y = newPos.y;
+    node.position.z = newPos.z;
+
     node.data.post = postData;
     graph.addNode(node);
     drawPost(source, node, context);
@@ -464,23 +480,26 @@ Drawing.SphereGraph = function(options) {
       var text = text.removeStopWords().split(' ').slice(0, 30); // Weidong: set maximum to 20 pieces
       for(var i = 0; i < text.length; i++){
         if(text[i].toLowerCase() !== 'the'){
-        var materialFront = new THREE.MeshBasicMaterial( { color: 'white' } );
-        var textGeom = new THREE.TextGeometry( text[i], {
-          size: 30, height: 4, curveSegments: 3,
-          font: "helvetiker", weight: "bold", style: "normal",
-          bevelEnabled: false, material: 0
-          });
+          var materialFront = new THREE.MeshBasicMaterial( { color: 'white' } );
+          var textGeom = new THREE.TextGeometry( text[i], {
+            size: 30, height: 4, curveSegments: 3,
+            font: "helvetiker", weight: "bold", style: "normal",
+            bevelEnabled: false, material: 0
+            });
 
-        var textMesh = new THREE.Mesh(textGeom, materialFront );
+          var textMesh = new THREE.Mesh(textGeom, materialFront );
 
-        textGeom.computeBoundingBox();
-        var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+          textGeom.computeBoundingBox();
+          var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
 
-        textMesh.position.set( node.position.x, node.position.y, node.position.z );
-        textMesh.lookAt(camera.position);
-        textMesh.data = 'TEXT';
-        scene.add(textMesh);
-        createjs.Tween.get(textMesh.position).to({x: pos.x*(2+rnd()), y: pos.y*(2+rnd()), z: pos.z*(2+rnd())}, 9000).call(onComplete, [textMesh]);
+          textMesh.position.set( node.position.x, node.position.y, node.position.z );
+          textMesh.lookAt(camera.position);
+          textMesh.data = 'TEXT';
+          scene.add(textMesh);
+          var toPos = this.displace(pos, 3000);
+          createjs.Tween.get(textMesh.position)
+            .to({x: toPos.x, y: toPos.y, z: toPos.z}, 10000).call(onComplete, [textMesh]);
+          // createjs.Tween.get(textMesh.position).to({x: pos.x*(2+rnd()), y: pos.y*(2+rnd()), z: pos.z*(2+rnd())}, 15000).call(onComplete, [textMesh]);
         }
       }
     }
