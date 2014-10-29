@@ -40,6 +40,7 @@ module.exports = function(grunt){
            'public/webgl-frameworks/ease.js',
            'public/utils/Label.js',
            'public/utils/ObjectSelection.js',
+           'public/utils/stopWords.js',
            'public/js/Graph.js',
            'public/js/graph_actions.js',
            'public/js/sphere_graph.js',

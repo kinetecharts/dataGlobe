@@ -394,59 +394,59 @@ Drawing.SphereGraph = function(options) {
     scene.add( node.data.draw_object );
   }
 
-    function drawPost(source, node, context) {
+  function drawPost(source, node, context) {
 
-      var ball = new THREE.SphereGeometry(20, 10, 10);
-      material = new THREE.MeshBasicMaterial({ color: 'yellow' });
-      draw_object = new THREE.Mesh(ball, material);
-      draw_object.position.set(source.position.x, source.position.y, source.position.z);
-      draw_object.fbId = node.id;
-      draw_object.name = node.data.name
-      node.data.draw_object = draw_object;
-      scene.add( node.data.draw_object );
-      node.data.draw_object.lookAt(scene.position);
+    var ball = new THREE.SphereGeometry(20, 10, 10);
+    material = new THREE.MeshBasicMaterial({ color: 'yellow' });
+    draw_object = new THREE.Mesh(ball, material);
+    draw_object.position.set(source.position.x, source.position.y, source.position.z);
+    draw_object.fbId = node.id;
+    draw_object.name = node.data.name
+    node.data.draw_object = draw_object;
+    scene.add( node.data.draw_object );
+    node.data.draw_object.lookAt(scene.position);
 
-      var finalX = node.position.x;
-      var finalY = node.position.y;
-      var finalZ = node.position.z;
+    var finalX = node.position.x;
+    var finalY = node.position.y;
+    var finalZ = node.position.z;
 
-      var midX = (node.data.draw_object.position.x + finalX)/2*1.1;
-      var midY = (node.data.draw_object.position.y + finalY)/2*1.1;
-      var midZ = (node.data.draw_object.position.z + finalZ)/2*1.1;
+    var midX = (node.data.draw_object.position.x + finalX)/2*1.1;
+    var midY = (node.data.draw_object.position.y + finalY)/2*1.1;
+    var midZ = (node.data.draw_object.position.z + finalZ)/2*1.1;
 
-      var vect1 = new THREE.Vector3(node.data.draw_object.position.x, node.data.draw_object.position.y, node.data.draw_object.position.z);
-      var vect2 = new THREE.Vector3(midX, midY, midZ);
-      var vect3 = new THREE.Vector3(finalX, finalY, finalZ);
+    var vect1 = new THREE.Vector3(node.data.draw_object.position.x, node.data.draw_object.position.y, node.data.draw_object.position.z);
+    var vect2 = new THREE.Vector3(midX, midY, midZ);
+    var vect3 = new THREE.Vector3(finalX, finalY, finalZ);
 
-      var curve = new THREE.QuadraticBezierCurve3();
-      curve.v0 = vect1;
-      curve.v1 = vect2;
-      curve.v2 = vect3;
+    var curve = new THREE.QuadraticBezierCurve3();
+    curve.v0 = vect1;
+    curve.v1 = vect2;
+    curve.v2 = vect3;
 
-      var flyTo1 = curve.getPointAt(0.25);
-      var flyTo2 = curve.getPointAt(0.5);
-      var flyTo3 = curve.getPointAt(0.75);
+    var flyTo1 = curve.getPointAt(0.25);
+    var flyTo2 = curve.getPointAt(0.5);
+    var flyTo3 = curve.getPointAt(0.75);
 
-      var tween = new createjs.Tween(node.data.draw_object.position)
-      .to({x: flyTo1.x, y: flyTo1.y, z: flyTo1.z}, 300, createjs.Ease.linearInOut)
-      .to({x: flyTo2.x, y: flyTo2.y, z: flyTo2.z}, 300, createjs.Ease.linearInOut)
-      .to({x: flyTo3.x, y: flyTo3.y, z: flyTo3.z}, 300, createjs.Ease.linearInOut)
-      .to({x: finalX, y: finalY, z: finalZ}, 300, createjs.Ease.linearInOut).call(function(){
-        context.postPieces(node);
-        context.addEdge(source.id, node.id, 'yellow',true, 0.5);
-      })
+    var tween = new createjs.Tween(node.data.draw_object.position)
+    .to({x: flyTo1.x, y: flyTo1.y, z: flyTo1.z}, 300, createjs.Ease.linearInOut)
+    .to({x: flyTo2.x, y: flyTo2.y, z: flyTo2.z}, 300, createjs.Ease.linearInOut)
+    .to({x: flyTo3.x, y: flyTo3.y, z: flyTo3.z}, 300, createjs.Ease.linearInOut)
+    .to({x: finalX, y: finalY, z: finalZ}, 300, createjs.Ease.linearInOut).call(function(){
+      context.postPieces(node);
+      context.addEdge(source.id, node.id, 'yellow',true, 0.5);
+    })
 
-      //this code stays the same, I use the fbId to get friend data on mouseover
-      node.layout = {}
-      node.layout.max_X = 90;
-      node.layout.min_X = -90;
-      node.layout.max_Y = 180;
-      node.layout.min_Y = -180;
+    //this code stays the same, I use the fbId to get friend data on mouseover
+    node.layout = {}
+    node.layout.max_X = 90;
+    node.layout.min_X = -90;
+    node.layout.max_Y = 180;
+    node.layout.min_Y = -180;
 
-      node.data.draw_object.material.transparent = true;
-      createjs.Tween.get(node.data.draw_object.material).wait(5000).to({opacity: 0}, 5000).call(function(){
-        scene.remove(node.data.draw_object);
-      });
+    node.data.draw_object.material.transparent = true;
+    createjs.Tween.get(node.data.draw_object.material).wait(5000).to({opacity: 0}, 5000).call(function(){
+      scene.remove(node.data.draw_object);
+    });
   }
 
   // this function makes the "pieces" i.e. text or photos of a post fly out of the post sphere
@@ -461,7 +461,7 @@ Drawing.SphereGraph = function(options) {
     }
     var text = data.message || data.story;
     if(text !== undefined) {
-      var text = text.split(' ');
+      var text = text.removeStopWords().split(' ').slice(0, 30); // Weidong: set maximum to 20 pieces
       for(var i = 0; i < text.length; i++){
         if(text[i].toLowerCase() !== 'the'){
         var materialFront = new THREE.MeshBasicMaterial( { color: 'white' } );
