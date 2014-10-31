@@ -7,6 +7,7 @@ var Drawing = Drawing || {};
 
 Drawing.SphereGraph = function(opts) {
   var bLeapOn = true;
+  var nextFuncReady = true;
   var options = opts || {};
 
   //color fn and shaders from google globe JHE
@@ -106,7 +107,7 @@ Drawing.SphereGraph = function(opts) {
     camera.position.x = 0;
     camera.position.y = 0;
 
-    camera.position.z = 20000;
+    camera.position.z = -20000;
     window.camera = camera;
     var canvas = document.body;
     clock = new THREE.Clock();
@@ -187,6 +188,7 @@ Drawing.SphereGraph = function(opts) {
 
         for(var h = 0; h < frame.hands.length; h++){
           var hand = frame.hands[h];
+          window.hand = hand;
           var position = hand.palmPosition;
           var direction = hand.direction;
           var timer = new Date().getTime() * 0.0005;
@@ -210,18 +212,34 @@ Drawing.SphereGraph = function(opts) {
           var lr = hand.palmPosition[0];
           var ud = hand.palmPosition[2];
           var zoom = hand.palmPosition[1];
+          var vel = hand.palmVelocity;
+          var v = Math.sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
+          console.log(v);
+          console.log(hand.confidence);
 
-          if(Math.abs(lr)>80){
-            control.rotateLeft(0.01 * lr / Math.abs(lr));
-          }else if(Math.abs(ud - 0) > 80){
-            var offset = ud - 160;
-            control.rotateUp(0.01 * offset / Math.abs(offset));
-          }else if(Math.abs(zoom - 250)> 50){
-            var offset = zoom - 250;
-            if(offset > 0)
-              control.zoomOut(1.01);
-            else
-              control.zoomIn(1.01);
+          if(hand.confidence > 0.8 && v < 300){
+            if(hand.pinchStrength< 0.4){ //hand open
+              if(Math.abs(lr)>80){
+                control.rotateLeft(0.01 * lr / Math.abs(lr));
+              }else if(Math.abs(ud) > 80){
+                var offset = ud;
+                control.rotateUp(0.01 * offset / Math.abs(offset));
+              }else if(Math.abs(zoom - 250)> 50){
+                var offset = zoom - 250;
+                if(offset > 0)
+                  control.zoomIn(1.01);
+                else
+                  control.zoomOut(1.01);
+              }
+            }else if(hand.pinchStrength > 0.8){
+              if(nextFuncReady){
+                if(nextFunc == undefined)
+                  initNextFunc();
+                nextFunc();
+                nextFuncReady = false;
+                setTimeout(function(){nextFuncReady = true;}, 10000);
+              }
+            }
           }
 
           // if(lr>30) control.rotateLeft(0.01);
@@ -620,7 +638,7 @@ Drawing.SphereGraph = function(opts) {
     };
     var text = data.message || data.story;
     if(text !== undefined) {
-      text = text.removeStopWords().split(' ').slice(0, 30); // Weidong: set maximum to 20 pieces
+      text = text.removeStopWords().split(' ').slice(0, 10); // Weidong: set maximum to 20 pieces
       for(var i = 0; i < text.length; i++){
         if(text[i].toLowerCase() !== 'the'){
           var materialFront = new THREE.MeshBasicMaterial( { color: 'white' } );

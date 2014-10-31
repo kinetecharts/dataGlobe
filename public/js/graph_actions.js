@@ -27,9 +27,12 @@ var flyToNext = function(cb){
 };
 // TODO: Brilliant but hurts everyone's brains James
 var nextFunc;
-flyToNext(function(next){
-  nextFunc = next;
-});
+var initNextFunc = function(){
+  flyToNext(function(next){
+    nextFunc = next;
+  });
+};
+initNextFunc();
 
 var getAllPhotos = function(id){
   id = id || window.currentId;
