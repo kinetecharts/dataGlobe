@@ -1,13 +1,13 @@
 // "use strict";
 
-var dPI = Math.PI/2
+var dPI = Math.PI/2;
 var curPos = 0.0;
 
 var Drawing = Drawing || {};
 
-Drawing.SphereGraph = function(options) {
+Drawing.SphereGraph = function(opts) {
   var bLeapOn = true;
-  var options = options || {};
+  var options = opts || {};
 
   //color fn and shaders from google globe JHE
   var colorFn = function(x) {
@@ -76,7 +76,7 @@ Drawing.SphereGraph = function(options) {
   var watched = {};
   setInterval(function(){
     watched = {};
-  }, 5000)
+  }, 5000);
 
   var sphere_radius = 4900;
   var max_X = 10000;
@@ -134,82 +134,82 @@ Drawing.SphereGraph = function(options) {
           switch( type ){
 
             case "circle":
-              console.log("circle")
+              console.log("circle");
               break;
 
             case "swipe":
-              var i = 0.001;
+              //var i = 0.001;
               // while (i < 1000000) {
               //   curPos = curPos + i
               //   camera.position.x = Math.floor(Math.cos( curPos ) * 20000);
               //   camera.position.z = Math.floor(Math.sin( curPos ) * 20000);
               //   i++;
               // }
-              console.log("swipe")
+              console.log("swipe");
               break;
 
             case "screenTap":
-              console.log("screenTap")
+              console.log("screenTap");
               break;
 
             case "keyTap":
-              console.log("keyTap")
+              console.log("keyTap");
               break;
 
           }
 
         }
 
-        xHandMin = -300.0
-        xHandMax = 300.0
-        yHandMin = 15.0
-        yHandMax = 400.0
-        zHandMin = -200.0
-        zHandMax = 200.0
+        xHandMin = -300.0;
+        xHandMax = 300.0;
+        yHandMin = 15.0;
+        yHandMax = 400.0;
+        zHandMin = -200.0;
+        zHandMax = 200.0;
 
-        xCamMin = -20000.0
-        xCamMax = 20000.0
-        yCamMin = -20000.0
-        yCamMax = 20000.0
-        zCamMin = -10000.0
-        zCamMax = 40000.0
+        xCamMin = -20000.0;
+        xCamMax = 20000.0;
+        yCamMin = -20000.0;
+        yCamMax = 20000.0;
+        zCamMin = -10000.0;
+        zCamMax = 40000.0;
 
         function mapValues(value, istart, istop ,ostart, ostop) {
-          return ostart + (ostop - ostart) * ((value - istart) / (istop - istart))
+          return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
         }
 
-        for(var h = 0; h < frame.hands.length; h++){
-          var hand = frame.hands[h];
-          // var position = hand.palmPosition
-          // var direction = hand.direction;
-          // var timer = new Date().getTime() * 0.0005;
+        // for(var h = 0; h < frame.hands.length; h++){
+        //   var hand = frame.hands[h];
+        //   var position = hand.palmPosition;
+        //   var direction = hand.direction;
+        //   var timer = new Date().getTime() * 0.0005;
 
 
-          // Some trig to move the camera around in a circle
+        //   // Some trig to move the camera around in a circle
          
-          // camera.position.z = Math.floor(Math.cos( timer ) * 20000);
-          // camera.position.y = Math.floor(Math.sin( timer ) * 20000);
+        //   camera.position.z = Math.floor(Math.cos( timer ) * 20000);
+        //   camera.position.y = Math.floor(Math.sin( timer ) * 20000);
 
 
 
-          // Direct Mapping
+        //   // Direct Mapping
 
-          // camera.position.x = mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax); 
-          // camera.position.y = mapValues(hand.palmPosition[1],yHandMin,yHandMax,yCamMin,yCamMax);
-          // camera.position.z = mapValues(hand.palmPosition[2],zHandMin,zHandMax,zCamMin,zCamMax);
+        //   camera.position.x = mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax); 
+        //   camera.position.y = mapValues(hand.palmPosition[1],yHandMin,yHandMax,yCamMin,yCamMax);
+        //   camera.position.z = mapValues(hand.palmPosition[2],zHandMin,zHandMax,zCamMin,zCamMax);
 
-          //console.log("X Position = ", mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax))
-          // console.log("Y Position = ", hand.palmPosition[1])
-          // console.log("Z Position = ", hand.palmPosition[2])
+        //   console.log("X Position = ", mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax));
+        //   console.log("Y Position = ", hand.palmPosition[1]);
+        //   console.log("Z Position = ", hand.palmPosition[2]);
 
-          // console.log("Camera X Position = ", camera.position.x)
-          // console.log("Camera Y Position = ", camera.position.y)
-          // console.log("Camera Z Position = ", camera.position.z)
+        //   console.log("Camera X Position = ", camera.position.x);
+        //   console.log("Camera Y Position = ", camera.position.y);
+        //   console.log("Camera Z Position = ", camera.position.z);
 
-          // console.log("X Position = ", hand.palmPosition[0])
-          // console.log("Y Position = ", hand.palmPosition[1])
-          // console.log("Z Position = ", hand.palmPosition[2])
-        }
+        //   console.log("X Position = ", hand.palmPosition[0]);
+        //   console.log("Y Position = ", hand.palmPosition[1]);
+        //   console.log("Z Position = ", hand.palmPosition[2]);
+        // }
 
       });
   
@@ -253,8 +253,7 @@ Drawing.SphereGraph = function(options) {
 
     var skyboxGeometry = new THREE.CubeGeometry(50000, 50000, 50000);
     var skyboxMaterial = new THREE.MeshBasicMaterial({
-      map: THREE.ImageUtils.loadTexture('./img/bsg-stars.png')
-      , side: THREE.BackSide });
+      map: THREE.ImageUtils.loadTexture('./img/bsg-stars.png'), side: THREE.BackSide });
     var skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
     scene.add(skybox);
 
@@ -273,7 +272,7 @@ Drawing.SphereGraph = function(options) {
     meshClouds.rotation.z = tilt;
     setInterval(function(){
       meshClouds.rotation.z +=0.0001;
-    },16)
+    },16);
 
     globe = new THREE.Mesh(globeGeometry, globeMaterial);
     globe.rotation.y = Math.PI;
@@ -307,8 +306,8 @@ Drawing.SphereGraph = function(options) {
   }
 
   this.nodes = [];
-  this.userNode;
-  this.previousNode;
+  this.userNode = [];
+  this.previousNode = [];
   this.addEdge = function(from, to, color, fade, width){
     width = width || 2;
     color = color || 'red';
@@ -327,7 +326,7 @@ Drawing.SphereGraph = function(options) {
         drawEdge(fromNode, toNode, color, fade, width);
       }
     }
-  }
+  };
   /*
   goToNode is the function used to "fly to friends"
   */
@@ -364,7 +363,7 @@ Drawing.SphereGraph = function(options) {
     camera.lookAt( scene.position );
     this.connectToUser(node);
     //$('.info-header').text(node.data.name);
-  }
+  };
 
     //LeapMotion controls
 
@@ -380,16 +379,16 @@ Drawing.SphereGraph = function(options) {
         drawEdge(node, this.userNode, 'blue', true);
       }
     }
-  }
+  };
 
   this.getCurrent = function(){
     return this.previousNode;
-  }
+  };
 
 
   this.getNode = function(id){
     return graph.getNode(id);
-  }
+  };
 
   this.createGraph = function(current, isUser) {
       //only add if lat and lon are not null
@@ -440,7 +439,7 @@ Drawing.SphereGraph = function(options) {
     graph.addNode(node);
     drawPost(source, node, context);
     return node;
-  }
+  };
 
   this.createLayout = function(){
     var layout_options = {};
@@ -457,12 +456,12 @@ Drawing.SphereGraph = function(options) {
       node.data.draw_object.position.x = Math.random() * max_X;
       node.data.draw_object.position.y = Math.random() * max_Y;
       node.data.draw_object.position.z = Math.random() * max_X;
-    }
+    };
 
     graph.layout = new Layout.ForceDirected(graph, layout_options);
     graph.layout.init();
     graph.layout.generate();
-  }
+  };
 
   this.addUser = function(user, connect){
     connect = connect || false;
@@ -485,7 +484,7 @@ Drawing.SphereGraph = function(options) {
         }
       }
     }
-  }
+  };
 
   // Create a node object and add it to the scene.
 
@@ -507,10 +506,10 @@ Drawing.SphereGraph = function(options) {
 
     //this code stays the same, I use the fbId to get friend data on mouseover
     draw_object.fbId = node.id;
-    draw_object.name = node.data.name
+    draw_object.name = node.data.name;
 
     node.data.draw_object = draw_object;
-    node.layout = {}
+    node.layout = {};
     node.layout.max_X = 90;
     node.layout.min_X = -90;
     node.layout.max_Y = 180;
@@ -527,7 +526,7 @@ Drawing.SphereGraph = function(options) {
     draw_object = new THREE.Mesh(ball, material);
     draw_object.position.set(source.position.x, source.position.y, source.position.z);
     draw_object.fbId = node.id;
-    draw_object.name = node.data.name
+    draw_object.name = node.data.name;
     node.data.draw_object = draw_object;
     scene.add( node.data.draw_object );
     node.data.draw_object.lookAt(scene.position);
@@ -560,10 +559,10 @@ Drawing.SphereGraph = function(options) {
     .to({x: finalX, y: finalY, z: finalZ}, 300, createjs.Ease.linearInOut).call(function(){
       context.postPieces(node);
       context.addEdge(source.id, node.id, 'yellow',true, 0.5);
-    })
+    });
 
     //this code stays the same, I use the fbId to get friend data on mouseover
-    node.layout = {}
+    node.layout = {};
     node.layout.max_X = 90;
     node.layout.min_X = -90;
     node.layout.max_Y = 180;
@@ -584,10 +583,10 @@ Drawing.SphereGraph = function(options) {
     var onComplete = function(object){
       scene.remove(object);
       renderer.render( scene, camera );
-    }
+    };
     var text = data.message || data.story;
     if(text !== undefined) {
-      var text = text.removeStopWords().split(' ').slice(0, 30); // Weidong: set maximum to 20 pieces
+      text = text.removeStopWords().split(' ').slice(0, 30); // Weidong: set maximum to 20 pieces
       for(var i = 0; i < text.length; i++){
         if(text[i].toLowerCase() !== 'the'){
           var materialFront = new THREE.MeshBasicMaterial( { color: 'white' } );
@@ -629,17 +628,17 @@ Drawing.SphereGraph = function(options) {
         createjs.Tween.get(image.position)
         .to({x: pos.x*(1+rnd()), y: pos.y*(1+rnd()), z: pos.z*(1+rnd())}, 8000)
         .call(onComplete, [image]);
-      }
+      };
       texture.src = data.picture;
     }
-  }
+  };
 
   this.displayPhoto = function(data, node){
     var onComplete = function(object){
       scene.remove(object);
       // TODO: Note: check what happens with and without render call
       // renderer.render( scene, camera );
-    }
+    };
     var pos = camera.position;
     var rnd = Math.random;
     var texture = new Image();
@@ -656,9 +655,9 @@ Drawing.SphereGraph = function(options) {
       createjs.Tween.get(image.position)
       .to({x: pos.x*(0.9+(rnd()*0.4)), y: pos.y*(0.9+(rnd()*0.4)), z: pos.z*(0.9+(rnd()*0.4))}, 8000)
       .call(onComplete, [image]); // Tween hijacked .call() -> .call( callback, parameter )
-    }
+    };
     texture.src = data.picture;
-  }
+  };
 
   // Create an edge object (line) and add it to the scene.
   function drawEdge(source, target, color, fade, width) {
@@ -674,17 +673,17 @@ Drawing.SphereGraph = function(options) {
     var targetXy = target.position;
 
     //get averages (mid-point) between coordinates of source and target
-    var AvgX = (sourceXy['x'] + targetXy['x'])/2;
-    var AvgY = (sourceXy['y'] + targetXy['y'])/2;
-    var AvgZ = (sourceXy['z'] + targetXy['z'])/2;
+    var AvgX = (sourceXy.x + targetXy.x)/2;
+    var AvgY = (sourceXy.y + targetXy.y)/2;
+    var AvgZ = (sourceXy.z + targetXy.z)/2;
     //get difference between source and target
-    var diffX = Math.abs(sourceXy['x'] - targetXy['x']);
-    var diffY = Math.abs(sourceXy['y'] - targetXy['y']);
+    var diffX = Math.abs(sourceXy.x - targetXy.x);
+    var diffY = Math.abs(sourceXy.y - targetXy.y);
     //set middle point to average(x/y) and average(z + sum of difference(x/y))
     var middle = [ AvgX * multiplier, AvgY * multiplier, AvgZ * multiplier ];
 
     //make quadratic bezier out of the three points
-    var curve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(sourceXy['x'], sourceXy['y'], sourceXy['z']), new THREE.Vector3(middle[0], middle[1], middle[2]), new THREE.Vector3(targetXy['x'], targetXy['y'], targetXy['z']));
+    var curve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(sourceXy.x, sourceXy.y, sourceXy.z), new THREE.Vector3(middle[0], middle[1], middle[2]), new THREE.Vector3(targetXy.x, targetXy.y, targetXy.z));
 
     //make a curve path and add the bezier curve to it
     var path = new THREE.CurvePath();
@@ -701,7 +700,7 @@ Drawing.SphereGraph = function(options) {
     var onComplete = function(curvedLine){
       scene.remove(curvedLine);
       renderer.render( scene, camera );
-    }
+    };
     if(fade){
       curvedLine.material.transparent = true;
       createjs.Tween.get(curvedLine.material).wait(5000).to({opacity: 0}, 5000).call(onComplete, [curvedLine]);
@@ -714,7 +713,7 @@ Drawing.SphereGraph = function(options) {
     // ***** maybe keep a boolean to check if the camera has already moved out
     //var newPos = {x: camera.position.x*1.4, y: camera.position.y*1.25, z: camera.position.z*1.3};
     //createjs.Tween.get(camera.position).to(newPos, 4000);
-  }
+  };
 
   function animate() {
     if(bLeapOn){
@@ -723,7 +722,7 @@ Drawing.SphereGraph = function(options) {
     }
 
     var dt = clock.getDelta();
-    control.update(dt)
+    control.update(dt);
 
     // console.log(camera.position.x);
     // console.log(camera.position.y);
@@ -751,7 +750,7 @@ Drawing.SphereGraph = function(options) {
     }
 
     // set lookat of nodes to camera
-    for(var i=0; i<graph.nodes.length; i++) {
+    for(i=0; i<graph.nodes.length; i++) {
       // graph.nodes[i].data.draw_object.lookAt(camera.position);
     }
 
@@ -774,7 +773,7 @@ Drawing.SphereGraph = function(options) {
     // console.log('in printInfo: '+ text);
     var str = '';
     for(var index in info_text) {
-      if(str != '' && info_text[index] != '') {
+      if(str !== '' && info_text[index] !== '') {
         str += " - ";
       }
       str += info_text[index];
@@ -801,4 +800,4 @@ Drawing.SphereGraph = function(options) {
     }
     return result;
   }
-}
+};
