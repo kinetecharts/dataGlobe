@@ -1,4 +1,4 @@
-// "use strict";
+"use strict";
 
 var dPI = Math.PI/2;
 var curPos = 0.0;
@@ -67,7 +67,8 @@ Drawing.SphereGraph = function(opts) {
   this.selection = options.selection || true;
   this.limit = options.limit || 10;
 
-  var camera, controls, scene, renderer, interaction, geometry, object_selection;
+  var camera, control, controls, scene, renderer, interaction, geometry, object_selection;
+  var clock;
   var stats;
   var graph = new Graph();
 
@@ -106,7 +107,8 @@ Drawing.SphereGraph = function(opts) {
     camera.position.y = 0;
 
     camera.position.z = 20000;
-    canvas = document.body;
+    window.camera = camera;
+    var canvas = document.body;
     clock = new THREE.Clock();
 
 
@@ -124,7 +126,7 @@ Drawing.SphereGraph = function(opts) {
       var dz = 0.001;
 
       controller.on( 'animationFrame' , function( frame ) {
-
+        if(false){
         for( var i =  0; i < frame.gestures.length; i++){
 
           var gesture  = frame.gestures[0];
@@ -138,6 +140,7 @@ Drawing.SphereGraph = function(opts) {
               break;
 
             case "swipe":
+              window.ges = gesture;
               //var i = 0.001;
               // while (i < 1000000) {
               //   curPos = curPos + i
@@ -159,57 +162,58 @@ Drawing.SphereGraph = function(opts) {
           }
 
         }
+        }
 
-        xHandMin = -300.0;
-        xHandMax = 300.0;
-        yHandMin = 15.0;
-        yHandMax = 400.0;
-        zHandMin = -200.0;
-        zHandMax = 200.0;
+        var xHandMin = -300.0;
+        var xHandMax = 300.0;
+        var yHandMin = 15.0;
+        var yHandMax = 400.0;
+        var zHandMin = -200.0;
+        var zHandMax = 200.0;
 
-        xCamMin = -20000.0;
-        xCamMax = 20000.0;
-        yCamMin = -20000.0;
-        yCamMax = 20000.0;
-        zCamMin = -10000.0;
-        zCamMax = 40000.0;
+        var xCamMin = -20000.0;
+        var xCamMax = 20000.0;
+        var yCamMin = -20000.0;
+        var yCamMax = 20000.0;
+        var zCamMin = -10000.0;
+        var zCamMax = 40000.0;
 
         function mapValues(value, istart, istop ,ostart, ostop) {
           return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
         }
 
-        // for(var h = 0; h < frame.hands.length; h++){
-        //   var hand = frame.hands[h];
-        //   var position = hand.palmPosition;
-        //   var direction = hand.direction;
-        //   var timer = new Date().getTime() * 0.0005;
+        for(var h = 0; h < frame.hands.length; h++){
+          var hand = frame.hands[h];
+          var position = hand.palmPosition;
+          var direction = hand.direction;
+          var timer = new Date().getTime() * 0.0005;
 
 
-        //   // Some trig to move the camera around in a circle
+          // Some trig to move the camera around in a circle
          
-        //   camera.position.z = Math.floor(Math.cos( timer ) * 20000);
-        //   camera.position.y = Math.floor(Math.sin( timer ) * 20000);
+          // camera.position.z = Math.floor(Math.cos( timer ) * 20000);
+          // camera.position.y = Math.floor(Math.sin( timer ) * 20000);
 
 
 
-        //   // Direct Mapping
+          // Direct Mapping
 
-        //   camera.position.x = mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax); 
-        //   camera.position.y = mapValues(hand.palmPosition[1],yHandMin,yHandMax,yCamMin,yCamMax);
-        //   camera.position.z = mapValues(hand.palmPosition[2],zHandMin,zHandMax,zCamMin,zCamMax);
+          camera.position.x = mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax); 
+          camera.position.y = mapValues(hand.palmPosition[1],yHandMin,yHandMax,yCamMin,yCamMax);
+          camera.position.z = mapValues(hand.palmPosition[2],zHandMin,zHandMax,zCamMin,zCamMax);
 
-        //   console.log("X Position = ", mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax));
-        //   console.log("Y Position = ", hand.palmPosition[1]);
-        //   console.log("Z Position = ", hand.palmPosition[2]);
+          console.log("X Position = ", mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax));
+          console.log("Y Position = ", hand.palmPosition[1]);
+          console.log("Z Position = ", hand.palmPosition[2]);
 
-        //   console.log("Camera X Position = ", camera.position.x);
-        //   console.log("Camera Y Position = ", camera.position.y);
-        //   console.log("Camera Z Position = ", camera.position.z);
+          console.log("Camera X Position = ", camera.position.x);
+          console.log("Camera Y Position = ", camera.position.y);
+          console.log("Camera Z Position = ", camera.position.z);
 
-        //   console.log("X Position = ", hand.palmPosition[0]);
-        //   console.log("Y Position = ", hand.palmPosition[1]);
-        //   console.log("Z Position = ", hand.palmPosition[2]);
-        // }
+          console.log("X Position = ", hand.palmPosition[0]);
+          console.log("Y Position = ", hand.palmPosition[1]);
+          console.log("Z Position = ", hand.palmPosition[2]);
+        }
 
       });
   
@@ -267,14 +271,14 @@ Drawing.SphereGraph = function(opts) {
     var cloudGeometry = new THREE.SphereGeometry(sphere_radius+50, 200, 100);
     var materialClouds = new THREE.MeshLambertMaterial( { color: 0xffffff, map: cloudTexture, transparent: true } );
 
-    meshClouds = new THREE.Mesh( cloudGeometry, materialClouds );
+    var meshClouds = new THREE.Mesh( cloudGeometry, materialClouds );
     meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
     meshClouds.rotation.z = tilt;
     setInterval(function(){
       meshClouds.rotation.z +=0.0001;
     },16);
 
-    globe = new THREE.Mesh(globeGeometry, globeMaterial);
+    var globe = new THREE.Mesh(globeGeometry, globeMaterial);
     globe.rotation.y = Math.PI;
     scene.add(globe);
     scene.add( meshClouds );
@@ -499,9 +503,9 @@ Drawing.SphereGraph = function(opts) {
     node.position.z = sphere_radius * Math.sin(phi) * Math.sin(theta);
 
     var ball = new THREE.SphereGeometry(10, 10, 10);
-    material = new THREE.MeshBasicMaterial({ color: 'red' });
+    var material = new THREE.MeshBasicMaterial({ color: 'red' });
     // material.map = THREE.ImageUtils.loadTexture('./img/person.gif');
-    draw_object = new THREE.Mesh(ball, material);
+    var draw_object = new THREE.Mesh(ball, material);
     draw_object.position.set(node.position.x*1.02, node.position.y*1.02,node.position.z*1.02);
 
     //this code stays the same, I use the fbId to get friend data on mouseover
@@ -522,8 +526,8 @@ Drawing.SphereGraph = function(opts) {
   function drawPost(source, node, context) {
 
     var ball = new THREE.SphereGeometry(20, 10, 10);
-    material = new THREE.MeshBasicMaterial({ color: 'yellow' });
-    draw_object = new THREE.Mesh(ball, material);
+    var material = new THREE.MeshBasicMaterial({ color: 'yellow' });
+    var draw_object = new THREE.Mesh(ball, material);
     draw_object.position.set(source.position.x, source.position.y, source.position.z);
     draw_object.fbId = node.id;
     draw_object.name = node.data.name;
@@ -666,7 +670,7 @@ Drawing.SphereGraph = function(opts) {
     var multiplier = 2.0;
 
     //make a 3js line object
-    material = new THREE.LineBasicMaterial( { color: 0xCCCCCC, opacity: 0.5, linewidth: width } );
+    var material = new THREE.LineBasicMaterial( { color: 0xCCCCCC, opacity: 0.5, linewidth: width } );
 
     //cache the coordinates of the source and target nodes
     var sourceXy = source.position;
@@ -695,7 +699,7 @@ Drawing.SphereGraph = function(opts) {
     });
 
     //create curved line and add to scene
-    curvedLine = new THREE.Line(path.createPointsGeometry(100), curveMaterial);
+    var curvedLine = new THREE.Line(path.createPointsGeometry(100), curveMaterial);
     curvedLine.lookAt(scene.position);
     var onComplete = function(curvedLine){
       scene.remove(curvedLine);
