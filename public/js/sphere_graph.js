@@ -114,6 +114,9 @@ Drawing.SphereGraph = function(opts) {
 
     control = new THREE.OrbitControls(camera);
     control.addEventListener( 'change', render );
+    control.minDistance = 8000;
+    control.maxDistance = 50000;
+    window.control = control;
 
     var controller;
     if(bLeapOn){
@@ -198,13 +201,40 @@ Drawing.SphereGraph = function(opts) {
 
           // Direct Mapping
 
-          camera.position.x = mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax); 
-          camera.position.y = mapValues(hand.palmPosition[1],yHandMin,yHandMax,yCamMin,yCamMax);
-          camera.position.z = mapValues(hand.palmPosition[2],zHandMin,zHandMax,zCamMin,zCamMax);
+          // camera.position.x = mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax); 
+          // camera.position.y = mapValues(hand.palmPosition[1],yHandMin,yHandMax,yCamMin,yCamMax);
+          // camera.position.z = mapValues(hand.palmPosition[2],zHandMin,zHandMax,zCamMin,zCamMax);
+          // var lr = mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax); 
+          // var ud = mapValues(hand.palmPosition[1],yHandMin,yHandMax,yCamMin,yCamMax);
+          // var zoom = mapValues(hand.palmPosition[2],zHandMin,zHandMax,zCamMin,zCamMax);
+          var lr = hand.palmPosition[0];
+          var ud = hand.palmPosition[2];
+          var zoom = hand.palmPosition[1];
 
-          console.log("X Position = ", mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax));
-          console.log("Y Position = ", hand.palmPosition[1]);
-          console.log("Z Position = ", hand.palmPosition[2]);
+          if(Math.abs(lr)>80){
+            control.rotateLeft(0.01 * lr / Math.abs(lr));
+          }else if(Math.abs(ud - 0) > 80){
+            var offset = ud - 160;
+            control.rotateUp(0.01 * offset / Math.abs(offset));
+          }else if(Math.abs(zoom - 250)> 50){
+            var offset = zoom - 250;
+            if(offset > 0)
+              control.zoomOut(1.01);
+            else
+              control.zoomIn(1.01);
+          }
+
+          // if(lr>30) control.rotateLeft(0.01);
+          // if(lr<-30) control.rotateLeft(-0.01);
+
+          // if(ud>(160+30)) control.rotateUp(0.001);
+          // if(ud<(160-30)) control.rotateUp(-0.001);
+
+
+
+          console.log("X lr = ", lr);
+          console.log("Y ud = ", ud);
+          console.log("Z zoom = ", zoom);
 
           console.log("Camera X Position = ", camera.position.x);
           console.log("Camera Y Position = ", camera.position.y);
