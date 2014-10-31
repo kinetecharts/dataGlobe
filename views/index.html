@@ -11,15 +11,27 @@
   <link rel="stylesheet" href="/css/style.css">
 
   <script src="js/config.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="lib/underscore/underscore-min.js"></script>
-  <script src="lib/backbone/backbone.js"></script>
-  <script src="js/backbone/LoginModel.js"></script>
-  <script src="js/backbone/LoginView.js"></script>
-  <script src="js/backbone/GlobeView.js"></script>
-  <script src="js/backbone/AppView.js"></script>
 
-  <script type="text/template"></script>
+  <!-- build:js:dist //cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js -->
+  <!-- grunt-processhtml reads these comments and replaces below with above cdn -->
+  <script src="lib/jQuery/dist/jquery.js"></script>
+  <!-- /build -->
+
+  <!-- build:js:dist //cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js -->
+  <!-- grunt-processhtml reads these comments and replaces below with above cdn -->
+  <script src="lib/underscore/underscore-min.js"></script>
+  <!-- /build -->
+
+  <!-- build:js:dist //cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js -->
+  <!-- grunt-processhtml reads these comments and replaces below with above cdn -->
+  <script src="lib/backbone/backbone.js"></script>
+  <!-- /build -->
+
+  <!-- build:js:dist dist/appBackbone.js -->
+  <!-- grunt-processhtml reads these comments and replaces below with above cdn -->
+  <script src="js/backbone/LoginModel.js"></script>
+  <script src="js/backbone/AppView.js"></script>
+  <!-- /build -->
 
 </head>
 <body>
@@ -54,13 +66,12 @@
             friends_status"
           onlogin="checkLoginState();"> Login </fb:login-button>
         <div id="status"></div>
-        <hr>
-        <p class='lead'>Mouse over friends or press space to view data.</p>
       </div>
     </div>
   </div>
 
-
+  <!-- build:js:dist dist/index.min.js -->
+  <!-- grunt-processhtml reads these comments and replaces below with above cdn -->
   <script type="text/javascript" src="js/facebook/facebookGraphAPI.js"></script>
   <script type="text/javascript" src="webgl-frameworks/three.js"></script>
   <script src="js/helvetiker_bold.typeface.js"></script>
@@ -69,19 +80,15 @@
   <script type="text/javascript" src="webgl-frameworks/easeljs-0.7.1.min.js"></script>
   <script type="text/javascript" src="webgl-frameworks/tweenjs-0.5.1.min.js"></script>
   <script type="text/javascript" src="webgl-frameworks/ease.js"></script>
-  
-  <script type="text/javascript" src="lib/leapjs/leap-0.6.2.js"></script>
-  <script type="text/javascript" src="webgl-frameworks/Leap-Three-Camera-Controls/controls/LeapPointerControls.js"></script>
-  <script type="text/javascript" src="webgl-frameworks/Leap-Three-Camera-Controls/controls/LeapTrackballControls.js"></script>
-
   <script type="text/javascript" src="utils/Label.js"></script>
   <script type="text/javascript" src="utils/ObjectSelection.js"></script>
   <script type="text/javascript" src="js/Graph.js"></script>
   <script type="text/javascript" src="js/graph_actions.js"></script>
   <script type="text/javascript" src="js/sphere_graph.js"></script>
   <script type="text/javascript" src="js/client_rendering.js"></script>
+  <script type="text/javascript" src="lib/leapjs/leap-0.6.2.js"></script>
   <script type="text/javascript" src="js/facebook/queryObjects.js"></script>
   <script type="text/javascript" src="js/facebook/facebookQueries.js"></script>
-
+  <!-- /build -->
 </body>
 </html>

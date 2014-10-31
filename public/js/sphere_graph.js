@@ -1,9 +1,12 @@
 // "use strict";
 
+var dPI = Math.PI/2
+var curPos = 0.0;
+
 var Drawing = Drawing || {};
 
 Drawing.SphereGraph = function(options) {
-  var bLeapOn = false;
+  var bLeapOn = true;
   var options = options || {};
 
   //color fn and shaders from google globe JHE
@@ -99,6 +102,9 @@ Drawing.SphereGraph = function(options) {
     renderer.setSize( window.innerWidth, window.innerHeight );
 
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
+    camera.position.x = 0;
+    camera.position.y = 0;
+
     camera.position.z = 20000;
     canvas = document.body;
     clock = new THREE.Clock();
@@ -109,25 +115,121 @@ Drawing.SphereGraph = function(options) {
 
     var controller;
     if(bLeapOn){
-      controller = new Leap.Controller();
+      controller = new Leap.Controller({ enableGestures: true });
 
-      controls = new THREE.LeapTrackballControls( camera , controller );
-      //controls.addEventListener( 'drop', render );
-      controls.rotationSpeed            = 1;
-      controls.rotationDampening        = 2;
-      controls.zoom                     = 40;
-      controls.zoomDampening            = .6;
-      controls.zoomCutoff               = .9;
-      controls.zoomEnabled              = true;
+      controller.on( 'connect' , onControllerConnect);
+        
+      var dx = 0.001;
+      var dy = 0.001; 
+      var dz = 0.001;
 
-      controls.minZoom                  = 20;
-      controls.maxZoom                  = 80;
+      controller.on( 'animationFrame' , function( frame ) {
 
-      control = new THREE.FlyControls(camera, canvas);
-      control.dragToLook = false;
-      control.autoForward = false;
-      control.movementSpeed = 1000;
-      control.rollSpeed = 0.5;
+        for( var i =  0; i < frame.gestures.length; i++){
+
+          var gesture  = frame.gestures[0];
+          var type = gesture.type;
+
+          // Gestures
+          switch( type ){
+
+            case "circle":
+              console.log("circle")
+              break;
+
+            case "swipe":
+              var i = 0.001;
+              // while (i < 1000000) {
+              //   curPos = curPos + i
+              //   camera.position.x = Math.floor(Math.cos( curPos ) * 20000);
+              //   camera.position.z = Math.floor(Math.sin( curPos ) * 20000);
+              //   i++;
+              // }
+              console.log("swipe")
+              break;
+
+            case "screenTap":
+              console.log("screenTap")
+              break;
+
+            case "keyTap":
+              console.log("keyTap")
+              break;
+
+          }
+
+        }
+
+        xHandMin = -300.0
+        xHandMax = 300.0
+        yHandMin = 15.0
+        yHandMax = 400.0
+        zHandMin = -200.0
+        zHandMax = 200.0
+
+        xCamMin = -20000.0
+        xCamMax = 20000.0
+        yCamMin = -20000.0
+        yCamMax = 20000.0
+        zCamMin = -10000.0
+        zCamMax = 40000.0
+
+        function mapValues(value, istart, istop ,ostart, ostop) {
+          return ostart + (ostop - ostart) * ((value - istart) / (istop - istart))
+        }
+
+        for(var h = 0; h < frame.hands.length; h++){
+          var hand = frame.hands[h];
+          // var position = hand.palmPosition
+          // var direction = hand.direction;
+          // var timer = new Date().getTime() * 0.0005;
+
+
+          // Some trig to move the camera around in a circle
+         
+          // camera.position.z = Math.floor(Math.cos( timer ) * 20000);
+          // camera.position.y = Math.floor(Math.sin( timer ) * 20000);
+
+
+
+          // Direct Mapping
+
+          // camera.position.x = mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax); 
+          // camera.position.y = mapValues(hand.palmPosition[1],yHandMin,yHandMax,yCamMin,yCamMax);
+          // camera.position.z = mapValues(hand.palmPosition[2],zHandMin,zHandMax,zCamMin,zCamMax);
+
+          //console.log("X Position = ", mapValues(hand.palmPosition[0],xHandMin,xHandMax,xCamMin,xCamMax))
+          // console.log("Y Position = ", hand.palmPosition[1])
+          // console.log("Z Position = ", hand.palmPosition[2])
+
+          // console.log("Camera X Position = ", camera.position.x)
+          // console.log("Camera Y Position = ", camera.position.y)
+          // console.log("Camera Z Position = ", camera.position.z)
+
+          // console.log("X Position = ", hand.palmPosition[0])
+          // console.log("Y Position = ", hand.palmPosition[1])
+          // console.log("Z Position = ", hand.palmPosition[2])
+        }
+
+      });
+  
+      // controls = new THREE.LeapTrackballControls( camera , controller );
+      // //controls.addEventListener( 'drop', render );
+      // controls.rotationSpeed            = 1;
+      // controls.rotationDampening        = 2;
+      // controls.zoom                     = 40;
+      // controls.zoomDampening            = .6;
+      // controls.zoomCutoff               = .9;
+      // controls.zoomEnabled              = true;
+
+      // controls.minZoom                  = 20;
+      // controls.maxZoom                  = 80;
+
+      // control = new THREE.FlyControls(camera, canvas);
+      // control.dragToLook = false;
+      // control.autoForward = false;
+      // control.movementSpeed = 1000;
+      // control.rollSpeed = 0.5;
     }
 
     scene = new THREE.Scene();
@@ -262,6 +364,14 @@ Drawing.SphereGraph = function(options) {
     camera.lookAt( scene.position );
     this.connectToUser(node);
     //$('.info-header').text(node.data.name);
+  }
+
+    //LeapMotion controls
+
+  function onControllerConnect(){
+
+    console.log( 'Successfully connected.' );
+
   }
 
   this.connectToUser = function(node){
@@ -589,8 +699,8 @@ Drawing.SphereGraph = function(options) {
 
   function animate() {
     if(bLeapOn){
-      controls.update();
-      controls.object.matrixAutoUpdate = true;
+      //controls.update();
+      //controls.object.matrixAutoUpdate = true;
     }
 
     var dt = clock.getDelta();

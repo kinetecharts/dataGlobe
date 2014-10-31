@@ -45,7 +45,7 @@ module.exports = function(grunt){
            'public/js/sphere_graph.js',
            'public/js/client_rendering.js',
            'public/js/facebook/queryObjects.js',
-           'public/js/facebook/facebookQueries.js'
+           'public/js/facebook/facebookQueries.js'          
         ],
         dest: 'public/dist/index.js'
       },
