@@ -7,6 +7,8 @@ var Drawing = Drawing || {};
 
 Drawing.SphereGraph = function(opts) {
   var bLeapOn = true;
+  var bOculusOn = true;
+
   var nextFuncReady = true;
   var options = opts || {};
 
@@ -69,6 +71,7 @@ Drawing.SphereGraph = function(opts) {
   this.limit = options.limit || 10;
 
   var camera, control, controls, scene, renderer, interaction, geometry, object_selection;
+  var vrControls, vrEffect;
   var clock;
   var stats;
   var graph = new Graph();
@@ -286,8 +289,21 @@ Drawing.SphereGraph = function(opts) {
 
     scene = new THREE.Scene();
 
+    if (bOculusOn) {
+      vrControls = new THREE.VRControls( camera );
+      vrEffect = new THREE.VREffect( renderer );
+      vrEffect.setSize( window.innerWidth, window.innerHeight );
+    }
 
-/////////////////////////////////////////////////////////////////////////////////
+    // listen for double clicks to initiate full-screen/VR mode.
+    document.body.addEventListener( 'dblclick', function () {
+      if (bOculusOn) {
+        vrEffect.setFullScreen( true );
+      }
+    } );
+
+
+    /////////////////////////////////////////////////////////////////////////////////
     // a sun like light source and ambient light so all parts of globe are visible
     // adding a specular map turns the globe black without having lighting
     var sun = new THREE.DirectionalLight( 0xffffff , 0.8);
@@ -811,8 +827,15 @@ Drawing.SphereGraph = function(opts) {
       object_selection.render(scene, camera);
     }
 
-    // render scene
-    renderer.render( scene, camera );
+    if (bOculusOn) {
+      vrControls.update();
+      vrEffect.render( scene, camera );
+    }
+    else 
+    {
+      // render scene
+      renderer.render( scene, camera );
+    }
   }
 
   var bAllowPrintInfo = true;
@@ -851,5 +874,14 @@ Drawing.SphereGraph = function(opts) {
       }
     }
     return result;
+  }
+
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    if (bOculusOn) {
+      vrEffect.setSize( window.innerWidth, window.innerHeight );
+    }
   }
 };
