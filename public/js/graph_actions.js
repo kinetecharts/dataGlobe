@@ -19,7 +19,7 @@ var flyToNext = function(cb){
           window.currentId = current
           last = current;
           drawing.goToNode(current);
-          getPic(current);
+          // getPic(current); //Weidong: remove the picture on the side bar
           goToRelay(current);
           postExplosion(current);
       })
@@ -27,9 +27,12 @@ var flyToNext = function(cb){
 };
 // TODO: Brilliant but hurts everyone's brains James
 var nextFunc;
-flyToNext(function(next){
-  nextFunc = next;
-});
+var initNextFunc = function(){
+  flyToNext(function(next){
+    nextFunc = next;
+  });
+};
+initNextFunc();
 
 var getAllPhotos = function(id){
   id = id || window.currentId;
@@ -57,7 +60,7 @@ var getPhotos = function (array, id){
           drawing.displayPhoto(photoData, friend);
         })
       }
-    }, 20)
+    }, 300)
   }
 };
 
@@ -85,7 +88,7 @@ var investigatePosts = function(id, posts){
       if(posts.length){
         drawPosts(id, posts.pop());
       }
-    }, 300)
+    }, 1000)
   }
 }
 
@@ -96,7 +99,7 @@ var drawPosts = function(id, current){
     for(var l = 0; l < data.length; l++){
       var liker = data[l];
       liker = drawing.getNode(liker.id);
-      if(drawing.getNode(liker.id) !== undefined){
+      if(liker && drawing.getNode(liker.id) !== undefined){
         drawing.addEdge(current.id, liker.id, 'green', true);
       }
     }

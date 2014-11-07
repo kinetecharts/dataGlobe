@@ -40,12 +40,13 @@ module.exports = function(grunt){
            'public/webgl-frameworks/ease.js',
            'public/utils/Label.js',
            'public/utils/ObjectSelection.js',
+           'public/utils/stopWords.js',
            'public/js/Graph.js',
            'public/js/graph_actions.js',
            'public/js/sphere_graph.js',
            'public/js/client_rendering.js',
            'public/js/facebook/queryObjects.js',
-           'public/js/facebook/facebookQueries.js'
+           'public/js/facebook/facebookQueries.js'          
         ],
         dest: 'public/dist/index.js'
       },
