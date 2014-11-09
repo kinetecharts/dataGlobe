@@ -7,68 +7,23 @@ var Drawing = Drawing || {};
 
 Drawing.SphereGraph = function(opts) {
   var bLeapOn = true;
+  var bOculusOn = true;
+  var bAllowPrintInfo = true;
+  var bLookAround = true;
+
   var nextFuncReady = true;
   var options = opts || {};
 
-  //color fn and shaders from google globe JHE
-  var colorFn = function(x) {
-    var c = new THREE.Color();
-    c.setHSL( ( 0.6 - ( x * 0.5 ) ), 1.0, 0.5 );
-    return c;
-  };
-
-  var Shaders = {
-    'earth' : {
-      uniforms: {
-        'texture': { type: 't', value: null }
-      },
-      vertexShader: [
-        'varying vec3 vNormal;',
-        'varying vec2 vUv;',
-        'void main() {',
-          'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
-          'vNormal = normalize( normalMatrix * normal );',
-          'vUv = uv;',
-        '}'
-      ].join('\n'),
-      fragmentShader: [
-        'uniform sampler2D texture;',
-        'varying vec3 vNormal;',
-        'varying vec2 vUv;',
-        'void main() {',
-          'vec3 diffuse = texture2D( texture, vUv ).xyz;',
-          'float intensity = 1.05 - dot( vNormal, vec3( 0.0, 0.0, 1.0 ) );',
-          'vec3 atmosphere = vec3( 1.0, 1.0, 1.0 ) * pow( intensity, 3.0 );',
-          'gl_FragColor = vec4( diffuse + atmosphere, 1.0 );',
-        '}'
-      ].join('\n')
-    },
-    'atmosphere' : {
-      uniforms: {},
-      vertexShader: [
-        'varying vec3 vNormal;',
-        'void main() {',
-          'vNormal = normalize( normalMatrix * normal );',
-          'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
-        '}'
-      ].join('\n'),
-      fragmentShader: [
-        'varying vec3 vNormal;',
-        'void main() {',
-          'float intensity = pow( 0.8 - dot( vNormal, vec3( 0, 0, 1.0 ) ), 12.0 );',
-          'gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 ) * intensity;',
-        '}'
-      ].join('\n')
-    }
-  };
-  // end shaders and colors from google globe JHE
   this.layout = options.layout || "2d";
   this.show_stats = options.showStats || false;
   this.show_info = options.showInfo || true;
   this.selection = options.selection || true;
   this.limit = options.limit || 10;
 
-  var camera, control, controls, scene, renderer, interaction, geometry, object_selection;
+  var camera, orbitControls, controls, scene, renderer, interaction, geometry, object_selection;
+  var leapController;
+
+  var vrControls, vrEffect;
   var clock;
   var stats;
   var graph = new Graph();
@@ -100,73 +55,94 @@ Drawing.SphereGraph = function(opts) {
   */
   function init() {
     // Three.js initialization
-    renderer = new THREE.WebGLRenderer({alpha: true});
-    renderer.setSize( window.innerWidth, window.innerHeight );
-
+    renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+    renderer.autoClear = false;
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
-    camera.position.x = 0;
-    camera.position.y = 0;
+    if (bOculusOn) {
+      camera.position.z = -1000;
+    }
+    else
+    {
+      camera.position.z = -20000;
 
-    camera.position.z = -20000;
+    }
     window.camera = camera;
+
+    scene = new THREE.Scene();
+
+    if (bOculusOn) {
+      if (bLookAround) {
+        vrControls = new THREE.VRControls( camera );
+      }
+      vrEffect = new THREE.VREffect( renderer );
+      vrEffect.setSize( window.innerWidth, window.innerHeight );
+    }
+    else {
+      renderer.setSize( window.innerWidth, window.innerHeight );
+    }
+
+    // listen for double clicks to initiate full-screen/VR mode.
+    document.body.addEventListener( 'dblclick', function () {
+      if (bOculusOn) {
+        vrEffect.setFullScreen( true );
+      }
+    } );
+
     var canvas = document.body;
     clock = new THREE.Clock();
 
+    orbitControls = new THREE.OrbitControls(camera);
+    orbitControls.addEventListener( 'change', render );
+    orbitControls.minDistance = 8000;
+    orbitControls.maxDistance = 50000;
+      
+    window.orbitControls = orbitControls;
+    
+    if (bLeapOn) {
+      leapController = new Leap.Controller({ enableGestures: false });
 
-    control = new THREE.OrbitControls(camera);
-    control.addEventListener( 'change', render );
-    control.minDistance = 8000;
-    control.maxDistance = 50000;
-    window.control = control;
-
-    var controller;
-    if(bLeapOn){
-      controller = new Leap.Controller({ enableGestures: true });
-
-      controller.on( 'connect' , onControllerConnect);
+      leapController.on( 'connect' , onControllerConnect);
         
       var dx = 0.001;
       var dy = 0.001; 
       var dz = 0.001;
 
-      controller.on( 'animationFrame' , function( frame ) {
-        if(false){
-        for( var i =  0; i < frame.gestures.length; i++){
+      leapController.on( 'animationFrame' , function( frame ) {
+        // for( var i =  0; i < frame.gestures.length; i++){
 
-          var gesture  = frame.gestures[0];
-          var type = gesture.type;
+        //   var gesture  = frame.gestures[0];
+        //   var type = gesture.type;
 
-          // Gestures
-          switch( type ){
+        //   // Gestures
+        //   switch( type ){
 
-            case "circle":
-              console.log("circle");
-              break;
+        //     case "circle":
+        //       console.log("circle");
+        //       break;
 
-            case "swipe":
-              window.ges = gesture;
-              //var i = 0.001;
-              // while (i < 1000000) {
-              //   curPos = curPos + i
-              //   camera.position.x = Math.floor(Math.cos( curPos ) * 20000);
-              //   camera.position.z = Math.floor(Math.sin( curPos ) * 20000);
-              //   i++;
-              // }
-              console.log("swipe");
-              break;
+        //     case "swipe":
+        //       window.ges = gesture;
+        //       //var i = 0.001;
+        //       // while (i < 1000000) {
+        //       //   curPos = curPos + i
+        //       //   camera.position.x = Math.floor(Math.cos( curPos ) * 20000);
+        //       //   camera.position.z = Math.floor(Math.sin( curPos ) * 20000);
+        //       //   i++;
+        //       // }
+        //       console.log("swipe");
+        //       break;
 
-            case "screenTap":
-              console.log("screenTap");
-              break;
+        //     case "screenTap":
+        //       console.log("screenTap");
+        //       break;
 
-            case "keyTap":
-              console.log("keyTap");
-              break;
+        //     case "keyTap":
+        //       console.log("keyTap");
+        //       break;
 
-          }
+        //   }
 
-        }
-        }
+        // }
 
         var xHandMin = -300.0;
         var xHandMax = 300.0;
@@ -181,10 +157,6 @@ Drawing.SphereGraph = function(opts) {
         var yCamMax = 20000.0;
         var zCamMin = -10000.0;
         var zCamMax = 40000.0;
-
-        function mapValues(value, istart, istop ,ostart, ostop) {
-          return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
-        }
 
         for(var h = 0; h < frame.hands.length; h++){
           var hand = frame.hands[h];
@@ -220,16 +192,17 @@ Drawing.SphereGraph = function(opts) {
           if(hand.confidence > 0.5 && v < 400){
             if(hand.pinchStrength< 0.4){ //hand open
               if(Math.abs(lr)>80){
-                control.rotateLeft(0.01 * lr / Math.abs(lr));
+                orbitControls.rotateLeft(0.01 * lr / Math.abs(lr));
               }else if(Math.abs(ud) > 80){
                 var offset = ud;
-                control.rotateUp(0.01 * offset / Math.abs(offset));
+                orbitControls.rotateUp(0.01 * offset / Math.abs(offset));
               }else if(Math.abs(zoom - 250)> 50){
                 var offset = zoom - 250;
-                if(offset > 0)
-                  control.zoomIn(1.01);
-                else
-                  control.zoomOut(1.01);
+                if(offset > 0) {
+                  orbitControls.zoomIn(1.01);
+                } else {
+                  orbitControls.zoomOut(1.01);
+                }
               }
             }else if(hand.pinchStrength > 0.8){
               if(nextFuncReady){
@@ -264,30 +237,9 @@ Drawing.SphereGraph = function(opts) {
         }
 
       });
-  
-      // controls = new THREE.LeapTrackballControls( camera , controller );
-      // //controls.addEventListener( 'drop', render );
-      // controls.rotationSpeed            = 1;
-      // controls.rotationDampening        = 2;
-      // controls.zoom                     = 40;
-      // controls.zoomDampening            = .6;
-      // controls.zoomCutoff               = .9;
-      // controls.zoomEnabled              = true;
-
-      // controls.minZoom                  = 20;
-      // controls.maxZoom                  = 80;
-
-      // control = new THREE.FlyControls(camera, canvas);
-      // control.dragToLook = false;
-      // control.autoForward = false;
-      // control.movementSpeed = 1000;
-      // control.rollSpeed = 0.5;
     }
 
-    scene = new THREE.Scene();
-
-
-/////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////
     // a sun like light source and ambient light so all parts of globe are visible
     // adding a specular map turns the globe black without having lighting
     var sun = new THREE.DirectionalLight( 0xffffff , 0.8);
@@ -327,7 +279,9 @@ Drawing.SphereGraph = function(opts) {
     },16);
 
     var globe = new THREE.Mesh(globeGeometry, globeMaterial);
-    globe.rotation.y = Math.PI;
+    
+    //globe.rotation.y = Math.PI;
+
     scene.add(globe);
     scene.add( meshClouds );
     scene.add(sun);
@@ -353,7 +307,7 @@ Drawing.SphereGraph = function(opts) {
 
     document.body.appendChild( renderer.domElement );
 
-    if(bLeapOn) controller.connect();
+    if(bLeapOn) leapController.connect();
 
   }
 
@@ -768,13 +722,8 @@ Drawing.SphereGraph = function(opts) {
   };
 
   function animate() {
-    if(bLeapOn){
-      //controls.update();
-      //controls.object.matrixAutoUpdate = true;
-    }
-
     var dt = clock.getDelta();
-    control.update(dt);
+    orbitControls.update(dt);
 
     // console.log(camera.position.x);
     // console.log(camera.position.y);
@@ -811,11 +760,19 @@ Drawing.SphereGraph = function(opts) {
       object_selection.render(scene, camera);
     }
 
-    // render scene
-    renderer.render( scene, camera );
+    if (bOculusOn) {
+      if (bLookAround) {
+        vrControls.update();
+      }
+      vrEffect.render( scene, camera );
+    }
+    else 
+    {
+      // render scene
+      renderer.render( scene, camera );
+    }
   }
 
-  var bAllowPrintInfo = true;
   var pauseAllowPrintInfo = function(){
     bAllowPrintInfo = false;
     setTimeout(function(){bAllowPrintInfo = true;}, 5000);
@@ -851,5 +808,71 @@ Drawing.SphereGraph = function(opts) {
       }
     }
     return result;
+  }
+
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    if (bOculusOn) {
+      vrEffect.setSize( window.innerWidth, window.innerHeight );
+    }
+  }
+
+  //color fn and shaders from google globe JHE
+  var colorFn = function(x) {
+    var c = new THREE.Color();
+    c.setHSL( ( 0.6 - ( x * 0.5 ) ), 1.0, 0.5 );
+    return c;
+  };
+
+  var Shaders = {
+    'earth' : {
+      uniforms: {
+        'texture': { type: 't', value: null }
+      },
+      vertexShader: [
+        'varying vec3 vNormal;',
+        'varying vec2 vUv;',
+        'void main() {',
+          'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+          'vNormal = normalize( normalMatrix * normal );',
+          'vUv = uv;',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform sampler2D texture;',
+        'varying vec3 vNormal;',
+        'varying vec2 vUv;',
+        'void main() {',
+          'vec3 diffuse = texture2D( texture, vUv ).xyz;',
+          'float intensity = 1.05 - dot( vNormal, vec3( 0.0, 0.0, 1.0 ) );',
+          'vec3 atmosphere = vec3( 1.0, 1.0, 1.0 ) * pow( intensity, 3.0 );',
+          'gl_FragColor = vec4( diffuse + atmosphere, 1.0 );',
+        '}'
+      ].join('\n')
+    },
+    'atmosphere' : {
+      uniforms: {},
+      vertexShader: [
+        'varying vec3 vNormal;',
+        'void main() {',
+          'vNormal = normalize( normalMatrix * normal );',
+          'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'varying vec3 vNormal;',
+        'void main() {',
+          'float intensity = pow( 0.8 - dot( vNormal, vec3( 0, 0, 1.0 ) ), 12.0 );',
+          'gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 ) * intensity;',
+        '}'
+      ].join('\n')
+    }
+  };
+  // end shaders and colors from google globe JHE
+
+  function mapValues(value, istart, istop ,ostart, ostop) {
+    return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
   }
 };
