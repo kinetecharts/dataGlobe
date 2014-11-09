@@ -214,10 +214,10 @@ Drawing.SphereGraph = function(opts) {
           var zoom = hand.palmPosition[1];
           var vel = hand.palmVelocity;
           var v = Math.sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
-          console.log(v);
-          console.log(hand.confidence);
+          // console.log(v);
+          // console.log(hand.confidence);
 
-          if(hand.confidence > 0.8 && v < 300){
+          if(hand.confidence > 0.5 && v < 400){
             if(hand.pinchStrength< 0.4){ //hand open
               if(Math.abs(lr)>80){
                 control.rotateLeft(0.01 * lr / Math.abs(lr));
@@ -250,17 +250,17 @@ Drawing.SphereGraph = function(opts) {
 
 
 
-          console.log("X lr = ", lr);
-          console.log("Y ud = ", ud);
-          console.log("Z zoom = ", zoom);
+          // console.log("X lr = ", lr);
+          // console.log("Y ud = ", ud);
+          // console.log("Z zoom = ", zoom);
 
-          console.log("Camera X Position = ", camera.position.x);
-          console.log("Camera Y Position = ", camera.position.y);
-          console.log("Camera Z Position = ", camera.position.z);
+          // console.log("Camera X Position = ", camera.position.x);
+          // console.log("Camera Y Position = ", camera.position.y);
+          // console.log("Camera Z Position = ", camera.position.z);
 
-          console.log("X Position = ", hand.palmPosition[0]);
-          console.log("Y Position = ", hand.palmPosition[1]);
-          console.log("Z Position = ", hand.palmPosition[2]);
+          // console.log("X Position = ", hand.palmPosition[0]);
+          // console.log("Y Position = ", hand.palmPosition[1]);
+          // console.log("Z Position = ", hand.palmPosition[2]);
         }
 
       });
@@ -385,9 +385,9 @@ Drawing.SphereGraph = function(opts) {
   this.goToNode = function(id){
     console.log('WENT TO NODE');
     var node = graph.getNode(id);
-    var finalX = node.position.x * 2.2;
-    var finalY = node.position.y * 2.2;
-    var finalZ = node.position.z * 2.2;
+    var finalX = node.position.x * 3.2;
+    var finalY = node.position.y * 3.2;
+    var finalZ = node.position.z * 3.2;
 
     var midX = (camera.position.x + finalX)/2*1.1;
     var midY = (camera.position.y + finalY)/2*1.1;
