@@ -150,11 +150,11 @@ Drawing.SphereGraph = function(opts) {
     var canvas = document.body;
     clock = new THREE.Clock();
 
-    // control = new THREE.OrbitControls(camera);
-    // control.addEventListener( 'change', render );
-    // control.minDistance = 8000;
-    // control.maxDistance = 50000;
-    // window.control = control;
+    control = new THREE.OrbitControls(camera);
+    control.addEventListener( 'change', render );
+    control.minDistance = 8;
+    control.maxDistance = 50000;
+    window.control = control;
 
     if (bLeapOn) {
       initLeap();
@@ -247,7 +247,7 @@ Drawing.SphereGraph = function(opts) {
     for(var p = 0; p < particleCount; p++) {
       var a1 = Math.random() * Math.PI * 2,
           a2 = Math.random() * Math.PI * 2,
-          d = Math.random() * 500 + 500,
+          d = Math.random() * 500 + 10000,
           particle = new THREE.Vector3(d*Math.sin(a1)*Math.cos(a2), d*Math.sin(a1)*Math.sin(a2), d*Math.cos(a1));
       particles.vertices.push(particle);
     }
@@ -1062,7 +1062,7 @@ Drawing.SphereGraph = function(opts) {
     }
 
     var dt = clock.getDelta();
-    //control.update(dt);
+    control.update(dt);
 
     // console.log(camera.position.x);
     // console.log(camera.position.y);
