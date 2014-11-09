@@ -6,6 +6,7 @@ node_modules/*
 
 public/dist/
 views/index.html
+public/webgl-frameworks/Three.js
 
 # private
 public/js/config.js
