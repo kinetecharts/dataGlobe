@@ -28,9 +28,9 @@ var flyToNext = function(cb){
 // TODO: Brilliant but hurts everyone's brains James
 var nextFunc;
 var initNextFunc = function(){
-  flyToNext(function(next){
-    nextFunc = next;
-  });
+  // flyToNext(function(next){
+  //   nextFunc = next;
+  // });
 };
 initNextFunc();
 
