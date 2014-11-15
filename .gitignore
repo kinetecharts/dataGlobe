@@ -2,16 +2,15 @@
 .AppleDouble
 .LSOverride
 node_modules/
-node_modules/
+node_modules/*
 
 public/dist/
-public/lib/
+views/index.html
 
-views/index.html	
-public/webgl-frameworks/three.js
 
 # private
-public/js/config.js
+server/FBConfig.js
+
 
 # Icon must ends with two \r.
 Icon
