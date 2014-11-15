@@ -1,47 +1,148 @@
-"use strict";
-
 var dPI = Math.PI/2;
 var curPos = 0.0;
 
 var Drawing = Drawing || {};
 
-Drawing.SphereGraph = function(opts) {
-  var bLeapOn = true;
-  var bOculusOn = true;
-  var bAllowPrintInfo = true;
-  var bLookAround = true;
+Drawing.SphereGraph = function(opts) {"use strict";
 
-  var nextFuncReady = true;
+  //load  options
   var options = opts || {};
-
   this.layout = options.layout || "2d";
   this.show_stats = options.showStats || false;
   this.show_info = options.showInfo || true;
   this.selection = options.selection || true;
   this.limit = options.limit || 10;
 
-  var camera, orbitControls, controls, scene, renderer, interaction, geometry, object_selection;
-  var leapController;
+  this.leapOn = options.leapOn || true;
+  this.showHands = options.showHands || true;
+  this.oculusOn = options.oculusOn || true;
+  this.oculusControl = options.oculusControl || false;
 
-  var vrControls, vrEffect;
+  this.calibrateCamera = options.calibrateCamera || true;
+  this.debugDisplay = options.debugDisplay || false;
+
+  var nextFuncReady = true;
+
+  var earth, clouds;
+  
+  var WIDTH;
+  var HEIGHT;
+
+  //scale is millimeters
+
+  var univerSize = 8000;
+
+  var VIEW_ANGLE = 65;
+  var ASPECT;
+  var NEAR = 0.1;
+  var FAR = univerSize;
+  var directional , ambient;
+  var particles, particleSystem;
+  var vrEffect, vrControls;
+  var earth_radius = 1000;
+  var cloud_scale = 1.01;
+  var orbit_distance = 1400; 
+
+  var controlMin = 8;
+  var controlMax = univerSize;
+
+  var earthTextureScale = 0.0005;
+
+  var camera, orbitControls, scene, renderer, interaction, geometry, object_selection;
   var clock;
   var stats;
+  var gui;
   var graph = new Graph();
+
+  var leapController;
 
   var geometries = [];
   var info_text = {};
   var watched = {};
-  setInterval(function(){
-    watched = {};
-  }, 5000);
 
-  var sphere_radius = 4900;
   var max_X = 10000;
   var min_X = 10000;
   var max_Y = 10000;
   var min_Y = 10000;
 
   var that=this;
+
+  var Shaders = {
+    'earth' : {
+      uniforms: {
+        'texture': { type: 't', value: null }
+      },
+      vertexShader: [
+        'varying vec3 vNormal;',
+        'varying vec2 vUv;',
+        'void main() {',
+          'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+          'vNormal = normalize( normalMatrix * normal );',
+          'vUv = uv;',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform sampler2D texture;',
+        'varying vec3 vNormal;',
+        'varying vec2 vUv;',
+        'void main() {',
+          'vec3 diffuse = texture2D( texture, vUv ).xyz;',
+          'float intensity = 1.05 - dot( vNormal, vec3( 0.0, 0.0, 1.0 ) );',
+          'vec3 atmosphere = vec3( 1.0, 1.0, 1.0 ) * pow( intensity, 3.0 );',
+          'gl_FragColor = vec4( diffuse + atmosphere, 1.0 );',
+        '}'
+      ].join('\n')
+    },
+    'atmosphere' : {
+      uniforms: {},
+      vertexShader: [
+        'varying vec3 vNormal;',
+        'void main() {',
+          'vNormal = normalize( normalMatrix * normal );',
+          'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'varying vec3 vNormal;',
+        'void main() {',
+          'float intensity = pow( 0.8 - dot( vNormal, vec3( 0, 0, 1.0 ) ), 12.0 );',
+          'gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 ) * intensity;',
+        '}'
+      ].join('\n')
+    }
+  };
+  // end shaders and colors from google globe JHE
+
+  function addCameraGui(){
+    if (gui == null) {
+      gui = new dat.GUI();
+    }
+
+    var params = {
+      focalLength:0,
+      frameSize:0
+    };
+
+    gui.add(camera.position, 'x', -500,500).step(5);
+    gui.add(camera.position, 'y', -500,500).step(5);
+    gui.add(camera.position, 'z', 1000,5000).step(5);
+
+    gui.add( params, 'focalLength', 1, 200 ).step(.25).onChange( function( value ){ camera.setLens(value, params.frameSize); } );
+    gui.add( params, 'frameSize', 1, 200 ).step(.25).onChange( function( value ){ camera.setLens(params.frameSize, value); } );
+  }
+
+  if (that.debugDisplay)
+  {
+    setInterval(function(){
+      watched = {};
+    }, 5000);
+  }
+  //color fn and shaders from google globe JHE
+  var colorFn = function(x) {
+    var c = new THREE.Color();
+    c.setHSL( ( 0.6 - ( x * 0.5 ) ), 1.0, 0.5 );
+    return c;
+  };
 
   /*
   Run the functions to make the graph and start the animation
@@ -54,53 +155,36 @@ Drawing.SphereGraph = function(opts) {
   This function renders the globe
   */
   function init() {
-    // Three.js initialization
-    renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
-    renderer.autoClear = false;
-    camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 100000);
-    if (bOculusOn) {
-      camera.position.z = -1000;
-    }
-    else
-    {
-      camera.position.z = -20000;
+    WIDTH = window.innerWidth;
+    HEIGHT = window.innerHeight;
+    ASPECT = WIDTH / HEIGHT;
 
-    }
-    window.camera = camera;
+    clock = new THREE.Clock();
 
     scene = new THREE.Scene();
 
-    if (bOculusOn) {
-      if (bLookAround) {
-        vrControls = new THREE.VRControls( camera );
-      }
-      vrEffect = new THREE.VREffect( renderer );
-      vrEffect.setSize( window.innerWidth, window.innerHeight );
-    }
-    else {
-      renderer.setSize( window.innerWidth, window.innerHeight );
-    }
+    // Three.js initialization
+    renderer = new THREE.WebGLRenderer({alpha: true});
 
-    // listen for double clicks to initiate full-screen/VR mode.
-    document.body.addEventListener( 'dblclick', function () {
-      if (bOculusOn) {
-        vrEffect.setFullScreen( true );
-      }
-    } );
+    renderer.setSize(WIDTH, HEIGHT);
 
-    var canvas = document.body;
-    clock = new THREE.Clock();
+    //add camera
+    window.camera = camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
+
+    if (that.calibrateCamera) {
+      var cameraPerspectiveHelper = new THREE.CameraHelper( camera );
+      scene.add( cameraPerspectiveHelper );
+      
+      addCameraGui();
+    }
 
     orbitControls = new THREE.OrbitControls(camera);
     orbitControls.addEventListener( 'change', render );
-    orbitControls.minDistance = 8000;
-    orbitControls.maxDistance = 50000;
-      
+    orbitControls.minDistance = controlMin;
+    orbitControls.maxDistance = controlMax;
     window.orbitControls = orbitControls;
-    
-    if (bLeapOn) {
-      leapController = new Leap.Controller({ enableGestures: false });
 
+<<<<<<< HEAD
       leapController.on( 'connect' , onControllerConnect);
         
       var dx = 0.001;
@@ -235,59 +319,72 @@ Drawing.SphereGraph = function(opts) {
           // console.log("Y Position = ", hand.palmPosition[1]);
           // console.log("Z Position = ", hand.palmPosition[2]);
         }
+=======
+    if (that.leapOn) {
+      initLeap();
+    }
+>>>>>>> oculus
 
-      });
+    if (that.oculusOn) {
+      initVR();
     }
 
-    /////////////////////////////////////////////////////////////////////////////////
-    // a sun like light source and ambient light so all parts of globe are visible
-    // adding a specular map turns the globe black without having lighting
-    var sun = new THREE.DirectionalLight( 0xffffff , 0.8);
-    sun.position.set(0.8, 0.3, -0.3 ).normalize();
-    var ambientLight = new THREE.AmbientLight( 0x555555 );
-    //add sphere geometry from google globe JHE
-    var globeGeometry = new THREE.SphereGeometry(sphere_radius, 200, 100);
-    // Adds bumps, shininess
-    var globeMaterial  = new THREE.MeshPhongMaterial();
-    globeMaterial.map    = THREE.ImageUtils.loadTexture('./img/earth_dark.jpg');
-    globeMaterial.normalMap    = THREE.ImageUtils.loadTexture('./img/earth_normal.jpg');
-    globeMaterial.bumpScale = 0.05;
-    globeMaterial.specularMap = THREE.ImageUtils.loadTexture('./img/earth_specular.jpg');
-    globeMaterial.specular = new THREE.Color(0x444444);
-
-    var skyboxGeometry = new THREE.CubeGeometry(50000, 50000, 50000);
-    var skyboxMaterial = new THREE.MeshBasicMaterial({
-      map: THREE.ImageUtils.loadTexture('./img/bsg-stars.png'), side: THREE.BackSide });
+    //background stars
+    var skyboxGeometry = new THREE.CubeGeometry(univerSize, univerSize, univerSize);
+    var skyboxMaterial = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('../img/bsg-stars.png'), side: THREE.BackSide });
     var skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
     scene.add(skybox);
 
-/////////////////////////////////////////////////////////////////////////////////
-// clouds
-    var tilt = 0.41;
-    var rotationSpeed = 0.02;
-    var cloudsScale = 1.005;
+    //clouds object
+    var cloudsGeometry = new THREE.SphereGeometry(earth_radius*cloud_scale, 40, 40);
+    var cloudsMaterial  = new THREE.MeshLambertMaterial({
+      map: THREE.ImageUtils.loadTexture( '../img/clouds.jpg' ),
+      transparent: true,
+      blending: THREE.CustomBlending,
+      blendSrc: THREE.SrcAlphaFactor,
+      blendDst: THREE.OneMinusSrcColorFactor,
+      blendEquation: THREE.AddEquation,
+      bumpScale:earthTextureScale
+    });
+    window.clouds = clouds = new THREE.Mesh( cloudsGeometry, cloudsMaterial );
+    scene.add(clouds);
 
-    var cloudTexture = THREE.ImageUtils.loadTexture('./img/clouds.png');
-    var cloudGeometry = new THREE.SphereGeometry(sphere_radius+50, 200, 100);
-    var materialClouds = new THREE.MeshLambertMaterial( { color: 0xffffff, map: cloudTexture, transparent: true } );
+    //earth object
+    var earthBumpImage = THREE.ImageUtils.loadTexture( "../img/earthBumpMap.jpg" );
+    var earthGeometry = new THREE.SphereGeometry(earth_radius, 40, 40);
+    var earthMaterial  = new THREE.MeshPhongMaterial();
+    earthMaterial.map    = THREE.ImageUtils.loadTexture('../img/earth_dark.jpg');
+    earthMaterial.normalMap    = THREE.ImageUtils.loadTexture('../img/earth_normal.jpg');
+    earthMaterial.bumpScale = earthTextureScale;
+    earthMaterial.metal = true;
+    earthMaterial.specularMap = THREE.ImageUtils.loadTexture('../img/earth_specular.jpg');
+    earthMaterial.specular = new THREE.Color(0x555555);
+    window.earth = earth = new THREE.Mesh( earthGeometry, earthMaterial );
+    scene.add(earth);
 
-    var meshClouds = new THREE.Mesh( cloudGeometry, materialClouds );
-    meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
-    meshClouds.rotation.z = tilt;
-    setInterval(function(){
-      meshClouds.rotation.z +=0.0001;
-    },16);
 
-    var globe = new THREE.Mesh(globeGeometry, globeMaterial);
-    
-    //globe.rotation.y = Math.PI;
+    // create a Directional light as pretend sunshine.
+    directional = new THREE.DirectionalLight( 0xCCCCCC, 1.2 );
+    directional.castShadow = true;
+    directional.target.position.copy( earth.position.clone() );
+    directional.shadowCameraTop     =  1000;
+    directional.shadowCameraRight   =  1000;
+    directional.shadowCameraBottom  = -1000;
+    directional.shadowCameraLeft    = -1000;
+    directional.shadowCameraNear    =  600;
+    directional.shadowCameraFar     = -600;
+    directional.shadowBias          =   -0.0001;
+    directional.shadowDarkness      =    0.4;
+    directional.shadowMapWidth      = directional.shadowMapHeight = 2048;
+    camera.add( directional );
+    directional.position = new THREE.Vector3(2000,0,0);
 
-    scene.add(globe);
-    scene.add( meshClouds );
-    scene.add(sun);
-    scene.add(ambientLight);
+    //attach light to camera and point it at the earth
+    camera.position.set(earth.position.x, earth.position.y, earth.position.z - earth_radius - orbit_distance ).add(earth.position.clone());
+    orbitControls.target = earth.position.clone();
+    camera.lookAt( earth.position.clone() );
 
-    geometry = new THREE.SphereGeometry( 50, 25, 0 );
+    scene.add(camera); //light won't work unless the camera explicitly added to the scene
 
     // Create node selection, if set
     if(that.selection) {
@@ -306,8 +403,6 @@ Drawing.SphereGraph = function(opts) {
     }
 
     document.body.appendChild( renderer.domElement );
-
-    if(bLeapOn) leapController.connect();
 
   }
 
@@ -333,6 +428,66 @@ Drawing.SphereGraph = function(opts) {
       }
     }
   };
+
+  function initVR() {
+
+    vrEffect = new THREE.VREffect( renderer );
+    vrEffect.setSize( WIDTH, HEIGHT );
+
+    // announce to JAVRIS host that we are ready to go.
+    VRClient.ready();
+
+    if (that.oculusControl) {
+      vrControls = new THREE.VRControls( camera );
+    }
+
+    // listen for double clicks to initiate full-screen/VR mode.
+    document.body.addEventListener( 'dblclick', function () {
+      if (that.oculusOn) {
+        vrEffect.setFullScreen( true );
+      }
+    } );
+  }
+
+  function initLeap() {
+    window.hands = [];
+    window.controller = leapController = new Leap.Controller({
+      background:false,
+      optimizeHMD:that.oculusOn
+    })
+    .use('transform', {
+      vr: that.oculusOn
+    })
+    .use('handHold', {})
+    .use('handEntry', {});
+
+    leapController.on('handFound', function(hand){ window.hands.push(hand); });
+    leapController.on('handLost', function(hand){ window.hands.splice(window.hands.indexOf(hand), 1); });
+
+    if (that.showHands) {
+      leapController.use('riggedHand', {
+        scene:scene,
+        parent: camera,
+        renderFn:null,
+        materialOptions: {
+          wireframe: true
+        },
+        // geometryOptions: {},
+        // dotsMode: true,
+        // offset: new THREE.Vector3(0,0,0),
+        // scale: 1.5,
+        // positionScale: 2,
+        // checkWebGL: true
+      });
+    }
+
+    leapController.connect();
+  }
+
+  function onControllerConnect(){
+    console.log( 'Successfully connected.' );
+  }
+  
   /*
   goToNode is the function used to "fly to friends"
   */
@@ -370,14 +525,6 @@ Drawing.SphereGraph = function(opts) {
     this.connectToUser(node);
     //$('.info-header').text(node.data.name);
   };
-
-    //LeapMotion controls
-
-  function onControllerConnect(){
-
-    console.log( 'Successfully connected.' );
-
-  }
 
   this.connectToUser = function(node){
     if(this.userNode){
@@ -500,11 +647,11 @@ Drawing.SphereGraph = function(opts) {
     //convert lat and lon to x/y coordinates on a sphere
     var phi = (90 - node.position.x) * Math.PI / 180;
     var theta = (180 - node.position.y) * Math.PI / 180;
-    node.position.x = sphere_radius * Math.sin(phi) * Math.cos(theta);
-    node.position.y = sphere_radius * Math.cos(phi);
-    node.position.z = sphere_radius * Math.sin(phi) * Math.sin(theta);
+    node.position.x = earth_radius * Math.sin(phi) * Math.cos(theta);
+    node.position.y = earth_radius * Math.cos(phi);
+    node.position.z = earth_radius * Math.sin(phi) * Math.sin(theta);
 
-    var ball = new THREE.SphereGeometry(10, 10, 10);
+    var ball = new THREE.SphereGeometry(earth_radius/100, earth_radius/100, earth_radius/100);
     var material = new THREE.MeshBasicMaterial({ color: 'red' });
     // material.map = THREE.ImageUtils.loadTexture('./img/person.gif');
     var draw_object = new THREE.Mesh(ball, material);
@@ -588,7 +735,7 @@ Drawing.SphereGraph = function(opts) {
     var data = node.data.post;
     var onComplete = function(object){
       scene.remove(object);
-      renderer.render( scene, camera );
+      // renderer.render( scene, camera );
     };
     var text = data.message || data.story;
     if(text !== undefined) {
@@ -705,7 +852,7 @@ Drawing.SphereGraph = function(opts) {
     curvedLine.lookAt(scene.position);
     var onComplete = function(curvedLine){
       scene.remove(curvedLine);
-      renderer.render( scene, camera );
+      // renderer.render( scene, camera );
     };
     if(fade){
       curvedLine.material.transparent = true;
@@ -722,17 +869,31 @@ Drawing.SphereGraph = function(opts) {
   };
 
   function animate() {
+    //update default orbit controls
     var dt = clock.getDelta();
     orbitControls.update(dt);
 
-    // console.log(camera.position.x);
-    // console.log(camera.position.y);
-    // console.log(camera.position.z);
+    if (that.leapOn) {
+      trackHands();
+    }
+
+    if (that.oculusOn && that.oculusControl) {
+      vrControls.update();
+    }
+
+    //make sure the light stays with the camera
+    // directional.position.set( camera.position.x - orbit_distance, camera.position.y, camera.position.z );
+
+    //rotate cloud and earth independently
+    // clouds.rotation.y += 0.002;
+    // earth.rotation.y += 0.001;
 
     render();
+    
     if(that.show_info) {
       printInfo();
     }
+
     requestAnimationFrame( animate );
 
   }
@@ -760,23 +921,86 @@ Drawing.SphereGraph = function(opts) {
       object_selection.render(scene, camera);
     }
 
-    if (bOculusOn) {
-      if (bLookAround) {
-        vrControls.update();
-      }
-      vrEffect.render( scene, camera );
+    // if (that.leapOn) {
+    //   drawHands();
+    // }
+
+    // render scene
+    if (that.oculusOn) {
+      vrEffect.render(scene, camera);
     }
-    else 
+    else
     {
-      // render scene
       renderer.render( scene, camera );
     }
   }
 
-  var pauseAllowPrintInfo = function(){
-    bAllowPrintInfo = false;
-    setTimeout(function(){bAllowPrintInfo = true;}, 5000);
+   var pauseAllowPrintInfo = function(){
+    that.debugDisplay = false;
+    setTimeout(function(){that.debugDisplay = true;}, 5000);
   };
+
+  function trackHands() {
+    var xHandMin = -300.0;
+    var xHandMax = 300.0;
+    var yHandMin = 15.0;
+    var yHandMax = 400.0;
+    var zHandMin = -200.0;
+    var zHandMax = 200.0;
+
+    var xCamMin = -20000.0;
+    var xCamMax = 20000.0;
+    var yCamMin = -20000.0;
+    var yCamMax = 20000.0;
+    var zCamMin = -10000.0;
+    var zCamMax = 40000.0;
+
+    if (window.hands.length > 0) {
+      for(var h = 0; h < window.hands.length; h++){
+        var hand = window.hands[h];
+        window.hand = hand;
+        var position = hand.palmPosition;
+        var direction = hand.direction;
+        var timer = new Date().getTime() * 0.0005;
+
+        var lr = hand.palmPosition[0];
+        var ud = hand.palmPosition[2];
+        var zoom = hand.palmPosition[1];
+        var vel = hand.palmVelocity;
+        var v = Math.sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
+        
+        console.log(v);
+        console.log(hand.confidence);
+
+        var offset;
+        if(hand.confidence > 0.8 && v < 300){
+          if(hand.pinchStrength< 0.4){ //hand open
+            if(Math.abs(lr)>80){
+              orbitControls.rotateLeft(0.01 * lr / Math.abs(lr));
+            }else if(Math.abs(ud) > 80){
+              offset = ud;
+              orbitControls.rotateUp(0.01 * offset / Math.abs(offset));
+            }else if(Math.abs(zoom - 250)> 50){
+              offset = zoom - 250;
+              if(offset > 0) {
+                orbitControls.zoomIn(1.01);
+              } else {
+                orbitControls.zoomOut(1.01);
+              }
+            }
+          }else if(hand.pinchStrength > 0.8){
+            if(nextFuncReady){
+              if(nextFunc === undefined)
+                initNextFunc();
+              nextFunc();
+              nextFuncReady = false;
+              setTimeout(nextFuncReady = true, 10000);
+            }
+          }
+        }
+      }
+    }
+  }
 
   function printInfo(text) {
     // console.log('in printInfo: '+ text);
@@ -790,7 +1014,7 @@ Drawing.SphereGraph = function(opts) {
     if(!watched[str]){
       watched[str] = true;
       var fbId = parseInt(str);
-      if(bAllowPrintInfo && str !== ""){
+      if(that.debugDisplay && str !== ""){
           console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
           // getPic(fbId);
           goToRelay(fbId);
@@ -808,71 +1032,5 @@ Drawing.SphereGraph = function(opts) {
       }
     }
     return result;
-  }
-
-  function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-
-    if (bOculusOn) {
-      vrEffect.setSize( window.innerWidth, window.innerHeight );
-    }
-  }
-
-  //color fn and shaders from google globe JHE
-  var colorFn = function(x) {
-    var c = new THREE.Color();
-    c.setHSL( ( 0.6 - ( x * 0.5 ) ), 1.0, 0.5 );
-    return c;
-  };
-
-  var Shaders = {
-    'earth' : {
-      uniforms: {
-        'texture': { type: 't', value: null }
-      },
-      vertexShader: [
-        'varying vec3 vNormal;',
-        'varying vec2 vUv;',
-        'void main() {',
-          'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
-          'vNormal = normalize( normalMatrix * normal );',
-          'vUv = uv;',
-        '}'
-      ].join('\n'),
-      fragmentShader: [
-        'uniform sampler2D texture;',
-        'varying vec3 vNormal;',
-        'varying vec2 vUv;',
-        'void main() {',
-          'vec3 diffuse = texture2D( texture, vUv ).xyz;',
-          'float intensity = 1.05 - dot( vNormal, vec3( 0.0, 0.0, 1.0 ) );',
-          'vec3 atmosphere = vec3( 1.0, 1.0, 1.0 ) * pow( intensity, 3.0 );',
-          'gl_FragColor = vec4( diffuse + atmosphere, 1.0 );',
-        '}'
-      ].join('\n')
-    },
-    'atmosphere' : {
-      uniforms: {},
-      vertexShader: [
-        'varying vec3 vNormal;',
-        'void main() {',
-          'vNormal = normalize( normalMatrix * normal );',
-          'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
-        '}'
-      ].join('\n'),
-      fragmentShader: [
-        'varying vec3 vNormal;',
-        'void main() {',
-          'float intensity = pow( 0.8 - dot( vNormal, vec3( 0, 0, 1.0 ) ), 12.0 );',
-          'gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 ) * intensity;',
-        '}'
-      ].join('\n')
-    }
-  };
-  // end shaders and colors from google globe JHE
-
-  function mapValues(value, istart, istop ,ostart, ostop) {
-    return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
   }
 };

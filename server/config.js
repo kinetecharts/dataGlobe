@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var FBConfig = require('./FBConfig.js')
 var app = express();
 var path = require('path');
 var router = require('./router.js');
@@ -31,7 +32,7 @@ app.get('/render-connections', function(req, res){
 })
 
 app.get('/fbconfig', function(req, res){
-  var response = "288494137936913";
+  var response = FBConfig.fbId;
   res.end(response);
 })
 

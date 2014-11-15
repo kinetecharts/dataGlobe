@@ -1,0 +1,3 @@
+appConfig = {
+	fbId: ""
+}
